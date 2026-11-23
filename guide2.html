@@ -4375,15 +4375,15 @@ function applyTeacherModeToPage() {
   syncTeacherPinBtn();
   try {
     if (typeof teacherUnlockedAll !== 'undefined') teacherUnlockedAll = true;
-    if (typeof checkPrereq === 'function') {
-      const pb = document.getElementById('prereqBanner'); if (pb) pb.classList.remove('visible');
-      const pg = document.getElementById('prereqGate'); if (pg) pg.style.display = 'none';
-    }
-    if (typeof unlockedLevel !== 'undefined') {
-      unlockedLevel = Math.max(unlockedLevel, 5);
-    }
-    if (typeof applyGuardrailState === 'function') applyGuardrailState();
+    if (typeof presetShared !== 'undefined') presetShared = true;
+    if (typeof unlockedLevel !== 'undefined') unlockedLevel = Math.max(unlockedLevel, 5);
+    const pb = document.getElementById('prereqBanner'); if (pb) pb.classList.remove('visible');
+    const pg = document.getElementById('prereqGate'); if (pg) pg.style.display = 'none';
+    if (typeof renderGuardrailBoxes === 'function') renderGuardrailBoxes();
+    if (typeof applySectionLocks === 'function') applySectionLocks();
+    if (typeof checkPrereqGate === 'function') checkPrereqGate();
     if (typeof renderGuardrails === 'function') renderGuardrails();
+    if (typeof applyLocks === 'function') applyLocks();
   } catch (e) {}
 }
 function submitTeacherPin() {
