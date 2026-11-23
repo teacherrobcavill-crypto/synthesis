@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>A-Level Music Technology — Interactive Synthesis Suite | RJC Audio</title>
+<style>
+  :root {
+    --bg: #0b0f19;
+    --card: #131a29;
+    --border: #263248;
+    --ink: #f8fafc;
+    --muted: #94a3b8;
+    --blue: #38bdf8;
+    --purple: #a78bfa;
+    --amber: #fbbf24;
+    --green: #34d399;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background: radial-gradient(circle at top center, #1b2438 0%, var(--bg) 60%);
+    color: var(--ink);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+  header {
+    max-width: 1080px;
+    width: 100%;
+    margin: 0 auto;
+    padding: 52px 24px 28px;
+    text-align: center;
+  }
+  .badge {
+    display: inline-block;
+    font-size: 11.5px; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase;
+    padding: 5px 13px; border-radius: 999px;
+    background: rgba(56,189,248,0.14); border: 1px solid rgba(56,189,248,0.4); color: var(--blue);
+    margin-bottom: 14px;
+  }
+  h1 { margin: 0 0 12px; font-size: clamp(2rem, 4vw, 3rem); letter-spacing: -0.02em; }
+  header p { margin: 0 auto; max-width: 700px; color: var(--muted); font-size: 1.06rem; line-height: 1.6; }
+  main {
+    max-width: 1080px;
+    width: 100%;
+    margin: 12px auto 60px;
+    padding: 0 24px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 22px;
+    flex: 1;
+  }
+  .guide-card {
+    background: var(--card);
+    border: 1.5px solid var(--border);
+    border-radius: 16px;
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    text-decoration: none;
+    color: inherit;
+    transition: transform 0.18s, border-color 0.18s, box-shadow 0.18s;
+  }
+  .guide-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 16px 36px rgba(0,0,0,0.45);
+  }
+  .guide-card.g1:hover { border-color: var(--blue); }
+  .guide-card.g2:hover { border-color: var(--purple); }
+  .guide-card.g3:hover { border-color: var(--amber); }
+  .card-top { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-bottom: 12px; }
+  .g-tag {
+    font-size: 11px; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase;
+    padding: 4px 10px; border-radius: 999px;
+  }
+  .g1 .g-tag { background: rgba(56,189,248,0.16); color: var(--blue); }
+  .g2 .g-tag { background: rgba(167,139,250,0.16); color: var(--purple); }
+  .g3 .g-tag { background: rgba(251,191,36,0.16); color: var(--amber); }
+  .status-pill {
+    font-size: 11px; font-weight: 700; padding: 3px 9px; border-radius: 999px;
+    background: #1e293b; color: var(--muted);
+  }
+  .status-pill.done { background: rgba(52,211,153,0.18); color: var(--green); }
+  .guide-card h2 { margin: 0 0 8px; font-size: 1.32rem; line-height: 1.25; }
+  .guide-card p { margin: 0 0 16px; color: var(--muted); font-size: 0.94rem; line-height: 1.55; }
+  .topics { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 18px; }
+  .topic {
+    font-size: 11px; font-weight: 700; padding: 3px 8px; border-radius: 6px;
+    background: rgba(255,255,255,0.05); color: #cbd5e1; border: 1px solid rgba(255,255,255,0.08);
+  }
+  .cta {
+    display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+    padding: 10px 16px; border-radius: 10px; font-weight: 800; font-size: 13.5px;
+    background: #1e293b; color: #fff; border: 1px solid #334155; transition: 0.15s;
+  }
+  .g1:hover .cta { background: var(--blue); color: #0f172a; border-color: var(--blue); }
+  .g2:hover .cta { background: var(--purple); color: #0f172a; border-color: var(--purple); }
+  .g3:hover .cta { background: var(--amber); color: #0f172a; border-color: var(--amber); }
+  footer {
+    text-align: center; padding: 20px; font-size: 12.5px; color: #64748b;
+    border-top: 1px solid rgba(255,255,255,0.06);
+  }
+</style>
+</head>
+<body>
+  <header>
+    <div class="badge">A-Level Music Technology &bull; Area of Study 3</div>
+    <h1>Interactive Synthesis Learning Suite</h1>
+    <p>Hands-on Web Audio synthesisers, guided walkthroughs, interactive modular patch bays, and self-marking A-Level exam practice — built for browser playback with zero plugins required.</p>
+  </header>
+
+  <main>
+    <a class="guide-card g1" href="/guide1.html">
+      <div>
+        <div class="card-top">
+          <span class="g-tag">Guide 1</span>
+          <span class="status-pill" id="st1">Start Here</span>
+        </div>
+        <h2>Subtractive Synthesis Basics</h2>
+        <p>Master oscillators, low-pass filtering, resonance, ADSR envelopes, and live modular patching with a playable studio synth and 4-track step sequencer.</p>
+        <div class="topics">
+          <span class="topic">VCO Waveforms</span>
+          <span class="topic">VCF Cutoff &amp; Res</span>
+          <span class="topic">ADSR Envelopes</span>
+          <span class="topic">Real Modular View</span>
+        </div>
+      </div>
+      <div class="cta">Open Guide 1 &rarr;</div>
+    </a>
+
+    <a class="guide-card g2" href="/guide2.html">
+      <div>
+        <div class="card-top">
+          <span class="g-tag">Guide 2</span>
+          <span class="status-pill" id="st2">Intermediate</span>
+        </div>
+        <h2>Modular Synthesisers &amp; The Moog Modular</h2>
+        <p>Patch a 1960s Moog System 55 with CV &amp; Gate cables, explore LFO modulation (vibrato, tremolo, filter wobble), compare VCA vs. VCF envelopes, and program a Moog 960 step sequencer.</p>
+        <div class="topics">
+          <span class="topic">1V/Oct CV &amp; Gate</span>
+          <span class="topic">LFO Modulation</span>
+          <span class="topic">Dual Envelopes</span>
+          <span class="topic">Moog 960 Sequencer</span>
+        </div>
+      </div>
+      <div class="cta">Open Guide 2 &rarr;</div>
+    </a>
+
+    <a class="guide-card g3" href="/guide3.html">
+      <div>
+        <div class="card-top">
+          <span class="g-tag">Guide 3</span>
+          <span class="status-pill" id="st3">Advanced</span>
+        </div>
+        <h2>The Minimoog (1970) &amp; Modern DAW Synthesis</h2>
+        <p>Explore a hi-res interactive Minimoog Model D control panel with live Synth Tutor chat, watch virtual-mouse walkthroughs of 5 modern features, and compare hardware vs. DAW plugin workflows.</p>
+        <div class="topics">
+          <span class="topic">Minimoog Model D</span>
+          <span class="topic">Poly / Glide / Arp</span>
+          <span class="topic">Pitch Bend &amp; Unison</span>
+          <span class="topic">DAW vs Hardware</span>
+        </div>
+      </div>
+      <div class="cta">Open Guide 3 &rarr;</div>
+    </a>
+  </main>
+
+  <footer>
+    RJC Audio &bull; A-Level Music Technology Interactive Synthesis Suite &bull; Hosted on Cloudflare Pages
+  </footer>
+
+  <script>
+    const g1 = parseInt(localStorage.getItem('synth_v3_unlocked_level') || '0', 10);
+    const g2 = parseInt(localStorage.getItem('modular_g2_unlocked_level') || '0', 10);
+    const g3 = parseInt(localStorage.getItem('minimoog_g3_unlocked_level') || '0', 10);
+    if (g1 >= 5) { const e = document.getElementById('st1'); e.textContent = '✓ Completed'; e.classList.add('done'); }
+    if (g2 >= 5) { const e = document.getElementById('st2'); e.textContent = '✓ Completed'; e.classList.add('done'); }
+    if (g3 >= 4) { const e = document.getElementById('st3'); e.textContent = '✓ Completed'; e.classList.add('done'); }
+  </script>
+</body>
+</html>

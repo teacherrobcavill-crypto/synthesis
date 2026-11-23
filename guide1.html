@@ -1,0 +1,3573 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Subtractive Synthesis Basics (v3 Hybrid) — A-Level Music Technology Interactive Guide</title>
+<style>
+  :root {
+    --bg: #f8fafc;
+    --surface: #ffffff;
+    --surface-alt: #f1f5f9;
+    --ink: #0f172a;
+    --ink-soft: #334155;
+    --muted: #64748b;
+    --border: #e2e8f0;
+    --vco: #2563eb;
+    --vcf: #0d9488;
+    --vca: #16a34a;
+    --env: #d97706;
+    --lfo: #7c3aed;
+    --danger: #dc2626;
+    --radius: 14px;
+    --shadow: 0 1px 3px rgba(15, 23, 42, 0.06), 0 8px 24px rgba(15, 23, 42, 0.04);
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Inter, sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    line-height: 1.68;
+    font-size: 15px;
+    -webkit-font-smoothing: antialiased;
+  }
+  body.has-floating-kbd { padding-bottom: 180px; }
+  .container { max-width: 1080px; margin: 0 auto; padding: 28px 20px 72px; }
+  .prose { max-width: 74ch; color: var(--ink-soft); }
+  .prose p { margin: 0 0 12px; }
+  .prose p:last-child { margin-bottom: 0; }
+  code {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-size: 0.88em;
+    background: #eff6ff;
+    color: #1e40af;
+    padding: 1px 6px;
+    border-radius: 5px;
+    border: 1px solid #dbeafe;
+  }
+
+  /* Hero */
+  header.hero {
+    background: linear-gradient(135deg, #0f172a 0%, #1e293b 55%, #1d4ed8 100%);
+    color: #fff;
+    border-radius: 18px;
+    padding: 32px 34px 28px;
+    margin-bottom: 20px;
+    box-shadow: var(--shadow);
+  }
+  .hero-top { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-start; gap: 16px; }
+  .hero-badge {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: rgba(255,255,255,0.14); border: 1px solid rgba(255,255,255,0.22);
+    padding: 4px 12px; border-radius: 999px; font-size: 11.5px; font-weight: 700;
+    letter-spacing: 0.04em; text-transform: uppercase; margin-bottom: 12px;
+  }
+  header.hero h1 { margin: 0 0 8px; font-size: 30px; line-height: 1.2; letter-spacing: -0.015em; }
+  header.hero p.subtitle { margin: 0; color: #cbd5e1; max-width: 66ch; font-size: 15.5px; line-height: 1.55; }
+  .objectives {
+    margin-top: 22px; padding-top: 16px; border-top: 1px solid rgba(255,255,255,0.15);
+    display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; font-size: 13px; color: #e2e8f0;
+  }
+  @media (max-width: 820px) { .objectives { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 520px) { .objectives { grid-template-columns: 1fr; } }
+  .obj-item { background: rgba(255,255,255,0.08); border-radius: 10px; padding: 10px 12px; line-height: 1.45; }
+  .obj-item strong { color: #93c5fd; display: block; font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 3px; }
+
+  /* Buttons */
+  .btn {
+    border: 1px solid var(--border); background: var(--surface); color: var(--ink);
+    padding: 7px 13px; border-radius: 8px; font-size: 13px; font-weight: 600;
+    cursor: pointer; transition: all 0.15s ease; display: inline-flex; align-items: center; gap: 6px;
+  }
+  .btn:hover { background: var(--surface-alt); }
+  .btn-sm { padding: 5px 10px; font-size: 12px; border-radius: 6px; }
+  .btn-primary { background: var(--vco); border-color: var(--vco); color: #fff; }
+  .btn-primary:hover { background: #1d4ed8; }
+  .btn-success { background: var(--vca); border-color: var(--vca); color: #fff; }
+  .btn-success:hover { background: #15803d; }
+  .btn-dark { background: #1e293b; border-color: #334155; color: #e2e8f0; }
+  .btn-dark:hover { background: #334155; }
+  .btn-ghost { background: rgba(255,255,255,0.14); border-color: rgba(255,255,255,0.3); color: #fff; }
+  .btn-ghost:hover { background: rgba(255,255,255,0.24); }
+
+  /* Nav */
+  nav.toc { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 22px; }
+  nav.toc a {
+    text-decoration: none; color: var(--ink-soft); background: var(--surface);
+    border: 1px solid var(--border); padding: 6px 14px; border-radius: 999px;
+    font-size: 13px; font-weight: 600; transition: all 0.15s ease;
+  }
+  nav.toc a:hover { color: var(--vco); border-color: var(--vco); background: #eff6ff; }
+
+  /* Section Cards */
+  section.card {
+    background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+    padding: 28px 30px; margin-bottom: 24px; box-shadow: var(--shadow);
+  }
+  @media (max-width: 600px) { section.card { padding: 20px 18px; } }
+  .section-head {
+    display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 8px;
+  }
+  section.card h2 {
+    margin: 0; font-size: 21px; line-height: 1.3;
+    display: flex; align-items: center; flex-wrap: wrap; gap: 10px;
+  }
+  .section-tag {
+    display: inline-flex; align-items: center; padding: 3px 10px; border-radius: 999px;
+    background: #eff6ff; color: var(--vco); font-size: 11.5px; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 0.04em;
+  }
+  .lead { margin: 0 0 20px; color: var(--muted); font-size: 15px; max-width: 74ch; }
+
+  /* Context Grid */
+  .era-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; margin: 18px 0; }
+  @media (max-width: 720px) { .era-grid { grid-template-columns: 1fr; } }
+  .era-card { border: 1px solid var(--border); border-radius: 12px; padding: 16px 18px; background: #fcfdff; }
+  .era-pill {
+    display: inline-block; font-size: 11px; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.04em; padding: 2px 9px; border-radius: 999px;
+    background: #e0e7ff; color: #3730a3; margin-bottom: 7px;
+  }
+  .era-card h3 { margin: 0 0 6px; font-size: 15.5px; color: var(--ink); }
+  .era-card p { margin: 0; font-size: 13.8px; color: var(--ink-soft); line-height: 1.6; }
+
+  .callout-green {
+    background: #f0fdf4; border: 1px solid #bbf7d0; border-left: 4px solid var(--vca);
+    border-radius: 10px; padding: 15px 18px; margin-top: 16px; font-size: 14px; color: var(--ink-soft);
+  }
+  .callout-green strong.title { color: #166534; display: block; margin-bottom: 6px; }
+  .callout-green ul { margin: 0; padding-left: 20px; }
+  .callout-green li { margin-bottom: 5px; }
+  .callout-green li:last-child { margin-bottom: 0; }
+
+  .analogy {
+    background: #eff6ff; border: 1px solid #bfdbfe; border-left: 4px solid var(--vco);
+    border-radius: 10px; padding: 15px 18px; margin-bottom: 18px; font-size: 14.5px; color: var(--ink-soft);
+  }
+  .analogy strong { color: #1e40af; }
+
+  .golden-rule {
+    background: #fffbeb; border: 1px solid #fde68a; border-left: 4px solid var(--env);
+    border-radius: 10px; padding: 15px 18px; margin: 16px 0 20px; font-size: 14.5px; color: var(--ink-soft);
+  }
+  .golden-rule strong { color: #92400e; }
+
+  /* 3-step strip */
+  .steps-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-bottom: 18px; }
+  @media (max-width: 740px) { .steps-3 { grid-template-columns: 1fr; } }
+  .step-box {
+    border: 1px solid var(--border); border-top: 4px solid var(--vco);
+    border-radius: 10px; padding: 15px 16px; background: #fff;
+  }
+  .step-box.vcf { border-top-color: var(--vcf); }
+  .step-box.vca { border-top-color: var(--vca); }
+  .step-box h3 { margin: 0 0 6px; font-size: 15px; }
+  .step-box p { margin: 0; font-size: 13.8px; color: var(--ink-soft); line-height: 1.58; }
+
+  /* SVG Signal Flow */
+  .diagram-wrap { background: #f8fafc; border: 1px solid var(--border); border-radius: 12px; padding: 16px; overflow-x: auto; }
+  .diagram-wrap svg { width: 100%; height: auto; min-width: 700px; display: block; }
+  .svg-node { cursor: pointer; transition: filter 0.15s ease; }
+  .svg-node:hover { filter: brightness(0.95); }
+  .node-detail {
+    margin-top: 12px; padding: 14px 16px; border-radius: 10px;
+    background: #f8fafc; border: 1px solid var(--border); border-left: 4px solid var(--vco);
+    font-size: 14px; color: var(--ink-soft);
+  }
+
+  /* Table */
+  table.data-table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  table.data-table th, table.data-table td {
+    border: 1px solid var(--border); padding: 11px 13px; text-align: left; vertical-align: top;
+  }
+  table.data-table th {
+    background: var(--surface-alt); font-weight: 700; font-size: 12px;
+    text-transform: uppercase; letter-spacing: 0.04em; color: var(--muted);
+  }
+  table.data-table tr:nth-child(even) td { background: #fafcff; }
+  .mini-wave { width: 78px; height: 30px; display: block; }
+
+  /* Interactive Guided Demo Banner */
+  .demo-player {
+    display: none;
+    background: linear-gradient(90deg, #0f172a 0%, #1e3a8a 100%);
+    color: #fff;
+    border-radius: 10px;
+    padding: 14px 16px;
+    margin-bottom: 16px;
+    box-shadow: 0 4px 16px rgba(15, 23, 42, 0.18);
+  }
+  .demo-player.active { display: block; }
+  .demo-top { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 10px; margin-bottom: 8px; }
+  .demo-step-badge {
+    font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em;
+    background: rgba(56, 189, 248, 0.22); color: #7dd3fc; padding: 2px 9px; border-radius: 999px;
+  }
+  .demo-caption { font-size: 14.5px; font-weight: 500; color: #f1f5f9; margin: 0 0 10px; }
+  .demo-progress-bg { height: 5px; background: rgba(255,255,255,0.18); border-radius: 999px; overflow: hidden; }
+  .demo-progress-fill { height: 100%; width: 0%; background: #38bdf8; transition: width 0.2s linear; }
+
+  /* Experiments */
+  .try-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 16px; }
+  @media (max-width: 760px) { .try-grid { grid-template-columns: 1fr; } }
+  .try-card { background: #f8fafc; border: 1px solid var(--border); border-radius: 10px; padding: 13px 15px; font-size: 13.5px; }
+  .try-card strong { display: block; color: var(--vco); margin-bottom: 4px; }
+  .try-card p { margin: 0; color: var(--ink-soft); line-height: 1.55; }
+
+  /* Synth Lab */
+  .viz-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px; }
+  @media (max-width: 760px) { .viz-grid { grid-template-columns: 1fr; } }
+  .viz-box { background: #0f172a; border-radius: 10px; padding: 10px 12px 8px; color: #e2e8f0; }
+  .viz-title {
+    display: flex; justify-content: space-between; font-size: 11.5px; font-weight: 600;
+    color: #94a3b8; text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 6px;
+  }
+  .viz-box canvas { width: 100%; height: 146px; display: block; border-radius: 6px; }
+
+  .synth-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 14px; }
+  @media (max-width: 820px) { .synth-grid { grid-template-columns: 1fr; } }
+  .module {
+    border: 1px solid var(--border); border-top: 4px solid var(--vco);
+    border-radius: 10px; padding: 13px 15px; background: #fcfdff; transition: box-shadow 0.2s ease;
+  }
+  .module.vcf { border-top-color: var(--vcf); }
+  .module.env { border-top-color: var(--env); }
+  .module.demo-highlight { box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.55); }
+  .module h3 {
+    margin: 0 0 10px; font-size: 12.5px; text-transform: uppercase; letter-spacing: 0.04em;
+    display: flex; justify-content: space-between;
+  }
+  .ctrl { margin-bottom: 10px; }
+  .ctrl:last-child { margin-bottom: 0; }
+  .ctrl label { display: flex; justify-content: space-between; font-size: 12.5px; font-weight: 600; color: var(--muted); margin-bottom: 3px; }
+  .ctrl label output { color: var(--ink); font-variant-numeric: tabular-nums; }
+  .ctrl input[type="range"] { width: 100%; accent-color: var(--vco); cursor: pointer; }
+  .module.vcf input[type="range"] { accent-color: var(--vcf); }
+  .module.env input[type="range"] { accent-color: var(--env); }
+  .ctrl select, .input-field {
+    width: 100%; padding: 6px 9px; border-radius: 7px; border: 1px solid var(--border);
+    background: #fff; font-size: 13px; color: var(--ink); font-family: inherit;
+  }
+  .toggle-row { display: flex; align-items: center; justify-content: space-between; font-size: 12.5px; font-weight: 600; color: var(--muted); }
+  #adsrSvg { width: 100%; height: 52px; background: #fffbeb; border: 1px solid #fde68a; border-radius: 6px; margin-bottom: 8px; display: block; }
+
+  /* Keyboard (Docked & Floating) */
+  .kbd-placeholder { min-height: 118px; }
+  .keyboard-bar {
+    display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between;
+    gap: 12px; background: #0f172a; padding: 12px 16px; border-radius: 12px; color: #fff;
+    border: 1px solid #334155;
+  }
+  .keyboard-bar.floating {
+    position: fixed;
+    bottom: 14px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: min(960px, calc(100vw - 24px));
+    z-index: 1000;
+    box-shadow: 0 12px 36px rgba(15, 23, 42, 0.45);
+    border: 1px solid #475569;
+  }
+  .keys { position: relative; display: flex; user-select: none; height: 88px; }
+  .key-white {
+    width: 39px; height: 88px; background: #fff; border: 1px solid #94a3b8;
+    border-radius: 0 0 6px 6px; color: #334155; font-size: 11px; font-weight: 700;
+    display: flex; flex-direction: column; justify-content: flex-end; align-items: center;
+    padding-bottom: 6px; cursor: pointer;
+  }
+  .key-white.active { background: #bfdbfe; border-color: #2563eb; }
+  .key-black {
+    position: absolute; width: 25px; height: 54px; background: #1e293b; border: 1px solid #020617;
+    border-radius: 0 0 5px 5px; color: #cbd5e1; font-size: 10px; font-weight: 700;
+    display: flex; justify-content: center; align-items: flex-end; padding-bottom: 5px;
+    cursor: pointer; z-index: 2;
+  }
+  .key-black.active { background: #3b82f6; color: #fff; }
+  .kbd-controls { display: flex; flex-direction: column; gap: 8px; align-items: flex-end; }
+  .kbd-row { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
+  .transpose-chip {
+    display: inline-flex; align-items: center; gap: 4px;
+    background: #1e293b; border: 1px solid #334155; border-radius: 7px; padding: 3px 6px; font-size: 12px; color: #e2e8f0;
+  }
+  .transpose-chip button {
+    background: #334155; color: #fff; border: none; border-radius: 4px;
+    width: 22px; height: 22px; font-weight: 700; cursor: pointer;
+  }
+  .transpose-chip button:hover { background: #475569; }
+  .transpose-val { min-width: 44px; text-align: center; font-weight: 700; font-variant-numeric: tabular-nums; color: #7dd3fc; }
+  .kbd-hint { font-size: 11.5px; color: #94a3b8; max-width: 310px; text-align: right; line-height: 1.4; }
+
+  /* Sleek Shared Preset Bar inside Part 4 */
+  .preset-strip {
+    display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px;
+    background: #f8fafc; border: 1px solid var(--border); border-radius: 10px;
+    padding: 10px 14px; margin-bottom: 14px;
+  }
+  .preset-strip-group { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+  .preset-strip label { font-size: 11.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; color: var(--muted); }
+  .preset-strip select, .preset-strip input {
+    padding: 5px 9px; border-radius: 7px; border: 1px solid var(--border); background: #fff; font-size: 12.5px; color: var(--ink);
+  }
+  .preset-feedback { font-size: 12.5px; font-weight: 600; min-height: 18px; margin-bottom: 10px; }
+
+  /* 4-Track 16-Bar Sequencer */
+  .seq-toolbar {
+    display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px;
+    background: #0f172a; color: #fff; padding: 12px 14px; border-radius: 12px 12px 0 0;
+  }
+  .seq-group { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+  .seq-toolbar label { font-size: 12px; color: #cbd5e1; font-weight: 600; display: inline-flex; align-items: center; gap: 6px; }
+  .seq-toolbar select, .seq-toolbar input[type="number"] {
+    background: #1e293b; color: #fff; border: 1px solid #334155; border-radius: 6px; padding: 4px 8px; font-size: 12.5px; font-weight: 600;
+  }
+  .rec-dot { width: 8px; height: 8px; border-radius: 50%; background: #ef4444; display: inline-block; }
+  .btn-rec-on { background: #dc2626 !important; border-color: #ef4444 !important; color: #fff !important; box-shadow: 0 0 0 3px rgba(239,68,68,0.35); }
+
+  .seq-bars {
+    display: flex; flex-wrap: wrap; align-items: center; gap: 4px;
+    background: #1e293b; padding: 8px 14px; border-top: 1px solid #334155;
+  }
+  .seq-bars-label { font-size: 11px; font-weight: 700; text-transform: uppercase; color: #94a3b8; margin-right: 6px; }
+  .bar-btn {
+    width: 34px; height: 28px; border-radius: 6px; border: 1px solid #334155;
+    background: #0f172a; color: #cbd5e1; font-size: 12px; font-weight: 700; cursor: pointer; position: relative;
+  }
+  .bar-btn.has-notes::after {
+    content: ""; position: absolute; bottom: 3px; left: 50%; transform: translateX(-50%);
+    width: 4px; height: 4px; border-radius: 50%; background: #38bdf8;
+  }
+  .bar-btn.selected { background: #2563eb; border-color: #60a5fa; color: #fff; }
+  .bar-btn.playing { box-shadow: 0 0 0 2px #f59e0b; }
+
+  .seq-tracks-bar {
+    display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px;
+    background: var(--surface-alt); padding: 10px 12px; border: 1px solid var(--border); border-top: none;
+  }
+  @media (max-width: 760px) { .seq-tracks-bar { grid-template-columns: repeat(2, 1fr); } }
+  .track-tab {
+    border: 2px solid var(--border); background: #fff; border-radius: 10px; padding: 9px 10px;
+    cursor: pointer; transition: all 0.15s ease;
+  }
+  .track-tab.active { border-color: var(--vco); background: #eff6ff; }
+  .track-tab[data-track="harmony"].active { border-color: var(--lfo); background: #f5f3ff; }
+  .track-tab[data-track="bass"].active { border-color: var(--vcf); background: #f0fdfa; }
+  .track-tab[data-track="perc"].active { border-color: var(--env); background: #fffbeb; }
+  .track-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px; }
+  .track-name { font-weight: 800; font-size: 13px; }
+  .mute-btn {
+    border: 1px solid var(--border); background: #fff; color: var(--muted);
+    font-size: 11px; font-weight: 700; padding: 2px 7px; border-radius: 5px; cursor: pointer;
+  }
+  .mute-btn.muted { background: #fee2e2; border-color: #fca5a5; color: #991b1b; }
+  .track-preset-select {
+    width: 100%; font-size: 11.5px; padding: 4px 6px; border-radius: 6px; border: 1px solid var(--border); background: #fff;
+  }
+  .track-vol-row {
+    display: flex; align-items: center; gap: 6px; margin-top: 7px; font-size: 11px; font-weight: 700; color: var(--muted);
+  }
+  .track-vol-row input[type="range"] {
+    flex: 1; min-width: 0; height: 4px; cursor: pointer; accent-color: var(--vco);
+  }
+  .track-tab[data-track="harmony"] .track-vol-row input[type="range"] { accent-color: var(--lfo); }
+  .track-tab[data-track="bass"] .track-vol-row input[type="range"] { accent-color: var(--vcf); }
+  .track-tab[data-track="perc"] .track-vol-row input[type="range"] { accent-color: var(--env); }
+  .track-vol-val {
+    min-width: 32px; text-align: right; font-variant-numeric: tabular-nums; color: var(--ink-soft);
+  }
+
+  .seq-grid-wrap {
+    border: 1px solid var(--border); border-top: none; border-radius: 0 0 12px 12px;
+    background: #0f172a; padding: 10px; overflow-x: auto;
+  }
+  .seq-grid {
+    display: grid; grid-template-columns: 74px repeat(16, minmax(34px, 1fr)); gap: 3px; min-width: 650px;
+  }
+  .seq-step-hdr { text-align: center; font-size: 10.5px; font-weight: 700; color: #64748b; padding-bottom: 4px; }
+  .seq-step-hdr.beat { color: #e2e8f0; }
+  .seq-step-hdr.now { color: #fbbf24; }
+  .seq-step-hdr.step-cursor { color: #f87171; text-decoration: underline; }
+  .seq-row-label {
+    font-size: 11.5px; font-weight: 700; color: #cbd5e1; display: flex; align-items: center;
+    padding: 0 6px; border-radius: 4px; background: #1e293b; height: 24px;
+  }
+  .seq-row-label.sharp { background: #111827; color: #94a3b8; }
+  .seq-cell {
+    height: 24px; border-radius: 4px; background: #1e293b; border: 1px solid #263348;
+    cursor: pointer; transition: background 0.06s ease; user-select: none; touch-action: none; position: relative;
+  }
+  .seq-cell.beat-col { background: #263449; }
+  .seq-cell:hover { border-color: #60a5fa; }
+  .seq-cell.on-melody { background: #3b82f6; border-color: #93c5fd; }
+  .seq-cell.on-harmony { background: #8b5cf6; border-color: #c4b5fd; }
+  .seq-cell.on-bass { background: #14b8a6; border-color: #99f6e4; }
+  .seq-cell.on-perc { background: #f59e0b; border-color: #fde68a; }
+  .seq-cell.note-start { border-top-right-radius: 0; border-bottom-right-radius: 0; border-right-color: transparent; border-left: 3px solid rgba(255,255,255,0.85); }
+  .seq-cell.note-mid { border-radius: 0; border-left-color: transparent; border-right-color: transparent; opacity: 0.82; }
+  .seq-cell.note-end { border-top-left-radius: 0; border-bottom-left-radius: 0; border-left-color: transparent; opacity: 0.82; }
+  .note-handle {
+    position: absolute; top: 0; right: -1px; width: 9px; height: 100%;
+    cursor: ew-resize; display: flex; align-items: center; justify-content: center; z-index: 3;
+  }
+  .note-handle::after {
+    content: ""; width: 2px; height: 12px; border-radius: 2px; background: rgba(255,255,255,0.75);
+  }
+  .note-handle:hover::after { background: #fff; width: 3px; }
+  .seq-cell.playhead { box-shadow: inset 0 0 0 2px #fbbf24; }
+  .seq-cell.rec-cursor { box-shadow: inset 0 0 0 1px rgba(248, 113, 113, 0.7); }
+
+  .seq-footer {
+    display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 10px;
+    margin-top: 10px; font-size: 12.5px; color: var(--muted);
+  }
+
+  /* Self-Marking Quiz */
+  .quiz-score {
+    display: none; padding: 14px 18px; border-radius: 10px; margin-bottom: 16px;
+    font-weight: 700; font-size: 15px; border: 1px solid #bfdbfe; background: #eff6ff; color: #1e3a8a;
+  }
+  .quiz-score.great { background: #f0fdf4; border-color: #86efac; color: #166534; }
+  .quiz-score.mid { background: #fffbeb; border-color: #fcd34d; color: #92400e; }
+  .quiz-q {
+    border: 1px solid var(--border); border-radius: 12px; padding: 16px 18px;
+    margin-bottom: 14px; background: #fcfdff;
+  }
+  .quiz-q-title { font-weight: 700; font-size: 15px; margin: 0 0 10px; color: var(--ink); }
+  .quiz-opts { display: grid; gap: 7px; }
+  .quiz-opt {
+    display: flex; align-items: flex-start; gap: 10px; padding: 9px 12px;
+    border: 1px solid var(--border); border-radius: 8px; background: #fff;
+    cursor: pointer; font-size: 14px; color: var(--ink-soft); transition: all 0.12s ease;
+  }
+  .quiz-opt:hover { border-color: var(--vco); background: #f8fbff; }
+  .quiz-opt input { margin-top: 3px; accent-color: var(--vco); }
+  .quiz-opt.is-correct { background: #f0fdf4; border-color: #22c55e; color: #14532d; font-weight: 600; }
+  .quiz-opt.is-wrong { background: #fef2f2; border-color: #ef4444; color: #991b1b; }
+  .quiz-explain {
+    display: none; margin-top: 10px; padding: 10px 13px; border-radius: 8px;
+    font-size: 13.5px; line-height: 1.55; background: #f1f5f9; color: var(--ink-soft);
+    border-left: 3px solid var(--vco);
+  }
+  .quiz-explain.show { display: block; }
+  .quiz-actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 12px; }
+
+  footer.rag-footer {
+    font-size: 12.5px; color: var(--muted); text-align: center;
+    margin-top: 28px; padding-top: 16px; border-top: 1px solid var(--border);
+  }
+
+  @media print {
+    body { background: #fff; font-size: 13px; padding-bottom: 0 !important; }
+    .container { max-width: 100%; padding: 0; }
+    nav.toc, .btn-ghost, .keyboard-bar, .demo-player, #part4 { display: none !important; }
+    section.card { box-shadow: none; break-inside: avoid; margin-bottom: 14px; padding: 14px; }
+    header.hero { background: #0f172a !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  }
+
+  /* v3 Hybrid Upgrades: Active Signal Flow Node + Dark Hardware Synth Chassis + Exam Practice */
+  .v3-banner {
+    display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px;
+    background: #eff6ff; border: 1px solid #bfdbfe; color: #1e3a8a;
+    padding: 8px 14px; border-radius: 10px; font-size: 12.5px; font-weight: 600; margin-bottom: 14px;
+  }
+  .v3-banner a { color: #2563eb; text-decoration: none; font-weight: 700; margin-left: 10px; }
+  .v3-banner a:hover { text-decoration: underline; }
+
+  .svg-node rect { transition: all 0.18s ease; }
+  .svg-node:hover rect { filter: drop-shadow(0 4px 8px rgba(37, 99, 235, 0.22)); }
+  .svg-node.active rect { stroke-width: 4px; filter: drop-shadow(0 0 0 3px rgba(37, 99, 235, 0.28)); }
+  .node-detail-v3 {
+    margin-top: 12px; border: 1px solid var(--border); border-radius: 10px;
+    background: #ffffff; padding: 14px 16px;
+  }
+  .node-detail-v3 .exam-tip {
+    margin-top: 10px; font-size: 13px; background: #fef3c7; border-left: 3px solid #d97706;
+    padding: 8px 12px; border-radius: 0 6px 6px 0; color: #92400e;
+  }
+
+  /* Dark Studio-Hardware Synth Chassis (ported from Gemini Flash layout) */
+  .synth-chassis {
+    background: #0f172a; color: #f8fafc; border-radius: 14px; padding: 18px;
+    border: 1px solid #334155; box-shadow: 0 10px 28px rgba(15, 23, 42, 0.18);
+  }
+  .synth-top-bar {
+    display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px;
+    border-bottom: 1px solid #334155; padding-bottom: 12px; margin-bottom: 14px;
+  }
+  .quick-presets-row { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
+  .quick-presets-label {
+    font-size: 11px; font-weight: 800; letter-spacing: 0.06em; color: #94a3b8;
+    text-transform: uppercase; margin-right: 4px;
+  }
+  .qpreset-btn {
+    background: #1e293b; border: 1px solid #475569; color: #cbd5e1;
+    padding: 5px 11px; border-radius: 7px; font-size: 12px; font-weight: 600;
+    cursor: pointer; transition: all 0.15s ease;
+  }
+  .qpreset-btn:hover, .qpreset-btn.active {
+    background: #2563eb; border-color: #60a5fa; color: #ffffff;
+  }
+  .synth-status-pill {
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 11.5px;
+    color: #38bdf8; background: #020617; border: 1px solid #334155;
+    padding: 4px 10px; border-radius: 6px;
+  }
+  .synth-chassis .viz-box {
+    background: #020617; border: 1px solid #334155;
+  }
+  .synth-chassis .module {
+    background: #1e293b; border: 1px solid #334155; border-top: 4px solid var(--vco);
+    color: #f8fafc;
+  }
+  .synth-chassis .module.vcf { border-top-color: var(--vcf); }
+  .synth-chassis .module.env { border-top-color: var(--env); }
+  .synth-chassis .module h3 {
+    color: #e2e8f0; border-bottom: 1px solid #334155; padding-bottom: 7px;
+  }
+  .synth-chassis .ctrl label, .synth-chassis .toggle-row { color: #cbd5e1; }
+  .synth-chassis .ctrl label output {
+    color: #38bdf8; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12px;
+  }
+  .synth-chassis .ctrl select {
+    background: #0f172a; border: 1px solid #475569; color: #f8fafc;
+  }
+  .synth-chassis .ctrl input[type="range"] { accent-color: #38bdf8; }
+  .synth-chassis .module.vcf input[type="range"] { accent-color: #2dd4bf; }
+  .synth-chassis .module.env input[type="range"] { accent-color: #fbbf24; }
+  .synth-chassis #adsrSvg {
+    background: #020617; border: 1px solid #334155; height: 64px;
+  }
+  .synth-chassis .keyboard-bar:not(.floating) {
+    background: #020617; border: 1px solid #334155;
+  }
+
+  /* Part 5: 8-Mark A-Level Exam Practice Box */
+  .exam-practice-box {
+    margin-top: 24px; padding-top: 20px; border-top: 2px dashed var(--border);
+  }
+  .exam-practice-box h3 { margin: 0 0 8px; font-size: 17px; color: var(--ink); }
+  .exam-prompt-card {
+    background: #f8fafc; border: 1px solid var(--border); border-left: 4px solid #2563eb;
+    border-radius: 8px; padding: 14px 16px; margin-bottom: 12px; font-size: 14.5px; color: var(--ink-soft);
+  }
+  .exam-textarea {
+    width: 100%; min-height: 110px; padding: 12px; border-radius: 8px;
+    border: 1px solid var(--border); font-family: inherit; font-size: 14px;
+    resize: vertical; margin-bottom: 10px;
+  }
+  .model-answer-box {
+    display: none; margin-top: 12px; background: #f0fdf4; border: 1px solid #86efac;
+    border-radius: 10px; padding: 16px; font-size: 14px; color: #14532d;
+  }
+  .model-answer-box.visible { display: block; }
+  .model-answer-box ul { margin: 8px 0 0; padding-left: 20px; }
+  .model-answer-box li { margin-bottom: 6px; }
+
+
+  /* Guided Demo Spotlight Overlay + Floating Callout */
+  .demo-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(2, 6, 23, 0.74);
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+    z-index: 1500;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s ease;
+  }
+  body.demo-spotlight-active .demo-backdrop {
+    opacity: 1;
+    pointer-events: auto;
+  }
+  body.demo-spotlight-active .synth-chassis .viz-grid {
+    position: relative;
+    z-index: 1510;
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
+  }
+  body.demo-spotlight-active .module.demo-highlight {
+    position: relative;
+    z-index: 1520;
+    box-shadow: 0 0 0 3px #38bdf8, 0 0 36px rgba(56, 189, 248, 0.48) !important;
+    transform: translateY(-2px);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+  .ctrl.demo-ctrl-focus {
+    background: rgba(56, 189, 248, 0.16);
+    border: 1.5px solid #38bdf8;
+    border-radius: 8px;
+    padding: 7px 9px;
+    margin: -4px -9px 10px;
+    box-shadow: 0 0 16px rgba(56, 189, 248, 0.35);
+    transition: all 0.2s ease;
+  }
+  .ctrl.demo-ctrl-focus label {
+    color: #ffffff !important;
+  }
+  .ctrl.demo-ctrl-focus label output {
+    color: #7dd3fc !important;
+    font-weight: 800;
+  }
+
+  .demo-callout {
+    position: fixed;
+    z-index: 1530;
+    width: 320px;
+    max-width: calc(100vw - 24px);
+    background: #0f172a;
+    color: #f8fafc;
+    border: 2px solid #38bdf8;
+    border-radius: 14px;
+    padding: 15px 16px;
+    box-shadow: 0 18px 44px rgba(2, 6, 23, 0.72), 0 0 24px rgba(56, 189, 248, 0.25);
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(6px);
+    transition: top 0.28s ease, left 0.28s ease, opacity 0.22s ease, transform 0.22s ease;
+  }
+  .demo-callout.visible {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translateY(0);
+  }
+  .demo-callout-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    margin-bottom: 8px;
+  }
+  .demo-callout-badge {
+    font-size: 11px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #020617;
+    background: #38bdf8;
+    padding: 3px 8px;
+    border-radius: 999px;
+  }
+  .demo-callout-param {
+    font-size: 12px;
+    font-weight: 700;
+    color: #fbbf24;
+    margin: 0 0 6px;
+  }
+  .demo-callout-text {
+    margin: 0 0 12px;
+    font-size: 13.5px;
+    line-height: 1.5;
+    color: #e2e8f0;
+  }
+  .demo-callout-prog-bg {
+    height: 5px;
+    background: #1e293b;
+    border-radius: 999px;
+    overflow: hidden;
+  }
+  .demo-callout-prog-fill {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, #38bdf8, #2dd4bf);
+    transition: width 0.15s linear;
+  }
+  .demo-callout::before {
+    content: "";
+    position: absolute;
+    width: 12px;
+    height: 12px;
+    background: #0f172a;
+    border-top: 2px solid #38bdf8;
+    border-left: 2px solid #38bdf8;
+    display: none;
+  }
+  .demo-callout.arrow-left::before {
+    display: block;
+    left: -8px;
+    top: 28px;
+    transform: rotate(-45deg);
+  }
+  .demo-callout.arrow-right::before {
+    display: block;
+    right: -8px;
+    top: 28px;
+    transform: rotate(135deg);
+  }
+
+
+  /* Section Guardrail Checkpoints */
+  .toc a.locked-link {
+    opacity: 0.58;
+    background: #f1f5f9;
+    color: #64748b;
+  }
+  .toc a.passed-link {
+    background: #f0fdf4;
+    border-color: #86efac;
+    color: #166534;
+  }
+  .guardrail-progress-bar {
+    display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px;
+    background: #ffffff; border: 1px solid var(--border); border-radius: 10px;
+    padding: 9px 14px; margin-bottom: 16px; font-size: 13px;
+  }
+  .guardrail-progress-pill {
+    font-weight: 800; color: #1e40af; background: #eff6ff; border: 1px solid #bfdbfe;
+    padding: 3px 10px; border-radius: 999px; font-size: 12px;
+  }
+  .guardrail-progress-pill.all-done {
+    color: #166534; background: #f0fdf4; border-color: #86efac;
+  }
+  .guardrail-box {
+    margin-top: 22px;
+    border: 2px solid #bfdbfe;
+    background: #f8fafc;
+    border-radius: 12px;
+    padding: 16px 18px;
+  }
+  .guardrail-box.passed {
+    border-color: #86efac;
+    background: #f0fdf4;
+  }
+  .guardrail-head {
+    display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px;
+    margin-bottom: 12px;
+  }
+  .guardrail-badge {
+    font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em;
+    background: #2563eb; color: #fff; padding: 3px 9px; border-radius: 999px;
+  }
+  .guardrail-box.passed .guardrail-badge {
+    background: #16a34a;
+  }
+  .guardrail-title {
+    font-size: 15.5px; font-weight: 800; color: var(--ink); margin: 0;
+  }
+  .gq-item {
+    background: #fff; border: 1px solid var(--border); border-radius: 9px;
+    padding: 11px 13px; margin-bottom: 10px;
+  }
+  .gq-item.gq-right { border-color: #22c55e; background: #f0fdf4; }
+  .gq-item.gq-wrong { border-color: #ef4444; background: #fef2f2; }
+  .gq-prompt { font-weight: 700; font-size: 13.5px; color: var(--ink); margin-bottom: 8px; }
+  .gq-opts { display: grid; gap: 5px; }
+  .gq-opt {
+    display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--ink-soft);
+    padding: 5px 8px; border-radius: 6px; cursor: pointer; border: 1px solid transparent;
+  }
+  .gq-opt:hover { background: #f1f5f9; border-color: #cbd5e1; }
+  .gq-hint {
+    display: none; margin-top: 6px; font-size: 12.5px; font-weight: 600; color: #991b1b;
+  }
+  .gq-item.gq-wrong .gq-hint { display: block; }
+  .guardrail-actions {
+    display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px; margin-top: 10px;
+  }
+  .guardrail-status { font-size: 13px; font-weight: 700; }
+
+  /* Locked Section State */
+  section.card.section-locked {
+    position: relative;
+    overflow: hidden;
+    max-height: 210px;
+  }
+  section.card.section-locked > *:not(.lock-overlay) {
+    filter: blur(5px);
+    opacity: 0.35;
+    pointer-events: none;
+    user-select: none;
+  }
+  .lock-overlay {
+    display: none;
+  }
+  section.card.section-locked .lock-overlay {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    position: absolute;
+    inset: 0;
+    z-index: 20;
+    background: rgba(248, 250, 252, 0.72);
+    backdrop-filter: blur(2px);
+    padding: 20px;
+  }
+  .lock-overlay-card {
+    background: #ffffff;
+    border: 1px solid #cbd5e1;
+    border-radius: 12px;
+    padding: 16px 22px;
+    max-width: 440px;
+    box-shadow: 0 8px 24px rgba(15, 23, 42, 0.12);
+  }
+  .lock-overlay-card h4 { margin: 0 0 6px; font-size: 15.5px; color: var(--ink); }
+  .lock-overlay-card p { margin: 0 0 12px; font-size: 13.5px; color: var(--muted); }
+
+
+  /* Part 4 First-Time Preset Spotlight Tour */
+  .preset-tour-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(2, 6, 23, 0.74);
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+    z-index: 1500;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s ease;
+  }
+  body.preset-tour-active .preset-tour-backdrop {
+    opacity: 1;
+    pointer-events: auto;
+  }
+  body.preset-tour-active #presetStripBar {
+    position: relative;
+    z-index: 1520;
+    background: #ffffff;
+    border: 3px solid #38bdf8;
+    box-shadow: 0 0 0 4px rgba(56, 189, 248, 0.35), 0 18px 42px rgba(2, 6, 23, 0.55);
+  }
+  .preset-tour-callout {
+    position: fixed;
+    z-index: 1530;
+    width: 440px;
+    max-width: calc(100vw - 24px);
+    background: #0f172a;
+    color: #f8fafc;
+    border: 2px solid #38bdf8;
+    border-radius: 14px;
+    padding: 16px 18px;
+    box-shadow: 0 18px 46px rgba(2, 6, 23, 0.75), 0 0 26px rgba(56, 189, 248, 0.25);
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(8px);
+    transition: opacity 0.22s ease, transform 0.22s ease;
+  }
+  .preset-tour-callout.visible {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translateY(0);
+  }
+  .preset-tour-callout::before {
+    content: "";
+    position: absolute;
+    width: 14px;
+    height: 14px;
+    background: #0f172a;
+    border-top: 2px solid #38bdf8;
+    border-left: 2px solid #38bdf8;
+    top: -9px;
+    left: 44px;
+    transform: rotate(45deg);
+  }
+  .preset-tour-callout h4 {
+    margin: 6px 0 6px;
+    font-size: 16px;
+    color: #ffffff;
+  }
+  .preset-tour-callout p {
+    margin: 0 0 12px;
+    font-size: 13.5px;
+    line-height: 1.5;
+    color: #cbd5e1;
+  }
+  .preset-tour-arrow-hint {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(56, 189, 248, 0.14);
+    border: 1px solid rgba(56, 189, 248, 0.45);
+    border-radius: 8px;
+    padding: 8px 10px;
+    margin-bottom: 12px;
+    font-size: 12.5px;
+    color: #7dd3fc;
+    font-weight: 600;
+  }
+  .preset-tour-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: flex-end;
+  }
+  .synth-lab-pulse {
+    box-shadow: 0 0 0 4px #38bdf8, 0 0 36px rgba(56, 189, 248, 0.5) !important;
+    transition: box-shadow 0.35s ease;
+  }
+  .preset-req-banner {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    padding: 9px 12px;
+    border-radius: 8px;
+    margin-bottom: 12px;
+    font-size: 13px;
+    font-weight: 700;
+    background: #fffbeb;
+    border: 1px solid #fcd34d;
+    color: #92400e;
+  }
+  .preset-req-banner.done {
+    background: #f0fdf4;
+    border-color: #86efac;
+    color: #166534;
+  }
+
+
+  /* Guide 1 Real Modular View + Reason-Style Patching */
+  .btn-moog-flip {
+    background: linear-gradient(180deg, #78350f, #451a03); border: 1px solid #d97706; color: #fef3c7;
+  }
+  .btn-moog-flip:hover { background: linear-gradient(180deg, #92400e, #78350f); border-color: #fbbf24; }
+  .btn-moog-flip.active { background: #d97706; color: #020617; border-color: #fde68a; }
+  .real-moog-view {
+    display: none; background: #0a0c10; border: 8px solid #4a2c17; border-radius: 12px;
+    padding: 12px; margin: 12px 0 14px; box-shadow: inset 0 0 24px rgba(0,0,0,0.85); overflow-x: auto;
+  }
+  .real-moog-view.visible { display: block; }
+  .real-moog-view svg { width: 100%; min-width: 760px; height: auto; display: block; }
+  .moog-view-caption {
+    display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px;
+    font-size: 11.5px; color: #cbd5e1; margin-top: 8px; padding-top: 8px; border-top: 1px solid #1e293b;
+  }
+  .moog-knob-hit { cursor: ns-resize; }
+  .moog-knob-hit:hover circle.knob-outer { stroke: #38bdf8; stroke-width: 2.6; }
+  .moog-cable-hit { cursor: pointer; transition: opacity 0.15s ease, stroke-width 0.15s ease; }
+  .moog-cable-hit:hover { opacity: 1 !important; stroke-width: 5.5; filter: drop-shadow(0 0 6px rgba(255,255,255,0.65)); }
+  .moog-jack-hit { cursor: pointer; }
+  .moog-jack-hit:hover circle.jack-outer { stroke: #ffffff; stroke-width: 3; }
+  .moog-jack-valid circle.jack-outer { stroke: #fbbf24 !important; stroke-width: 3.5 !important; filter: drop-shadow(0 0 7px #fbbf24); }
+  .module.mod-unpatched { opacity: 0.36; filter: grayscale(0.85); position: relative; }
+  .module.mod-unpatched::after {
+    content: "UNPATCHED IN MODULAR VIEW"; position: absolute; top: 8px; right: 8px;
+    background: #991b1b; color: #fee2e2; font-size: 9.5px; font-weight: 800; padding: 2px 7px; border-radius: 999px; pointer-events: none;
+  }
+  .patch-ctx-menu {
+    display: none; position: fixed; z-index: 3000; min-width: 230px; background: #0f172a; color: #f8fafc;
+    border: 1.5px solid #38bdf8; border-radius: 10px; padding: 6px; box-shadow: 0 16px 40px rgba(2,6,23,0.78); font-size: 12.5px;
+  }
+  .patch-ctx-menu.visible { display: block; }
+  .patch-ctx-hdr { font-size: 10.5px; font-weight: 800; text-transform: uppercase; color: #94a3b8; padding: 5px 9px 6px; border-bottom: 1px solid #1e293b; margin-bottom: 4px; }
+  .patch-ctx-item { display: flex; width: 100%; background: transparent; border: none; color: #e2e8f0; padding: 7px 9px; border-radius: 6px; text-align: left; cursor: pointer; font-family: inherit; font-size: 12.5px; font-weight: 600; }
+  .patch-ctx-item:hover { background: #1e293b; color: #38bdf8; }
+  .patch-ctx-item.danger { color: #fca5a5; }
+  .patch-ctx-item.danger:hover { background: #450a0a; color: #fecaca; }
+
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="v3-banner">
+    <span>v3 Hybrid Test: Full RAG A-Level Content + Dark Hardware Synth Lab &amp; Interactive Exam Tools</span>
+    <span>Series:<a href="/guide2.html">Guide 2: Modular Synths &rarr;</a><a href="/preview/subtractive_synthesis_basics_v2">v2 Original</a></span>
+  </div>
+
+  <header class="hero">
+    <div class="hero-top">
+      <div>
+        <div class="hero-badge">A-Level Music Technology (Edexcel 9MT0) &bull; Guide 1: Foundations</div>
+        <h1>Subtractive Synthesis: The Basics</h1>
+        <p class="subtitle">How analogue synthesisers reshaped modern music — and how oscillators, waveforms, and filters work together to build sound from scratch.</p>
+      </div>
+      <button class="btn btn-ghost" onclick="window.print()">Print / Save PDF</button>
+    </div>
+    <div class="objectives">
+      <div class="obj-item"><strong>Context</strong>How subtractive synths transformed musicians, producers &amp; genres.</div>
+      <div class="obj-item"><strong>Signal Flow</strong>Trace audio through the three core stages: VCO &rarr; VCF &rarr; VCA.</div>
+      <div class="obj-item"><strong>Synth Lab</strong>Watch the guided demo and sculpt waveforms &amp; filters live.</div>
+      <div class="obj-item"><strong>4-Track Sequencer</strong>Record chords &amp; parts across 16 bars and share saved timbres.</div>
+    </div>
+  </header>
+
+  <nav class="toc" id="mainToc">
+    <a href="#context" data-sec="context">Context &amp; Styles</a>
+    <a href="#part1" data-sec="part1">1. Signal Flow</a>
+    <a href="#part2" data-sec="part2">2. Waveforms &amp; Harmonics</a>
+    <a href="#part3" data-sec="part3">3. Interactive Synth Lab</a>
+    <a href="#part4" data-sec="part4">4. 16-Bar Sequencer &amp; Presets</a>
+    <a href="#quiz" data-sec="quiz">5. Self-Marking Quiz</a>
+  </nav>
+
+  <div class="guardrail-progress-bar">
+    <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+      <span class="guardrail-progress-pill" id="guardrailProgressPill">Checkpoints Passed: 0 / 5</span>
+      <span style="color:var(--muted);font-size:12.5px;">Answer the 3 quick questions at the bottom of each section to unlock the next.</span>
+    </div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;">
+      <button type="button" class="btn btn-sm" id="teacherUnlockBtn" onclick="toggleTeacherUnlock()">Teacher Preview: Unlock All</button>
+      <button type="button" class="btn btn-sm" onclick="resetGuardrails()">Reset Locks</button>
+    </div>
+  </div>
+
+  <!-- CONTEXT -->
+  <section id="context" class="card">
+    <div class="section-head">
+      <h2><span class="section-tag">Context</span> How Subtractive Synthesis Changed Music</h2>
+    </div>
+    <p class="lead">Before turning a single dial, it helps to see <em>why</em> synthesisers mattered so much — and how their hardware design shaped entire musical styles from the 1960s to today.</p>
+
+    <div class="prose">
+      <p>
+        In the 1950s, creating electronic music meant wiring up laboratory test oscillators, tape loops, and radio equipment — pioneering work done at the <strong>BBC Radiophonic Workshop</strong> (Delia Derbyshire) and <strong>IRCAM</strong>. Those early setups had no piano keyboards and took hours to program.
+      </p>
+      <p>
+        By the late 1960s and 1970s, engineers like <strong>Robert Moog</strong> and <strong>Alan Pearlman (ARP)</strong> combined oscillators, filters, and amplifiers into playable keyboard instruments using <strong>voltage control (VCO / VCF / VCA)</strong>. For the first time, musicians could sculpt brand-new timbres in real time.
+      </p>
+    </div>
+
+    <div class="era-grid">
+      <div class="era-card">
+        <span class="era-pill">1970s &bull; Monophonic Era</span>
+        <h3>Prog Rock, Funk &amp; Cosmic Electronic</h3>
+        <p>Early portable synths such as the <strong>Minimoog (1970)</strong> were <strong>monophonic</strong> (one note at a time). Because players couldn't play chords, synths became iconic for punchy <strong>basslines</strong> and expressive <strong>lead solos</strong> — using pitch-bend wheels, glide (portamento), and vibrato to rival an electric guitar (Stevie Wonder, Kraftwerk, Pink Floyd).</p>
+      </div>
+      <div class="era-card">
+        <span class="era-pill">Late 1970s–80s &bull; Polyphonic Era</span>
+        <h3>Synth-Pop, New Wave &amp; 80s Game Audio</h3>
+        <p>Polyphonic synths (<strong>Prophet-5</strong>, <strong>Roland Juno/Jupiter</strong>) unlocked full chords, lush string pads, and bright synth brass. Alongside <strong>MIDI (1981)</strong>, drum machines (TR-808, LinnDrum), and 8-bit game sound chips (NES, Commodore 64), a single composer could write melody, harmony, bass, and drums using pure waveforms.</p>
+      </div>
+      <div class="era-card">
+        <span class="era-pill">Late 1980s–90s &bull; Club Culture</span>
+        <h3>House, Techno &amp; Hip-Hop</h3>
+        <p>Producers pushed filters to extremes — cranking up <strong>resonance</strong> for squelchy acid basslines (Roland TB-303), sweeping low-pass filters to build dancefloor tension, and using high portamento synth leads in G-Funk hip-hop.</p>
+      </div>
+      <div class="era-card">
+        <span class="era-pill">2000s–Today &bull; Modern DAWs</span>
+        <h3>The Universal Blueprint</h3>
+        <p>Modern software synths (Logic's <em>Retro Synth</em>, Serum, Vital, Ableton <em>Analog</em>) still follow this exact architecture. Even early analogue quirks like slight <strong>tuning drift</strong> are intentionally recreated today because subtle detuning makes synths sound warm and thick.</p>
+      </div>
+    </div>
+
+    <div class="callout-green">
+      <strong class="title">Why Producers Adopted Subtractive Synths (Key Context for A-Level Essays)</strong>
+      <ul>
+        <li><strong>Two creative goals:</strong> Emulate acoustic instruments (brass, strings, flutes) <em>or</em> invent completely futuristic, otherworldly timbres.</li>
+        <li><strong>One musician, full band:</strong> Affordable synths and drum machines helped launch the home-studio revolution.</li>
+        <li><strong>Timbre as a musical hook:</strong> Sweeping a filter cutoff or resonance became an expressive production technique in its own right.</li>
+      </ul>
+    </div>
+    <div class="guardrail-box" id="guardrail-context"></div>
+  </section>
+
+  <!-- PART 1 -->
+  <section id="part1" class="card">
+    <div class="section-head">
+      <h2><span class="section-tag">Part 1</span> What Is Subtractive Synthesis? &amp; Signal Flow</h2>
+    </div>
+    <p class="lead">Every subtractive synthesiser — from a 1970 Minimoog to a modern DAW plugin — follows the same left-to-right journey.</p>
+
+    <div class="analogy">
+      <strong>The Sculptor Analogy:</strong> Think of subtractive synthesis like carving a statue out of marble. You start with a bright, harmonically rich block of raw sound (<strong>Oscillator</strong>), chisel away the frequencies you don't want (<strong>Filter</strong>), and control how loudly the note starts, holds, and fades out (<strong>Amplifier</strong>).
+    </div>
+
+    <div class="steps-3">
+      <div class="step-box">
+        <h3>1. VCO (Sound Source)</h3>
+        <p><strong>Voltage Controlled Oscillator.</strong> Produces a continuous, pitched waveform. Its octave range is measured in feet (like organ pipes): <code>16'</code> for deep bass, <code>8'</code> for normal pitch, <code>4'</code> for high leads.</p>
+      </div>
+      <div class="step-box vcf">
+        <h3>2. VCF (Tone Sculptor)</h3>
+        <p><strong>Voltage Controlled Filter.</strong> Removes unwanted frequencies to shape timbre. A <strong>Low-Pass Filter</strong> lets low frequencies pass and cuts bright highs — turning a buzzy wave into a warm bass or mellow pad.</p>
+      </div>
+      <div class="step-box vca">
+        <h3>3. VCA (Volume Gate)</h3>
+        <p><strong>Voltage Controlled Amplifier.</strong> Oscillators never stop humming on their own. The VCA acts like an automatic volume fader, opening when you press a key and fading out when you release it.</p>
+      </div>
+    </div>
+
+    <div class="prose" style="margin-bottom:14px;">
+      <p>
+        <strong>What moves the controls automatically?</strong> Two modulators act like "invisible hands": an <strong>Envelope Generator (ADSR)</strong> creates a <em>one-shot</em> shape every time you press a key (e.g. a snappy pluck or slow fade-in), while an <strong>LFO</strong> creates a <em>repeating</em> back-and-forth motion (e.g. vibrato or a rhythmic filter wobble).
+      </p>
+    </div>
+
+    <div class="diagram-wrap">
+      <svg viewBox="0 0 920 248" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Subtractive synthesis signal flow diagram">
+        <defs>
+          <marker id="arr-audio" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M 0 1 L 10 5 L 0 9 z" fill="#0f172a"/></marker>
+          <marker id="arr-lfo" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M 0 1 L 10 5 L 0 9 z" fill="#7c3aed"/></marker>
+          <marker id="arr-env" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M 0 1 L 10 5 L 0 9 z" fill="#d97706"/></marker>
+        </defs>
+        <line x1="24" y1="16" x2="54" y2="16" stroke="#0f172a" stroke-width="2.5" marker-end="url(#arr-audio)"/>
+        <text x="62" y="20" font-size="11.5" font-weight="600" fill="#334155">Audio Signal (What you hear)</text>
+        <line x1="252" y1="16" x2="282" y2="16" stroke="#d97706" stroke-width="2" stroke-dasharray="5,4" marker-end="url(#arr-env)"/>
+        <text x="290" y="20" font-size="11.5" font-weight="600" fill="#b45309">Envelope (One-shot per key press)</text>
+        <line x1="510" y1="16" x2="540" y2="16" stroke="#7c3aed" stroke-width="2" stroke-dasharray="5,4" marker-end="url(#arr-lfo)"/>
+        <text x="548" y="20" font-size="11.5" font-weight="600" fill="#5b21b6">LFO (Repeating wobble / vibrato)</text>
+
+        <line x1="230" y1="86" x2="310" y2="86" stroke="#0f172a" stroke-width="3" marker-end="url(#arr-audio)"/>
+        <line x1="510" y1="86" x2="590" y2="86" stroke="#0f172a" stroke-width="3" marker-end="url(#arr-audio)"/>
+        <line x1="770" y1="86" x2="830" y2="86" stroke="#0f172a" stroke-width="3" marker-end="url(#arr-audio)"/>
+
+        <g class="svg-node active" id="flow-vco" onclick="selectNode('vco')">
+          <rect x="24" y="42" width="206" height="88" rx="10" fill="#eff6ff" stroke="#2563eb" stroke-width="2.5"/>
+          <text x="127" y="68" text-anchor="middle" font-size="15" font-weight="800" fill="#1e40af">1. VCO (Oscillator)</text>
+          <text x="127" y="88" text-anchor="middle" font-size="12" font-weight="600" fill="#1e3a8a">Creates the raw waveform</text>
+          <text x="127" y="109" text-anchor="middle" font-size="11" fill="#475569">Pitch (16'/8'/4') &bull; Shape &bull; Sub</text>
+        </g>
+        <g class="svg-node" id="flow-vcf" onclick="selectNode('vcf')">
+          <rect x="314" y="42" width="196" height="88" rx="10" fill="#f0fdfa" stroke="#0d9488" stroke-width="2.5"/>
+          <text x="412" y="68" text-anchor="middle" font-size="15" font-weight="800" fill="#115e59">2. VCF (Filter)</text>
+          <text x="412" y="88" text-anchor="middle" font-size="12" font-weight="600" fill="#134e4a">Subtracts frequencies</text>
+          <text x="412" y="109" text-anchor="middle" font-size="11" fill="#475569">Cutoff Hz &bull; Resonance (Q)</text>
+        </g>
+        <g class="svg-node" id="flow-vca" onclick="selectNode('vca')">
+          <rect x="594" y="42" width="176" height="88" rx="10" fill="#f0fdf4" stroke="#16a34a" stroke-width="2.5"/>
+          <text x="682" y="68" text-anchor="middle" font-size="15" font-weight="800" fill="#166534">3. VCA (Amplifier)</text>
+          <text x="682" y="88" text-anchor="middle" font-size="12" font-weight="600" fill="#14532d">Controls output volume</text>
+          <text x="682" y="109" text-anchor="middle" font-size="11" fill="#475569">Start &bull; Hold &bull; Fade-out</text>
+        </g>
+        <rect x="836" y="60" width="66" height="52" rx="8" fill="#0f172a"/>
+        <text x="869" y="84" text-anchor="middle" font-size="12" font-weight="700" fill="#fff">SPEAKER</text>
+        <text x="869" y="99" text-anchor="middle" font-size="10.5" fill="#94a3b8">OUT</text>
+
+        <g class="svg-node" id="flow-lfo" onclick="selectNode('lfo')">
+          <rect x="41" y="172" width="236" height="62" rx="10" fill="#f5f3ff" stroke="#7c3aed" stroke-width="2"/>
+          <text x="159" y="198" text-anchor="middle" font-size="13.5" font-weight="800" fill="#5b21b6">LFO</text>
+          <text x="159" y="217" text-anchor="middle" font-size="10.5" fill="#475569">Repeating movement (Vibrato / Wobble)</text>
+        </g>
+        <g class="svg-node" id="flow-env" onclick="selectNode('env')">
+          <rect x="440" y="172" width="246" height="62" rx="10" fill="#fffbeb" stroke="#d97706" stroke-width="2"/>
+          <text x="563" y="198" text-anchor="middle" font-size="13.5" font-weight="800" fill="#b45309">Envelope Generators (ADSR)</text>
+          <text x="563" y="217" text-anchor="middle" font-size="11" fill="#475569">Shapes brightness (VCF) &amp; loudness (VCA)</text>
+        </g>
+
+        <path d="M 127 172 L 127 135" fill="none" stroke="#7c3aed" stroke-width="2" stroke-dasharray="5,4" marker-end="url(#arr-lfo)"/>
+        <path d="M 205 172 L 205 152 L 365 152 L 365 135" fill="none" stroke="#7c3aed" stroke-width="2" stroke-dasharray="5,4" marker-end="url(#arr-lfo)"/>
+        <path d="M 500 172 L 500 152 L 435 152 L 435 135" fill="none" stroke="#d97706" stroke-width="2" stroke-dasharray="5,4" marker-end="url(#arr-env)"/>
+        <path d="M 625 172 L 625 152 L 682 152 L 682 135" fill="none" stroke="#d97706" stroke-width="2" stroke-dasharray="5,4" marker-end="url(#arr-env)"/>
+      </svg>
+    </div>
+
+    <div id="nodeDetail" class="node-detail-v3">
+      <div><strong>1. VCO (Voltage Controlled Oscillator):</strong> The sound source. Generates a continuous pitched waveform. Octave range is measured in feet (<code>16'</code> for bass, <code>8'</code> normal pitch). Layering a slightly detuned second oscillator thickens the sound.</div>
+      <div class="exam-tip"><strong>A-Level Exam Keyword:</strong> <em>Harmonic Richness</em> — subtractive filtering can only remove harmonics that already exist in the raw VCO waveform (so a Sine wave has no upper harmonics to filter).</div>
+    </div>
+    <div class="guardrail-box" id="guardrail-part1"></div>
+  </section>
+
+  <!-- PART 2 -->
+  <section id="part2" class="card">
+    <div class="section-head">
+      <h2><span class="section-tag">Part 2</span> Waveforms &amp; Harmonics Explained Simply</h2>
+    </div>
+    <p class="lead">Why does a flute playing Middle C sound totally different to a trumpet playing the same Middle C? The answer is <strong>harmonics</strong>.</p>
+
+    <div class="prose">
+      <p>
+        Almost every musical sound is built from a <strong>fundamental frequency</strong> (the main pitch you sing) stacked with quieter, higher frequencies called <strong>harmonics</strong> (or overtones). The blend of harmonics creates an instrument's tone colour (<strong>timbre</strong>): few harmonics sound smooth and mellow; many harmonics sound bright and buzzy.
+      </p>
+    </div>
+
+    <div class="golden-rule">
+      <strong>The Golden Rule of Subtractive Synthesis:</strong> A filter can only <em>subtract</em> harmonics that are already present — it cannot invent new ones. That is why synth designers start with a rich <strong>Sawtooth</strong> or <strong>Square</strong> wave, and almost never try to filter a Sine wave.
+    </div>
+
+    <div style="overflow-x:auto;">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Waveform</th>
+            <th>Shape</th>
+            <th>What's Inside (Harmonics)</th>
+            <th>How It Sounds</th>
+            <th>Classic Musical Uses</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Sine</strong></td>
+            <td><svg class="mini-wave" viewBox="0 0 78 30"><path d="M2 15 Q11 2 20 15 T38 15 T56 15 T74 15" fill="none" stroke="#2563eb" stroke-width="2.2"/></svg></td>
+            <td>Fundamental only — <strong>zero harmonics</strong></td>
+            <td>Pure, smooth, whistle or soft flute</td>
+            <td>Deep 808-style sub-bass, pure test tones, smooth leads</td>
+          </tr>
+          <tr>
+            <td><strong>Triangle</strong></td>
+            <td><svg class="mini-wave" viewBox="0 0 78 30"><path d="M2 15 L11 4 L29 26 L47 4 L65 26 L74 15" fill="none" stroke="#2563eb" stroke-width="2.2"/></svg></td>
+            <td><strong>Odd harmonics only</strong>, fading very quickly</td>
+            <td>Soft, mellow, warmer than a sine</td>
+            <td>Flutes, gentle 80s game bass (NES), rounded electric keys</td>
+          </tr>
+          <tr>
+            <td><strong>Sawtooth</strong></td>
+            <td><svg class="mini-wave" viewBox="0 0 78 30"><path d="M2 26 L26 4 L26 26 L50 4 L50 26 L74 4" fill="none" stroke="#2563eb" stroke-width="2.2"/></svg></td>
+            <td><strong>All harmonics</strong> (odd &amp; even) — the richest wave</td>
+            <td>Bright, buzzy, rich, brassy</td>
+            <td>80s synth brass, detuned string pads, cutting leads, big bass</td>
+          </tr>
+          <tr>
+            <td><strong>Square / Pulse</strong></td>
+            <td><svg class="mini-wave" viewBox="0 0 78 30"><path d="M2 26 L2 4 L20 4 L20 26 L38 26 L38 4 L56 4 L56 26 L74 26 L74 4" fill="none" stroke="#2563eb" stroke-width="2.2"/></svg></td>
+            <td>Strong <strong>odd harmonics only</strong> (1st, 3rd, 5th...)</td>
+            <td>Hollow, woody, punchy (nasal when narrow)</td>
+            <td>Retro arcade leads, clarinet tones, chunky synth bass, sub-oscillators</td>
+          </tr>
+          <tr>
+            <td><strong>White Noise</strong></td>
+            <td><svg class="mini-wave" viewBox="0 0 78 30"><path d="M2 15 L6 6 L10 24 L14 9 L18 22 L22 4 L26 25 L30 11 L34 21 L38 5 L42 26 L46 8 L50 20 L54 4 L58 23 L62 10 L66 25 L70 7 L74 16" fill="none" stroke="#64748b" stroke-width="1.8"/></svg></td>
+            <td><strong>Unpitched</strong> — all frequencies randomly at equal level</td>
+            <td>Static hiss (untuned radio)</td>
+            <td>Synthesised hi-hats &amp; snare snap (with HPF), retro explosions &amp; wind</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="guardrail-box" id="guardrail-part2"></div>
+  </section>
+
+  <!-- PART 3: CLEAN SYNTH LAB + GUIDED DEMO -->
+  <section id="part3" class="card">
+    <div class="section-head">
+      <h2><span class="section-tag">Part 3</span> Interactive Synth Lab</h2>
+      <button id="demoBtn" class="btn btn-primary" onclick="toggleGuidedDemo()">&#9654; Play Guided Synth Demo (52s)</button>
+    </div>
+    <p class="lead">Watch the guided live-audio demo or sculpt your own timbre below. You can float the keyboard so it follows you down into the Sequencer!</p>
+
+    <!-- Animated Guided Demo Bar -->
+    <div id="demoPlayer" class="demo-player">
+      <div class="demo-top">
+        <span id="demoStepBadge" class="demo-step-badge">Demo 1 / 4 &bull; VCO Waveforms</span>
+        <button class="btn btn-sm btn-ghost" onclick="stopGuidedDemo()">&#9632; Stop Demo</button>
+      </div>
+      <p id="demoCaption" class="demo-caption">Starting guided synth walkthrough...</p>
+      <div class="demo-progress-bg"><div id="demoProgress" class="demo-progress-fill"></div></div>
+    </div>
+
+    <div class="synth-chassis">
+      <div class="synth-top-bar">
+        <div class="quick-presets-row">
+          <span class="quick-presets-label">Classic Patches:</span>
+          <button type="button" class="qpreset-btn active" data-qp="minimoog" onclick="applyQuickPreset('minimoog', this)">Minimoog Funk Bass</button>
+          <button type="button" class="qpreset-btn" data-qp="juno" onclick="applyQuickPreset('juno', this)">80s Juno Pad</button>
+          <button type="button" class="qpreset-btn" data-qp="acid" onclick="applyQuickPreset('acid', this)">Acid 303 Squelch</button>
+          <button type="button" class="qpreset-btn" data-qp="brass" onclick="applyQuickPreset('brass', this)">80s Brass Stab</button>
+          <button type="button" class="qpreset-btn" data-qp="lead" onclick="applyQuickPreset('lead', this)">Hollow Square Lead</button>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;"><button type="button" class="btn btn-sm btn-moog-flip" id="g1RealBtn" onclick="toggleG1RealView()">&#127899; Real Modular View</button><div class="synth-status-pill" id="synthStatusPill">AUDIO: READY</div></div>
+      </div>
+    <div class="viz-grid">
+      <div class="viz-box">
+        <div class="viz-title">
+          <span>Oscilloscope (Wave Shape)</span>
+          <span id="vizWaveLabel">Sawtooth &bull; 16'</span>
+        </div>
+        <canvas id="scopeCanvas" width="480" height="146"></canvas>
+      </div>
+      <div class="viz-box">
+        <div class="viz-title">
+          <span>Harmonics (Blue) &amp; Filter Curve (Teal)</span>
+          <span id="vizFilterLabel">LPF 900 Hz &bull; Q 2.0</span>
+        </div>
+        <canvas id="filterCanvas" width="480" height="146"></canvas>
+      </div>
+    </div>
+
+    <div class="real-moog-view" id="g1RealMoogView"><svg id="g1RealMoogSvg" viewBox="0 0 920 300"></svg><div class="moog-view-caption"><span><strong>Interactive Moog Modular View:</strong> Drag knobs up/down &bull; <strong>Left-click</strong> cables/jacks to pick up &amp; repatch &bull; <strong>Right-click</strong> for Disconnect / Connect menu!</span><span>Solid = Audio &bull; Dashed = Envelope CV</span></div></div>
+    <div class="synth-grid" id="g1SlidersWrap">
+      <div class="module" id="mod-vco">
+        <h3><span>1. VCO</span><span style="color:var(--vco)">Sound Source</span></h3>
+        <div class="ctrl">
+          <label>Waveform</label>
+          <select id="waveSelect" onchange="updateSynthParams()">
+            <option value="sawtooth" selected>Sawtooth (All harmonics)</option>
+            <option value="square">Square (Odd harmonics)</option>
+            <option value="triangle">Triangle (Soft odd)</option>
+            <option value="sine">Sine (Fundamental only)</option>
+            <option value="noise">White Noise (Unpitched)</option>
+          </select>
+        </div>
+        <div class="ctrl">
+          <label>Octave Range (ft)</label>
+          <select id="rangeSelect" onchange="updateSynthParams()">
+            <option value="-1" selected>16' (Bass — 1 octave down)</option>
+            <option value="0">8' (Normal pitch)</option>
+            <option value="1">4' (High — 1 octave up)</option>
+          </select>
+        </div>
+        <div class="ctrl">
+          <label>Detune (2nd Osc) <output id="detuneOut">6 cents</output></label>
+          <input id="detuneSlider" type="range" min="0" max="35" value="6" oninput="updateSynthParams()" />
+        </div>
+        <div class="ctrl toggle-row">
+          <span>Sub-Oscillator (-1 Octave)</span>
+          <input id="subToggle" type="checkbox" checked onchange="updateSynthParams()" />
+        </div>
+      </div>
+
+      <div class="module vcf" id="mod-vcf">
+        <h3><span>2. VCF</span><span style="color:var(--vcf)">Filter</span></h3>
+        <div class="ctrl">
+          <label>Filter Type</label>
+          <select id="filterType" onchange="updateSynthParams()">
+            <option value="lowpass" selected>Low-Pass (Cuts highs)</option>
+            <option value="highpass">High-Pass (Cuts lows)</option>
+          </select>
+        </div>
+        <div class="ctrl">
+          <label>Cutoff Frequency <output id="cutoffOut">900 Hz</output></label>
+          <input id="cutoffSlider" type="range" min="0" max="100" value="44" oninput="updateSynthParams()" />
+        </div>
+        <div class="ctrl">
+          <label>Resonance (Q) <output id="resOut">2.0</output></label>
+          <input id="resSlider" type="range" min="0.5" max="18" step="0.5" value="2" oninput="updateSynthParams()" />
+        </div>
+        <div class="ctrl">
+          <label>Filter Env Punch <output id="fenvOut">1500 Hz</output></label>
+          <input id="fenvSlider" type="range" min="0" max="4500" step="50" value="1500" oninput="updateSynthParams()" />
+        </div>
+      </div>
+
+      <div class="module env" id="mod-env">
+        <h3><span>3. VCA Envelope</span><span style="color:var(--env)">Volume Shape</span></h3>
+        <svg id="adsrSvg" viewBox="0 0 220 52" preserveAspectRatio="none">
+          <path id="adsrFill" fill="rgba(217, 119, 6, 0.16)" d=""></path>
+          <path id="adsrPath" fill="none" stroke="#d97706" stroke-width="2.5" d=""></path>
+        </svg>
+        <div class="ctrl">
+          <label>Attack (Fade-in) <output id="attOut">0.01 s</output></label>
+          <input id="attSlider" type="range" min="0.005" max="1.2" step="0.005" value="0.01" oninput="updateSynthParams()" />
+        </div>
+        <div class="ctrl">
+          <label>Decay <output id="decOut">0.25 s</output></label>
+          <input id="decSlider" type="range" min="0.02" max="1.2" step="0.01" value="0.25" oninput="updateSynthParams()" />
+        </div>
+        <div class="ctrl">
+          <label>Sustain (Held Level) <output id="susOut">50%</output></label>
+          <input id="susSlider" type="range" min="0" max="1" step="0.01" value="0.50" oninput="updateSynthParams()" />
+        </div>
+        <div class="ctrl">
+          <label>Release (Fade-out) <output id="relOut">0.20 s</output></label>
+          <input id="relSlider" type="range" min="0.02" max="1.8" step="0.01" value="0.20" oninput="updateSynthParams()" />
+        </div>
+      </div>
+    </div>
+
+    <!-- Dockable / Floating Keyboard -->
+    <div class="kbd-placeholder">
+      <div class="keyboard-bar" id="keyboardBar">
+        <div class="keys" id="keyboard"></div>
+        <div class="kbd-controls">
+          <div class="kbd-row">
+            <div class="transpose-chip" title="Transpose keyboard in semitones">
+              <span>Transpose</span>
+              <button type="button" onclick="shiftTranspose(-1)">&minus;</button>
+              <span class="transpose-val" id="transposeVal">0 st</span>
+              <button type="button" onclick="shiftTranspose(1)">+</button>
+              <button type="button" onclick="setTranspose(0)" style="width:auto;padding:0 6px;font-size:10.5px;">0</button>
+            </div>
+            <button id="floatKbdBtn" class="btn btn-sm btn-dark" onclick="toggleFloatKeyboard()">&#8599; Float Keyboard</button>
+          </div>
+          <div class="kbd-row">
+            <button id="holdBtn" class="btn btn-sm btn-primary" onclick="toggleHold()">Hold C Note</button>
+            <button class="btn btn-sm btn-dark" onclick="stopAllNotes()">Stop</button>
+          </div>
+          <div class="kbd-hint">Keys <strong>A S D F G H J K</strong> (sharps <strong>W E T Y U</strong>). Hold multiple keys to play or step-record <strong>chords</strong>!</div>
+        </div>
+      </div>
+    </div>
+    </div><!-- /.synth-chassis -->
+    <div class="guardrail-box" id="guardrail-part3"></div>
+  </section>
+
+  <!-- PART 4: 4-TRACK 16-BAR SEQUENCER + SIMPLE SHARED PRESET BAR -->
+  <section id="part4" class="card">
+    <div class="section-head">
+      <h2><span class="section-tag">Part 4</span> 4-Track 80s Sequencer &amp; Shared Timbre Presets</h2>
+    </div>
+    <p class="lead">Program a 16-bar retro piece across <strong>Melody</strong>, <strong>Harmony</strong>, <strong>Bassline</strong>, and <strong>Percussion</strong>. Load or save custom timbres directly to the shared class library, and float the keyboard above to record melodies or full chords!</p>
+
+    <!-- Sharp, simple Load / Save Preset Bar -->
+    <div class="preset-strip" id="presetStripBar">
+      <div class="preset-strip-group">
+        <label for="sharedPresetSelect">Load Timbre</label>
+        <select id="sharedPresetSelect" style="min-width:210px;"></select>
+        <button class="btn btn-sm btn-primary" onclick="loadSelectedPresetToLab()">Load in Synth Lab</button>
+        <button class="btn btn-sm" onclick="assignSelectedPresetToActiveTrack()">Use on Active Track</button>
+      </div>
+      <form class="preset-strip-group" onsubmit="saveCurrentPreset(event)">
+        <label for="pName">Save Lab Timbre</label>
+        <input id="pName" type="text" maxlength="50" placeholder="Preset name" required style="width:140px;" />
+        <input id="pAuthor" type="text" maxlength="30" placeholder="Your name" required style="width:110px;" />
+        <button type="submit" class="btn btn-sm btn-success">Save Preset</button>
+      </form>
+    </div>
+    <div id="presetFeedback" class="preset-feedback"></div>
+
+    <div class="seq-toolbar">
+      <div class="seq-group">
+        <button id="seqPlayBtn" class="btn btn-success" onclick="toggleSeqPlay()">&#9654; Play</button>
+        <button id="seqRecBtn" class="btn" onclick="toggleSeqRec()"><span class="rec-dot"></span> Rec (Chords OK)</button>
+        <label>BPM <input id="seqBpm" type="number" min="70" max="170" value="124" style="width:66px;" /></label>
+        <label>Loop
+          <select id="seqLoopMode">
+            <option value="bar">Current Bar</option>
+            <option value="4bars" selected>Bars 1–4</option>
+            <option value="16bars">Full 16 Bars</option>
+          </select>
+        </label>
+      </div>
+      <div class="seq-group">
+        <button class="btn btn-sm" onclick="advanceStepCursor(2)">Step &rarr;</button>
+        <button class="btn btn-sm" onclick="copyBarToNext()">Copy Bar &rarr; Next</button>
+        <button class="btn btn-sm" onclick="clearCurrentBar()">Clear Bar</button>
+        <button class="btn btn-sm" onclick="loadRetroDemo()">Load 80s Demo</button>
+      </div>
+    </div>
+
+    <div class="seq-bars" id="seqBarStrip">
+      <span class="seq-bars-label">Bar (1–16):</span>
+    </div>
+
+    <div class="seq-tracks-bar" id="seqTracksBar">
+      <div class="track-tab active" data-track="melody" onclick="selectSeqTrack('melody')">
+        <div class="track-head">
+          <span class="track-name" style="color:var(--vco)">1. Melody</span>
+          <button class="mute-btn" onclick="toggleMute(event,'melody')">M</button>
+        </div>
+        <select class="track-preset-select" id="preset-melody" onclick="event.stopPropagation()" onchange="assignTrackPreset('melody', this.value)"></select>
+        <div class="track-vol-row" onclick="event.stopPropagation()">
+          <span>Vol</span>
+          <input type="range" id="vol-melody" min="0" max="1.4" step="0.05" value="1.0" oninput="setTrackVolume('melody', this.value)" />
+          <span class="track-vol-val" id="vol-val-melody">100%</span>
+        </div>
+      </div>
+      <div class="track-tab" data-track="harmony" onclick="selectSeqTrack('harmony')">
+        <div class="track-head">
+          <span class="track-name" style="color:var(--lfo)">2. Harmony (Chords)</span>
+          <button class="mute-btn" onclick="toggleMute(event,'harmony')">M</button>
+        </div>
+        <select class="track-preset-select" id="preset-harmony" onclick="event.stopPropagation()" onchange="assignTrackPreset('harmony', this.value)"></select>
+        <div class="track-vol-row" onclick="event.stopPropagation()">
+          <span>Vol</span>
+          <input type="range" id="vol-harmony" min="0" max="1.4" step="0.05" value="1.0" oninput="setTrackVolume('harmony', this.value)" />
+          <span class="track-vol-val" id="vol-val-harmony">100%</span>
+        </div>
+      </div>
+      <div class="track-tab" data-track="bass" onclick="selectSeqTrack('bass')">
+        <div class="track-head">
+          <span class="track-name" style="color:var(--vcf)">3. Bassline</span>
+          <button class="mute-btn" onclick="toggleMute(event,'bass')">M</button>
+        </div>
+        <select class="track-preset-select" id="preset-bass" onclick="event.stopPropagation()" onchange="assignTrackPreset('bass', this.value)"></select>
+        <div class="track-vol-row" onclick="event.stopPropagation()">
+          <span>Vol</span>
+          <input type="range" id="vol-bass" min="0" max="1.4" step="0.05" value="1.0" oninput="setTrackVolume('bass', this.value)" />
+          <span class="track-vol-val" id="vol-val-bass">100%</span>
+        </div>
+      </div>
+      <div class="track-tab" data-track="perc" onclick="selectSeqTrack('perc')">
+        <div class="track-head">
+          <span class="track-name" style="color:var(--env)">4. Percussion</span>
+          <button class="mute-btn" onclick="toggleMute(event,'perc')">M</button>
+        </div>
+        <div style="font-size:11.5px; color:var(--muted); padding-top:4px;">Synthesised 80s Kit (Kick, Snare, Hats)</div>
+        <div class="track-vol-row" onclick="event.stopPropagation()">
+          <span>Vol</span>
+          <input type="range" id="vol-perc" min="0" max="1.4" step="0.05" value="1.0" oninput="setTrackVolume('perc', this.value)" />
+          <span class="track-vol-val" id="vol-val-perc">100%</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="seq-grid-wrap">
+      <div class="seq-grid" id="seqGrid"></div>
+    </div>
+
+    <div class="seq-footer">
+      <span><strong>Edit &amp; Record:</strong> Click a cell to add/erase a note. Drag the <strong>white right edge</strong> of any note to make it longer or shorter. Arm <strong>Rec</strong> + float the keyboard to play chords in live!</span>
+      <button class="btn btn-sm" onclick="clearAllTracks()">Clear All 16 Bars</button>
+    </div>
+    <div class="guardrail-box" id="guardrail-part4"></div>
+  </section>
+
+  <!-- PART 5: SELF-MARKING QUIZ -->
+  <section id="quiz" class="card">
+    <div class="section-head">
+      <h2><span class="section-tag">Part 5</span> Self-Marking Quiz</h2>
+    </div>
+    <p class="lead">Select one answer for each question, then click <strong>Mark My Quiz</strong> to see your score and full explanations.</p>
+
+    <div id="quizScore" class="quiz-score"></div>
+    <div id="quizContainer"></div>
+
+    <div class="quiz-actions">
+      <button class="btn btn-primary" onclick="markQuiz()">Mark My Quiz</button>
+      <button class="btn" onclick="resetQuiz()">Reset &amp; Try Again</button>
+    </div>
+
+    <div class="exam-practice-box">
+      <h3>A-Level Extended Response Practice (8 Marks)</h3>
+      <div class="exam-prompt-card">
+        <strong>Exam Question:</strong> Explain how a producer would program a punchy 1970s analogue synth bass on a subtractive synthesiser, referring to the <strong>VCO</strong>, <strong>VCF</strong>, and <strong>ADSR Envelopes</strong>. <em>(8 marks — AO1/AO2/AO3)</em>
+      </div>
+      <textarea class="exam-textarea" placeholder="Draft your answer here (mention waveform harmonics, 16' octave range, low-pass cutoff/slope, resonance, and envelope timings)..."></textarea>
+      <button type="button" class="btn btn-primary" onclick="document.getElementById('modelAnsBox').classList.toggle('visible')">Toggle Band 4 / A* Model Answer &amp; Mark Scheme</button>
+      <div id="modelAnsBox" class="model-answer-box">
+        <strong>Band 4 / A* Mark Scheme Breakdown (7–8 marks):</strong>
+        <ul>
+          <li><strong>VCO (AO1/AO2):</strong> Select a harmonically rich <strong>Sawtooth</strong> (contains all odd &amp; even harmonics) or <strong>Square</strong> wave set to <code>16'</code> octave range, optionally adding a subtle <code>-1 octave</code> sub-oscillator or slight detune (5–10 cents) for analogue warmth.</li>
+          <li><strong>VCF (AO2/AO3):</strong> Route into a <strong>Low-Pass Filter</strong> (typically <code>24 dB/octave</code> Moog ladder slope) with a low static cutoff (e.g. 250–600 Hz) to remove harsh upper harmonics, plus moderate <strong>Resonance (Q)</strong> to emphasise the cutoff point and add nasal punch.</li>
+          <li><strong>Filter Envelope (AO2/AO3):</strong> Apply positive <strong>Filter Envelope Amount</strong> with an instant <strong>Attack</strong> (~5–10 ms), short <strong>Decay</strong> (150–300 ms), and low <strong>Sustain</strong> so each note opens brightly on the transient and snaps quickly back to a warm fundamental.</li>
+          <li><strong>VCA Envelope (AO1/AO2):</strong> Fast <strong>Attack</strong> for immediate transient punch, medium <strong>Sustain</strong> to hold bass weight, and short <strong>Release</strong> (100–200 ms) to prevent muddy overlap between bass notes.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div style="margin-top:22px;padding:16px 18px;border-radius:12px;background:#0f172a;color:#f8fafc;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px;">
+      <div>
+        <div style="font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:0.06em;color:#fbbf24;">Guide 1 Complete &bull; Next Module Unlocked</div>
+        <div style="font-size:16px;font-weight:800;margin-top:2px;">Continue to Guide 2: 1960s Modular Synths &amp; The Moog Modular</div>
+      </div>
+      <a href="/guide2.html" class="btn btn-primary" style="text-decoration:none;">Open Guide 2: Modular Synths &rarr;</a>
+    </div>
+  </section>
+
+  <footer class="rag-footer">
+    A-Level Music Technology Interactive Template &bull; Grounded in Firestore <code>alevel_rubrics</code>:
+    <code>AOS 3 - Overview Document.pdf</code>, <code>Pearson_Edexcel_Level_3_Advanced_GCE_in_Music_Technology_Specification_issue3.pdf</code> &amp; <code>all A2 exams combined2.pdf</code>.
+  </footer>
+
+</div>
+
+<script>
+// ================= 1. SIGNAL FLOW INTERACTION =================
+const NODE_INFO = {
+  vco: {
+    body: "<strong>1. VCO (Voltage Controlled Oscillator):</strong> The sound source. Generates a continuous pitched waveform. Octave range is measured in feet (<code>16'</code> for bass, <code>8'</code> normal pitch). Layering a slightly detuned second oscillator thickens the sound.",
+    tip: "<strong>A-Level Exam Keyword:</strong> <em>Harmonic Richness</em> — subtractive filtering can only remove harmonics that already exist in the raw VCO waveform (so a Sine wave has no upper harmonics to filter)."
+  },
+  vcf: {
+    body: "<strong>2. VCF (Voltage Controlled Filter):</strong> The tone sculptor. A Low-Pass Filter removes bright upper harmonics above the Cutoff frequency, while Resonance (Q) boosts frequencies right at the cutoff point.",
+    tip: "<strong>A-Level Exam Keyword:</strong> <em>Roll-off Slope (dB/octave)</em> — classic 4-pole filters attenuate at <code>24 dB/oct</code> (warm, steep) while 2-pole filters attenuate at <code>12 dB/oct</code> (brighter, gentler)."
+  },
+  vca: {
+    body: "<strong>3. VCA (Voltage Controlled Amplifier):</strong> The automatic volume gate. Without it, the oscillator would hum non-stop; the VCA opens when you press a key and fades out when you release it.",
+    tip: "<strong>A-Level Exam Keyword:</strong> <em>Amplitude Articulation</em> — the VCA shapes dynamic contour (percussive pluck vs sustained pad) under control of the Amp ADSR envelope."
+  },
+  env: {
+    body: "<strong>Envelope Generators (ADSR):</strong> A one-shot shape triggered every time you press a key. The Amp Envelope controls loudness (snappy pluck vs slow string swell), while the Filter Envelope sweeps brightness.",
+    tip: "<strong>A-Level Exam Keyword:</strong> <em>Sustain = Level (not Time)</em> — Attack, Decay, and Release are measured in seconds/ms, whereas Sustain is a held amplitude level (%)."
+  },
+  lfo: {
+    body: "<strong>LFO (Low Frequency Oscillator):</strong> A slow, repeating control wave (typically 0.1–20 Hz, below human hearing) that automatically wobbles a parameter — creating vibrato on pitch, tremolo on volume, or rhythmic sweeps on the filter.",
+    tip: "<strong>A-Level Exam Keyword:</strong> <em>Cyclic Modulation</em> — distinguish LFO (continuous/repeating) from ADSR Envelope (one-shot per key trigger)."
+  }
+};
+function selectNode(id) {
+  document.querySelectorAll('.svg-node').forEach(el => el.classList.remove('active'));
+  const activeEl = document.getElementById('flow-' + id);
+  if (activeEl) activeEl.classList.add('active');
+  const info = NODE_INFO[id];
+  if (!info) return;
+  document.getElementById('nodeDetail').innerHTML = `<div>${info.body}</div><div class="exam-tip">${info.tip}</div>`;
+}
+
+const QUICK_CLASSIC_PRESETS = {
+  minimoog: { wave: 'sawtooth', octave: -1, detune: 6, sub: true, filterType: 'lowpass', cutoff: 42, q: 3.0, fenv: 1800, attack: 0.01, decay: 0.25, sustain: 0.45, release: 0.18 },
+  juno:     { wave: 'sawtooth', octave: 0, detune: 18, sub: true, filterType: 'lowpass', cutoff: 58, q: 1.5, fenv: 600,  attack: 0.55, decay: 0.60, sustain: 0.78, release: 0.95 },
+  acid:     { wave: 'sawtooth', octave: -1, detune: 0, sub: false, filterType: 'lowpass', cutoff: 26, q: 14.5, fenv: 3600, attack: 0.005, decay: 0.22, sustain: 0.15, release: 0.12 },
+  brass:    { wave: 'sawtooth', octave: 0, detune: 12, sub: false, filterType: 'lowpass', cutoff: 48, q: 2.0, fenv: 2900, attack: 0.06, decay: 0.35, sustain: 0.65, release: 0.28 },
+  lead:     { wave: 'square',   octave: 0, detune: 8, sub: false, filterType: 'lowpass', cutoff: 66, q: 2.5, fenv: 1100, attack: 0.015, decay: 0.28, sustain: 0.60, release: 0.22 }
+};
+function applyQuickPreset(key, btnEl) {
+  const p = QUICK_CLASSIC_PRESETS[key];
+  if (!p) return;
+  document.querySelectorAll('.qpreset-btn').forEach(b => b.classList.remove('active'));
+  if (btnEl) btnEl.classList.add('active');
+  if (typeof g1Patch !== 'undefined') {
+    Object.assign(g1Patch, { vcoToVcf: true, vcfToVca: true, envToVcf: true, envToVca: true });
+    if (typeof syncG1UnpatchedStyles === 'function') syncG1UnpatchedStyles();
+  }
+  setLabParams(p);
+  if (typeof renderG1RealMoog === 'function' && g1RealViewOn) renderG1RealMoog();
+  const pill = document.getElementById('synthStatusPill');
+  if (pill) pill.textContent = 'PATCH: ' + (btnEl ? btnEl.textContent.toUpperCase() : key.toUpperCase());
+}
+
+// ================= 2. WEB AUDIO ENGINE =================
+let audioCtx = null, analyser = null, masterGain = null, noiseBuffer = null, holdActive = false;
+const activeVoices = new Map();
+let transposeSemitones = 0;
+
+function ensureAudio() {
+  if (!audioCtx) {
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    analyser = audioCtx.createAnalyser();
+    analyser.fftSize = 1024;
+    masterGain = audioCtx.createGain();
+    masterGain.gain.value = 0.28;
+    masterGain.connect(analyser);
+    analyser.connect(audioCtx.destination);
+    noiseBuffer = audioCtx.createBuffer(1, audioCtx.sampleRate * 2, audioCtx.sampleRate);
+    const data = noiseBuffer.getChannelData(0);
+    for (let i = 0; i < data.length; i++) data[i] = Math.random() * 2 - 1;
+  }
+  if (audioCtx.state === 'suspended') audioCtx.resume();
+  const pill = document.getElementById('synthStatusPill');
+  if (pill && pill.textContent === 'AUDIO: READY') pill.textContent = 'AUDIO: LIVE';
+}
+
+function sliderToCutoff(val) { return Math.round(80 * Math.pow(12000 / 80, val / 100)); }
+
+function getLabParams() {
+  return {
+    wave: document.getElementById('waveSelect').value,
+    octave: parseInt(document.getElementById('rangeSelect').value, 10),
+    detune: parseFloat(document.getElementById('detuneSlider').value),
+    sub: document.getElementById('subToggle').checked,
+    filterType: document.getElementById('filterType').value,
+    cutoff: parseFloat(document.getElementById('cutoffSlider').value),
+    q: parseFloat(document.getElementById('resSlider').value),
+    fenv: parseFloat(document.getElementById('fenvSlider').value),
+    attack: parseFloat(document.getElementById('attSlider').value),
+    decay: parseFloat(document.getElementById('decSlider').value),
+    sustain: parseFloat(document.getElementById('susSlider').value),
+    release: parseFloat(document.getElementById('relSlider').value)
+  };
+}
+
+function setLabParams(p) {
+  document.getElementById('waveSelect').value = p.wave;
+  document.getElementById('rangeSelect').value = String(p.octave);
+  document.getElementById('detuneSlider').value = p.detune;
+  document.getElementById('subToggle').checked = !!p.sub;
+  document.getElementById('filterType').value = p.filterType;
+  document.getElementById('cutoffSlider').value = p.cutoff;
+  document.getElementById('resSlider').value = p.q;
+  document.getElementById('fenvSlider').value = p.fenv;
+  document.getElementById('attSlider').value = p.attack;
+  document.getElementById('decSlider').value = p.decay;
+  document.getElementById('susSlider').value = p.sustain;
+  document.getElementById('relSlider').value = p.release;
+  updateSynthParams();
+}
+
+function triggerSynthVoice(baseFreq, p, startTime, durationSec, gainScale = 0.7) {
+  ensureAudio();
+  const cutoffHz = sliderToCutoff(p.cutoff);
+  const freq = baseFreq * Math.pow(2, p.octave);
+
+  const vcf = audioCtx.createBiquadFilter();
+  vcf.type = p.filterType;
+  vcf.Q.setValueAtTime(p.q, startTime);
+  vcf.frequency.setValueAtTime(cutoffHz, startTime);
+  const effFenv = (typeof g1Patch === 'undefined' || g1Patch.envToVcf) ? p.fenv : 0;
+  if (effFenv > 0) {
+    vcf.frequency.linearRampToValueAtTime(Math.min(18000, cutoffHz + effFenv), startTime + p.attack);
+    vcf.frequency.exponentialRampToValueAtTime(Math.max(60, cutoffHz + effFenv * p.sustain), startTime + p.attack + p.decay);
+  }
+
+  const vca = audioCtx.createGain();
+  vca.gain.setValueAtTime(0.0001, startTime);
+  vca.gain.linearRampToValueAtTime(gainScale, startTime + p.attack);
+  vca.gain.linearRampToValueAtTime(Math.max(0.0001, gainScale * p.sustain), startTime + p.attack + p.decay);
+
+  if (typeof g1Patch === 'undefined' || (g1Patch.vcoToVcf && g1Patch.vcfToVca)) {
+    vcf.connect(vca);
+    vca.connect(masterGain);
+  }
+
+  const sources = [];
+  let osc1 = null, osc2 = null, osc2Gain = null, subOsc = null, subGain = null, noiseSrc = null, noiseGain = null, oscBusGain = null;
+
+  // Always create pitched oscillators + noise branch for held voices so every control updates live without cutting audio
+  oscBusGain = audioCtx.createGain();
+  oscBusGain.gain.setValueAtTime(p.wave === 'noise' ? 0.0001 : 1.0, startTime);
+  oscBusGain.connect(vcf);
+
+  const safeWave = p.wave === 'noise' ? 'sawtooth' : p.wave;
+  osc1 = audioCtx.createOscillator();
+  osc1.type = safeWave;
+  osc1.frequency.setValueAtTime(freq, startTime);
+  osc1.detune.setValueAtTime(p.detune > 0 ? -p.detune / 2 : 0, startTime);
+  osc1.connect(oscBusGain);
+  osc1.start(startTime);
+  sources.push(osc1);
+
+  osc2 = audioCtx.createOscillator();
+  osc2.type = safeWave;
+  osc2.frequency.setValueAtTime(freq, startTime);
+  osc2.detune.setValueAtTime(p.detune, startTime);
+  osc2Gain = audioCtx.createGain();
+  osc2Gain.gain.setValueAtTime(p.detune > 0 ? 0.6 : 0.0001, startTime);
+  osc2.connect(osc2Gain);
+  osc2Gain.connect(oscBusGain);
+  osc2.start(startTime);
+  sources.push(osc2);
+
+  subOsc = audioCtx.createOscillator();
+  subOsc.type = 'square';
+  subOsc.frequency.setValueAtTime(freq / 2, startTime);
+  subGain = audioCtx.createGain();
+  subGain.gain.setValueAtTime(p.sub ? 0.35 : 0.0001, startTime);
+  subOsc.connect(subGain);
+  subGain.connect(oscBusGain);
+  subOsc.start(startTime);
+  sources.push(subOsc);
+
+  noiseSrc = audioCtx.createBufferSource();
+  noiseSrc.buffer = noiseBuffer;
+  noiseSrc.loop = true;
+  noiseGain = audioCtx.createGain();
+  noiseGain.gain.setValueAtTime(p.wave === 'noise' ? 0.9 : 0.0001, startTime);
+  noiseSrc.connect(noiseGain);
+  noiseGain.connect(vcf);
+  noiseSrc.start(startTime);
+  sources.push(noiseSrc);
+
+  if (durationSec != null) {
+    const relStart = startTime + durationSec;
+    const relTime = Math.max(0.02, p.release);
+    // Compute exact VCA level at key-release time (respecting Attack, Decay, and Sustain)
+    let levelAtRel;
+    if (durationSec <= p.attack) {
+      levelAtRel = Math.max(0.0001, gainScale * (durationSec / Math.max(0.001, p.attack)));
+    } else if (durationSec <= p.attack + p.decay) {
+      const frac = (durationSec - p.attack) / Math.max(0.001, p.decay);
+      levelAtRel = Math.max(0.0001, gainScale * (1 - frac * (1 - p.sustain)));
+    } else {
+      levelAtRel = Math.max(0.0001, gainScale * p.sustain);
+    }
+    vca.gain.cancelScheduledValues(relStart);
+    vca.gain.setValueAtTime(levelAtRel, relStart);
+    vca.gain.exponentialRampToValueAtTime(0.0001, relStart + relTime);
+    const stopAt = relStart + relTime + 0.04;
+    sources.forEach(s => { try { s.stop(stopAt); } catch(e){} });
+  }
+  return { sources, vcf, vca, osc1, osc2, osc2Gain, subOsc, subGain, oscBusGain, noiseGain, baseFreq, gainScale };
+}
+
+function triggerPercVoice(drumId, t, volScale = 1.0) {
+  ensureAudio();
+  const vs = Math.max(0.0001, volScale);
+  if (drumId === 'kick') {
+    const osc = audioCtx.createOscillator();
+    const g = audioCtx.createGain();
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(145, t);
+    osc.frequency.exponentialRampToValueAtTime(42, t + 0.11);
+    g.gain.setValueAtTime(0.95 * vs, t);
+    g.gain.exponentialRampToValueAtTime(0.001, t + 0.18);
+    osc.connect(g); g.connect(masterGain);
+    osc.start(t); osc.stop(t + 0.2);
+  } else if (drumId === 'snare') {
+    const noise = audioCtx.createBufferSource();
+    noise.buffer = noiseBuffer;
+    const filt = audioCtx.createBiquadFilter();
+    filt.type = 'highpass'; filt.frequency.setValueAtTime(1400, t);
+    const ng = audioCtx.createGain();
+    ng.gain.setValueAtTime(0.6 * vs, t); ng.gain.exponentialRampToValueAtTime(0.001, t + 0.14);
+    noise.connect(filt); filt.connect(ng); ng.connect(masterGain);
+    noise.start(t); noise.stop(t + 0.16);
+    const body = audioCtx.createOscillator();
+    const bg = audioCtx.createGain();
+    body.type = 'triangle'; body.frequency.setValueAtTime(190, t); body.frequency.exponentialRampToValueAtTime(95, t + 0.07);
+    bg.gain.setValueAtTime(0.45 * vs, t); bg.gain.exponentialRampToValueAtTime(0.001, t + 0.09);
+    body.connect(bg); bg.connect(masterGain);
+    body.start(t); body.stop(t + 0.1);
+  } else {
+    const isOpen = drumId === 'ohat';
+    const noise = audioCtx.createBufferSource();
+    noise.buffer = noiseBuffer;
+    const filt = audioCtx.createBiquadFilter();
+    filt.type = 'highpass'; filt.frequency.setValueAtTime(6500, t);
+    const g = audioCtx.createGain();
+    const dur = isOpen ? 0.22 : 0.055;
+    g.gain.setValueAtTime(0.4 * vs, t); g.gain.exponentialRampToValueAtTime(0.001, t + dur);
+    noise.connect(filt); filt.connect(g); g.connect(masterGain);
+    noise.start(t); noise.stop(t + dur + 0.02);
+  }
+}
+
+// Transpose helpers
+function shiftTranspose(delta) { setTranspose(Math.max(-12, Math.min(12, transposeSemitones + delta))); }
+function setTranspose(val) {
+  transposeSemitones = val;
+  document.getElementById('transposeVal').textContent = (val > 0 ? `+${val}` : `${val}`) + ' st';
+}
+
+function toggleFloatKeyboard() {
+  const bar = document.getElementById('keyboardBar');
+  const btn = document.getElementById('floatKbdBtn');
+  const isFloat = bar.classList.toggle('floating');
+  document.body.classList.toggle('has-floating-kbd', isFloat);
+  btn.innerHTML = isFloat ? '&#8600; Dock Keyboard' : '&#8599; Float Keyboard';
+}
+
+// Polyphonic chord tracking for step-recording
+const heldRecKeys = new Set();
+let stepChordRecorded = false;
+
+function startNote(noteId, baseFreq, skipRecord = false) {
+  ensureAudio();
+  if (activeVoices.has(noteId)) stopNote(noteId);
+  const transposedFreq = baseFreq * Math.pow(2, transposeSemitones / 12);
+  const voice = triggerSynthVoice(transposedFreq, getLabParams(), audioCtx.currentTime, null, 0.72);
+  activeVoices.set(noteId, voice);
+  const keyEl = document.querySelector(`[data-note="${noteId}"]`);
+  if (keyEl) keyEl.classList.add('active');
+
+  if (!skipRecord && seqRecArmed && seqActiveTrack !== 'perc') {
+    heldRecKeys.add(noteId);
+    // Map transposed note onto C4–C5 piano roll (wrap octave into grid range)
+    const idx = NOTES.findIndex(n => n.id === noteId);
+    const mappedIdx = ((idx + transposeSemitones) % 12 + 12) % 12;
+    const mappedNoteId = (idx + transposeSemitones === 12) ? 'C5' : NOTES[mappedIdx].id;
+    recordNoteToSequencer(mappedNoteId);
+  }
+}
+
+function stopNote(noteId) {
+  const voice = activeVoices.get(noteId);
+  if (!voice || !audioCtx) return;
+  const p = getLabParams();
+  const now = audioCtx.currentTime;
+  voice.vca.gain.cancelScheduledValues(now);
+  voice.vca.gain.setValueAtTime(Math.max(0.0001, voice.vca.gain.value), now);
+  voice.vca.gain.exponentialRampToValueAtTime(0.0001, now + p.release);
+  const stopAt = now + p.release + 0.03;
+  voice.sources.forEach(s => { try { s.stop(stopAt); } catch(e){} });
+  activeVoices.delete(noteId);
+  const keyEl = document.querySelector(`[data-note="${noteId}"]`);
+  if (keyEl) keyEl.classList.remove('active');
+
+  // Step-record chord advance: advance only after ALL held chord keys are released
+  if (heldRecKeys.has(noteId)) {
+    heldRecKeys.delete(noteId);
+    if (heldRecKeys.size === 0 && stepChordRecorded && !seqPlaying && seqRecArmed) {
+      stepChordRecorded = false;
+      advanceStepCursor(2); // advance by 8th note after chord release
+    }
+  }
+}
+
+function stopAllNotes() {
+  holdActive = false;
+  heldRecKeys.clear();
+  stepChordRecorded = false;
+  document.getElementById('holdBtn').textContent = 'Hold C Note';
+  Array.from(activeVoices.keys()).forEach(stopNote);
+}
+
+function toggleHold() {
+  if (holdActive) stopAllNotes();
+  else {
+    holdActive = true;
+    document.getElementById('holdBtn').textContent = 'Release C Note';
+    startNote('C4', 261.63, true);
+  }
+}
+
+function updateSynthParams() {
+  const p = getLabParams();
+  const cutoffHz = sliderToCutoff(p.cutoff);
+  document.getElementById('detuneOut').textContent = `${p.detune} cents`;
+  document.getElementById('cutoffOut').textContent = cutoffHz >= 1000 ? `${(cutoffHz/1000).toFixed(2)} kHz` : `${cutoffHz} Hz`;
+  document.getElementById('resOut').textContent = p.q.toFixed(1);
+  document.getElementById('fenvOut').textContent = `${p.fenv} Hz`;
+  document.getElementById('attOut').textContent = `${p.attack.toFixed(2)} s`;
+  document.getElementById('decOut').textContent = `${p.decay.toFixed(2)} s`;
+  document.getElementById('susOut').textContent = `${Math.round(p.sustain * 100)}%`;
+  document.getElementById('relOut').textContent = `${p.release.toFixed(2)} s`;
+
+  const rangeLabel = p.octave === -1 ? "16'" : (p.octave === 0 ? "8'" : "4'");
+  const waveName = p.wave.charAt(0).toUpperCase() + p.wave.slice(1);
+  document.getElementById('vizWaveLabel').textContent = `${waveName} \u2022 ${rangeLabel}`;
+  document.getElementById('vizFilterLabel').textContent = `${p.filterType === 'lowpass' ? 'LPF' : 'HPF'} ${cutoffHz} Hz \u2022 Q ${p.q.toFixed(1)}`;
+
+  if (audioCtx && activeVoices.size > 0) {
+    const now = audioCtx.currentTime;
+    const isNoise = p.wave === 'noise';
+    activeVoices.forEach(v => {
+      // VCF real-time updates (cancel any in-flight envelope ramp first so slider responds immediately)
+      v.vcf.type = p.filterType;
+      v.vcf.frequency.cancelScheduledValues(now);
+      v.vcf.frequency.setTargetAtTime(Math.max(40, cutoffHz), now, 0.015);
+      v.vcf.Q.cancelScheduledValues(now);
+      v.vcf.Q.setTargetAtTime(p.q, now, 0.015);
+
+      // VCO waveform, octave pitch, detune, and sub-oscillator real-time updates
+      if (v.osc1 && v.osc2 && v.subOsc) {
+        const freq = v.baseFreq * Math.pow(2, p.octave);
+        if (!isNoise) {
+          v.osc1.type = p.wave;
+          v.osc2.type = p.wave;
+        }
+        v.osc1.frequency.setTargetAtTime(freq, now, 0.015);
+        v.osc2.frequency.setTargetAtTime(freq, now, 0.015);
+        v.subOsc.frequency.setTargetAtTime(freq / 2, now, 0.015);
+        v.osc1.detune.setTargetAtTime(p.detune > 0 ? -p.detune / 2 : 0, now, 0.015);
+        v.osc2.detune.setTargetAtTime(p.detune, now, 0.015);
+        v.osc2Gain.gain.setTargetAtTime(p.detune > 0 ? 0.6 : 0.0001, now, 0.02);
+        v.subGain.gain.setTargetAtTime(p.sub ? 0.35 : 0.0001, now, 0.02);
+        v.oscBusGain.gain.setTargetAtTime(isNoise ? 0.0001 : 1.0, now, 0.02);
+        v.noiseGain.gain.setTargetAtTime(isNoise ? 0.9 : 0.0001, now, 0.02);
+      }
+
+      // VCA sustain level real-time update on held notes
+      if (v.vca && v.gainScale) {
+        v.vca.gain.cancelScheduledValues(now);
+        v.vca.gain.setTargetAtTime(Math.max(0.0001, v.gainScale * Math.max(0.02, p.sustain)), now, 0.025);
+      }
+    });
+  }
+  drawADSR(p);
+  drawFilterAndHarmonics(p, cutoffHz);
+}
+
+function drawADSR(p) {
+  const w = 220, h = 52, pad = 6;
+  const xA = pad + (p.attack / 1.2) * 52;
+  const xD = xA + (p.decay / 1.2) * 52;
+  const xS = xD + 46;
+  const xR = Math.min(w - pad, xS + (p.release / 1.8) * 56);
+  const yTop = pad, yBot = h - pad;
+  const ySus = yBot - p.sustain * (yBot - yTop);
+  const path = `M ${pad} ${yBot} L ${xA} ${yTop} L ${xD} ${ySus} L ${xS} ${ySus} L ${xR} ${yBot}`;
+  document.getElementById('adsrPath').setAttribute('d', path);
+  document.getElementById('adsrFill').setAttribute('d', `${path} L ${pad} ${yBot} Z`);
+}
+
+function drawFilterAndHarmonics(p, cutoffHz) {
+  const canvas = document.getElementById('filterCanvas');
+  const ctx = canvas.getContext('2d');
+  const W = canvas.width, H = canvas.height;
+  ctx.clearRect(0, 0, W, H);
+
+  ctx.strokeStyle = 'rgba(148, 163, 184, 0.16)'; ctx.lineWidth = 1;
+  [100, 500, 1000, 5000, 10000].forEach(hz => {
+    const x = (Math.log10(hz / 40) / Math.log10(16000 / 40)) * W;
+    ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, H); ctx.stroke();
+    ctx.fillStyle = '#64748b'; ctx.font = '10px sans-serif';
+    ctx.fillText(hz >= 1000 ? `${hz/1000}k` : `${hz}`, x + 3, H - 4);
+  });
+
+  const f0 = 130.81 * Math.pow(2, p.octave + 1);
+  for (let n = 1; n <= 24; n++) {
+    const hz = f0 * n;
+    if (hz > 15500) break;
+    let amp = 0;
+    if (p.wave === 'sine') amp = n === 1 ? 1 : 0;
+    else if (p.wave === 'triangle') amp = (n % 2 === 1) ? 1 / (n * n) : 0;
+    else if (p.wave === 'sawtooth') amp = 1 / n;
+    else if (p.wave === 'square') amp = (n % 2 === 1) ? 1 / n : 0;
+    else if (p.wave === 'noise') amp = 0.55;
+    if (amp <= 0.01) continue;
+
+    const ratio = hz / cutoffHz;
+    const denom = Math.sqrt(Math.pow(1 - ratio * ratio, 2) + Math.pow(ratio / p.q, 2));
+    const gain = p.filterType === 'lowpass' ? (1 / denom) : ((ratio * ratio) / denom);
+    const shaped = Math.min(1.4, amp * Math.min(2.2, gain));
+    const x = (Math.log10(Math.max(40, hz) / 40) / Math.log10(16000 / 40)) * W;
+    const rawH = amp * (H * 0.65);
+    const filtH = Math.min(H - 18, shaped * (H * 0.65));
+
+    ctx.fillStyle = 'rgba(148, 163, 184, 0.22)'; ctx.fillRect(x - 3, H - 16 - rawH, 6, rawH);
+    ctx.fillStyle = '#38bdf8'; ctx.fillRect(x - 3, H - 16 - filtH, 6, filtH);
+  }
+
+  ctx.beginPath(); ctx.strokeStyle = '#2dd4bf'; ctx.lineWidth = 2.5;
+  for (let x = 0; x < W; x += 2) {
+    const hz = 40 * Math.pow(16000 / 40, x / W);
+    const r = hz / cutoffHz;
+    const denom = Math.sqrt(Math.pow(1 - r * r, 2) + Math.pow(r / p.q, 2));
+    const mag = p.filterType === 'lowpass' ? (1 / denom) : ((r * r) / denom);
+    const db = Math.max(-36, Math.min(18, 20 * Math.log10(Math.max(0.0001, mag))));
+    const y = H * 0.36 - (db / 36) * (H * 0.45);
+    if (x === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+  }
+  ctx.stroke();
+
+  const cx = (Math.log10(Math.max(40, cutoffHz) / 40) / Math.log10(16000 / 40)) * W;
+  ctx.strokeStyle = 'rgba(245, 158, 11, 0.75)'; ctx.setLineDash([4, 3]);
+  ctx.beginPath(); ctx.moveTo(cx, 0); ctx.lineTo(cx, H - 16); ctx.stroke(); ctx.setLineDash([]);
+}
+
+let scopeAutoGain = 4.0;
+function renderScopeLoop() {
+  const canvas = document.getElementById('scopeCanvas');
+  const ctx = canvas.getContext('2d');
+  const W = canvas.width, H = canvas.height;
+  ctx.clearRect(0, 0, W, H);
+
+  // Subtle oscilloscope graticule grid
+  ctx.strokeStyle = 'rgba(148, 163, 184, 0.12)';
+  ctx.lineWidth = 1;
+  for (let gx = 1; gx < 8; gx++) {
+    const x = (gx / 8) * W;
+    ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, H); ctx.stroke();
+  }
+  ctx.beginPath(); ctx.moveTo(0, H * 0.25); ctx.lineTo(W, H * 0.25); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(0, H * 0.75); ctx.lineTo(W, H * 0.75); ctx.stroke();
+  ctx.strokeStyle = 'rgba(148, 163, 184, 0.28)';
+  ctx.beginPath(); ctx.moveTo(0, H / 2); ctx.lineTo(W, H / 2); ctx.stroke();
+
+  ctx.save();
+  ctx.strokeStyle = '#38bdf8';
+  ctx.shadowColor = 'rgba(56, 189, 248, 0.65)';
+  ctx.shadowBlur = 8;
+  ctx.lineWidth = 2.6;
+  ctx.beginPath();
+
+  if (analyser && (activeVoices.size > 0 || seqPlaying || demoRunning)) {
+    const buf = new Float32Array(analyser.fftSize);
+    analyser.getFloatTimeDomainData(buf);
+
+    // Measure peak amplitude & smoothly auto-gain so even low/filtered notes fill ~80% height clearly
+    let maxAbs = 0;
+    for (let i = 0; i < buf.length; i++) {
+      const a = Math.abs(buf[i]);
+      if (a > maxAbs) maxAbs = a;
+    }
+    const targetGain = maxAbs > 0.004 ? Math.min(14, 0.85 / maxAbs) : 4.0;
+    scopeAutoGain += (targetGain - scopeAutoGain) * 0.18;
+
+    // Rising zero-crossing trigger for rock-steady waveform lock
+    let start = 0;
+    for (let i = 1; i < buf.length / 2; i++) {
+      if (buf[i - 1] <= 0 && buf[i] > 0) { start = i; break; }
+    }
+    const slice = Math.min(320, buf.length - start);
+    for (let i = 0; i < slice; i++) {
+      const x = (i / (slice - 1)) * W;
+      const sample = Math.max(-1, Math.min(1, buf[start + i] * scopeAutoGain));
+      const y = H / 2 - sample * (H * 0.43);
+      if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+    }
+  } else {
+    const p = getLabParams();
+    for (let x = 0; x < W; x++) {
+      const t = (x / W) * 3, frac = t - Math.floor(t);
+      let v = 0;
+      if (p.wave === 'sine') v = Math.sin(t * Math.PI * 2);
+      else if (p.wave === 'square') v = frac < 0.5 ? 0.88 : -0.88;
+      else if (p.wave === 'sawtooth') v = 2 * frac - 1;
+      else if (p.wave === 'triangle') v = 1 - 4 * Math.abs(Math.round(t - 0.25) - (t - 0.25));
+      else v = (Math.sin(x * 12.9898) * 43758.5453 % 1) * 1.5 - 0.75;
+      const y = H / 2 - v * (H * 0.40);
+      if (x === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+    }
+  }
+  ctx.stroke();
+  ctx.restore();
+  requestAnimationFrame(renderScopeLoop);
+}
+
+// ================= 3. INTERACTIVE GUIDED SYNTH DEMO (30s) =================
+let demoRunning = false;
+let demoTimers = [];
+let demoVoices = [];
+let demoAnimInterval = null;
+let activeDemoModuleId = '';
+
+function clearCtrlFocus() {
+  document.querySelectorAll('.ctrl.demo-ctrl-focus').forEach(el => el.classList.remove('demo-ctrl-focus'));
+}
+
+function focusDemoControls(inputIds) {
+  clearCtrlFocus();
+  (inputIds || []).forEach(id => {
+    const inp = document.getElementById(id);
+    if (inp) {
+      const row = inp.closest('.ctrl');
+      if (row) row.classList.add('demo-ctrl-focus');
+    }
+  });
+}
+
+function positionDemoCallout(moduleId) {
+  const callout = document.getElementById('demoCallout');
+  const mod = moduleId ? document.getElementById(moduleId) : null;
+  if (!callout || !mod || !demoRunning) return;
+
+  const rect = mod.getBoundingClientRect();
+  const cw = Math.min(320, window.innerWidth - 24);
+  const gap = 16;
+  callout.classList.remove('arrow-left', 'arrow-right');
+
+  if (window.innerWidth < 860) {
+    callout.style.left = Math.max(12, (window.innerWidth - cw) / 2) + 'px';
+    callout.style.top = Math.max(12, window.innerHeight - callout.offsetHeight - 16) + 'px';
+    return;
+  }
+
+  let left;
+  if (moduleId === 'mod-env' || rect.right + gap + cw > window.innerWidth - 12) {
+    left = Math.max(12, rect.left - cw - gap);
+    callout.classList.add('arrow-right');
+  } else {
+    left = Math.min(window.innerWidth - cw - 12, rect.right + gap);
+    callout.classList.add('arrow-left');
+  }
+  const top = Math.max(16, Math.min(window.innerHeight - callout.offsetHeight - 16, rect.top + 8));
+  callout.style.left = left + 'px';
+  callout.style.top = top + 'px';
+}
+
+function highlightModule(id, controlIds = []) {
+  activeDemoModuleId = id || '';
+  ['mod-vco', 'mod-vcf', 'mod-env'].forEach(m => {
+    document.getElementById(m).classList.toggle('demo-highlight', m === id);
+  });
+  focusDemoControls(controlIds);
+  if (id && demoRunning) {
+    requestAnimationFrame(() => positionDemoCallout(id));
+  }
+}
+
+window.addEventListener('scroll', () => { if (demoRunning && activeDemoModuleId) positionDemoCallout(activeDemoModuleId); }, { passive: true });
+window.addEventListener('resize', () => { if (demoRunning && activeDemoModuleId) positionDemoCallout(activeDemoModuleId); });
+window.addEventListener('keydown', (e) => { if (e.key === 'Escape' && demoRunning) stopGuidedDemo(); });
+
+function setDemoMessage(badgeText, paramText, bodyText) {
+  document.getElementById('demoStepBadge').textContent = badgeText;
+  document.getElementById('demoCaption').textContent = bodyText;
+  document.getElementById('demoCalloutBadge').textContent = badgeText;
+  document.getElementById('demoCalloutParam').textContent = paramText;
+  document.getElementById('demoCalloutText').textContent = bodyText;
+  if (activeDemoModuleId) requestAnimationFrame(() => positionDemoCallout(activeDemoModuleId));
+}
+
+function toggleGuidedDemo() {
+  if (demoRunning) stopGuidedDemo();
+  else startGuidedDemo();
+}
+
+function stopGuidedDemo() {
+  demoRunning = false;
+  demoTimers.forEach(clearTimeout);
+  demoTimers = [];
+  if (demoAnimInterval) { clearInterval(demoAnimInterval); demoAnimInterval = null; }
+  demoVoices.forEach(v => { try { const now = audioCtx.currentTime; v.vca.gain.cancelScheduledValues(now); v.vca.gain.setTargetAtTime(0.0001, now, 0.02); v.sources.forEach(s => { try { s.stop(now + 0.06); } catch(e){} }); } catch(e){} });
+  demoVoices = [];
+  stopAllNotes();
+  highlightModule('', []);
+  document.body.classList.remove('demo-spotlight-active');
+  document.getElementById('demoCallout').classList.remove('visible');
+  document.getElementById('demoPlayer').classList.remove('active');
+  document.getElementById('demoBtn').innerHTML = '&#9654; Play Guided Synth Demo (52s)';
+}
+
+function startGuidedDemo() {
+  ensureAudio();
+  stopAllNotes();
+  if (seqPlaying) toggleSeqPlay();
+  demoRunning = true;
+
+  // Scroll Synth Lab nicely into view so visualizers + highlighted module are centered
+  const chassis = document.querySelector('.synth-chassis');
+  if (chassis) chassis.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+  document.body.classList.add('demo-spotlight-active');
+  document.getElementById('demoCallout').classList.add('visible');
+  document.getElementById('demoPlayer').classList.add('active');
+  document.getElementById('demoBtn').innerHTML = '&#9632; Stop Guided Demo';
+
+  const prog = document.getElementById('demoProgress');
+  const progFloat = document.getElementById('demoCalloutProg');
+  const t0 = Date.now();
+  const totalMs = 52000;
+
+  demoAnimInterval = setInterval(() => {
+    const pct = Math.min(100, ((Date.now() - t0) / totalMs) * 100);
+    prog.style.width = `${pct}%`;
+    progFloat.style.width = `${pct}%`;
+    if (activeDemoModuleId) positionDemoCallout(activeDemoModuleId);
+  }, 150);
+
+  const schedule = (ms, fn) => demoTimers.push(setTimeout(() => { if (demoRunning) fn(); }, ms));
+
+  // Scene 1: Waveforms (0-8s)
+  schedule(0, () => {
+    highlightModule('mod-vco', ['waveSelect']);
+    setDemoMessage(
+      'Scene 1 / 6 • VCO Waveforms',
+      'Changing: VCO → Waveform (Sine)',
+      '1. Sine Wave — pure fundamental frequency only (notice just one blue harmonic bar and a smooth wave on the scope!).'
+    );
+    setLabParams({ wave:'sine', octave:0, detune:0, sub:false, filterType:'lowpass', cutoff:95, q:1, fenv:0, attack:0.02, decay:0.2, sustain:0.8, release:0.2 });
+    startNote('C4', 261.63, true);
+  });
+  schedule(2400, () => {
+    highlightModule('mod-vco', ['waveSelect']);
+    setDemoMessage(
+      'Scene 1 / 6 • VCO Waveforms',
+      'Changing: VCO → Waveform (Square)',
+      '2. Square Wave — adds strong odd harmonics for that hollow, punchy 80s arcade sound.'
+    );
+    document.getElementById('waveSelect').value = 'square';
+    updateSynthParams();
+  });
+  schedule(5000, () => {
+    highlightModule('mod-vco', ['waveSelect']);
+    setDemoMessage(
+      'Scene 1 / 6 • VCO Waveforms',
+      'Changing: VCO → Waveform (Sawtooth)',
+      '3. Sawtooth Wave — every odd & even harmonic! This bright block of sound is ideal for subtractive filtering.'
+    );
+    document.getElementById('waveSelect').value = 'sawtooth';
+    updateSynthParams();
+  });
+
+  // Scene 2: VCF Cutoff Sweep (8-15s)
+  schedule(8000, () => {
+    highlightModule('mod-vcf', ['cutoffSlider']);
+    setDemoMessage(
+      'Scene 2 / 6 • VCF Cutoff Sweep',
+      'Changing: VCF → Cutoff Frequency',
+      'Watch the Low-Pass Filter sweep down — carving away upper harmonics to turn buzzy into warm!'
+    );
+    let step = 0;
+    const sweep = setInterval(() => {
+      if (!demoRunning || step > 28) { clearInterval(sweep); return; }
+      const val = step <= 16 ? (92 - step * 4.5) : (20 + (step - 16) * 5.2);
+      document.getElementById('cutoffSlider').value = Math.max(15, Math.min(92, val));
+      updateSynthParams();
+      step++;
+    }, 220);
+    demoTimers.push(sweep);
+  });
+
+  // Scene 3: Resonance (15-21.5s)
+  schedule(15000, () => {
+    highlightModule('mod-vcf', ['resSlider', 'cutoffSlider']);
+    setDemoMessage(
+      'Scene 3 / 6 • Filter Resonance (Q)',
+      'Changing: VCF → Resonance (Q) + Cutoff',
+      'Turning Resonance (Q) up to 13 creates a sharp peak right at the cutoff — hear that squelchy acid sweep!'
+    );
+    document.getElementById('resSlider').value = 13;
+    updateSynthParams();
+    let step = 0;
+    const sweep2 = setInterval(() => {
+      if (!demoRunning || step > 24) { clearInterval(sweep2); return; }
+      const val = 24 + Math.sin(step / 3.5) * 28 + 22;
+      document.getElementById('cutoffSlider').value = val;
+      updateSynthParams();
+      step++;
+    }, 230);
+    demoTimers.push(sweep2);
+  });
+
+  // Shared 4-chord progression for ADSR scenes (Cm -> Ab -> Eb -> Bb)
+  const ADSR_CHORDS = [
+    [261.63, 311.13, 392.00], // Cm
+    [207.65, 261.63, 311.13], // Ab
+    [311.13, 392.00, 466.16], // Eb
+    [233.08, 293.66, 349.23], // Bb
+  ];
+  const playDemoChord = (freqs, holdSec, gain = 0.34) => {
+    const pNow = getLabParams();
+    const t = audioCtx.currentTime;
+    freqs.forEach(f => {
+      const v = triggerSynthVoice(f, pNow, t, holdSec, gain);
+      demoVoices.push(v);
+    });
+  };
+
+  // Scene 4 / 6: ADSR Attack — 10s looping chords (21.5s - 31.5s)
+  schedule(21500, () => {
+    stopAllNotes();
+    highlightModule('mod-env', ['attSlider']);
+    setLabParams({ wave:'sawtooth', octave:0, detune:12, sub:false, filterType:'lowpass', cutoff:60, q:1.5, fenv:450, attack:0.005, decay:0.20, sustain:0.80, release:0.18 });
+    const attackSteps = [0.005, 0.04, 0.12, 0.24, 0.40, 0.58, 0.78, 0.96];
+    attackSteps.forEach((att, idx) => {
+      schedule(idx * 1250, () => {
+        document.getElementById('attSlider').value = att.toFixed(3);
+        updateSynthParams();
+        const feel = att < 0.06 ? 'instant punchy hit' : (att < 0.35 ? 'softening fade-in' : 'slow bowed pad swell');
+        setDemoMessage(
+          'Scene 4 / 6 • ADSR: Attack (10 s)',
+          `Attack: ${att.toFixed(2)} s (${feel})`,
+          'Listen to these short looping chords as Attack moves from 0.01 s up to 0.96 s — each chord fades in slower and smoother while the amber slope leans right.'
+        );
+        playDemoChord(ADSR_CHORDS[idx % ADSR_CHORDS.length], 0.95, 0.34);
+      });
+    });
+  });
+
+  // Scene 5 / 6: ADSR Sustain — 10s same looping chords (31.5s - 41.5s)
+  schedule(31500, () => {
+    stopAllNotes();
+    highlightModule('mod-env', ['susSlider']);
+    setLabParams({ wave:'sawtooth', octave:0, detune:12, sub:false, filterType:'lowpass', cutoff:62, q:1.5, fenv:500, attack:0.01, decay:0.24, sustain:1.0, release:0.16 });
+    const sustainSteps = [1.0, 0.80, 0.55, 0.30, 0.10, 0.0, 0.0];
+    sustainSteps.forEach((sus, idx) => {
+      schedule(idx * 1400, () => {
+        document.getElementById('susSlider').value = sus.toFixed(2);
+        updateSynthParams();
+        const pct = Math.round(sus * 100);
+        const feel = pct >= 70 ? 'full held volume' : (pct >= 25 ? 'quieter held level' : 'drops to silence = short pluck!');
+        setDemoMessage(
+          'Scene 5 / 6 • ADSR: Sustain (10 s)',
+          `Sustain: ${pct}% (${feel})`,
+          'The same chords loop while Sustain drops from 100% down to 0%. Notice Sustain controls the HELD volume level — at 0% the chord decays straight into a short pluck!'
+        );
+        playDemoChord(ADSR_CHORDS[idx % ADSR_CHORDS.length], 1.05, 0.36);
+      });
+    });
+  });
+
+  // Scene 6 / 6: ADSR Release — 10.5s same looping chords (41.5s - 52.0s)
+  schedule(41500, () => {
+    stopAllNotes();
+    highlightModule('mod-env', ['relSlider']);
+    setLabParams({ wave:'sawtooth', octave:0, detune:14, sub:false, filterType:'lowpass', cutoff:60, q:1.5, fenv:450, attack:0.015, decay:0.20, sustain:0.78, release:0.03 });
+    const releaseSteps = [0.03, 0.15, 0.40, 0.80, 1.30, 1.75];
+    releaseSteps.forEach((rel, idx) => {
+      schedule(idx * 1650, () => {
+        document.getElementById('relSlider').value = rel.toFixed(2);
+        updateSynthParams();
+        const feel = rel < 0.12 ? 'abrupt staccato stop' : (rel < 0.6 ? 'gentle fade-out' : 'long ambient tail ringing on!');
+        setDemoMessage(
+          'Scene 6 / 6 • ADSR: Release (10 s)',
+          `Release: ${rel.toFixed(2)} s (${feel})`,
+          'Same short chords (keys lifted after 0.35 s) while Release climbs from 0.03 s to 1.75 s — hear the abrupt stop transform into a long, floating fade-out tail!'
+        );
+        playDemoChord(ADSR_CHORDS[idx % ADSR_CHORDS.length], 0.35, 0.34);
+      });
+    });
+  });
+
+  schedule(52000, () => stopGuidedDemo());
+}
+
+// ================= 4. SHARED PRESET DATABASE (SIMPLE LOAD / SAVE IN PART 4) =================
+const FALLBACK_PRESETS = [
+  { preset_id:'builtin-16ft-bass', name:"16' Synth Bass", author:'Teacher', category:'bass', notes:'', is_builtin:true,
+    params:{ wave:'sawtooth', octave:-1, detune:6, sub:true, filterType:'lowpass', cutoff:44, q:2.0, fenv:1500, attack:0.01, decay:0.25, sustain:0.5, release:0.2 } },
+  { preset_id:'builtin-80s-lead', name:'80s Arcade Square Lead', author:'Teacher', category:'melody', notes:'', is_builtin:true,
+    params:{ wave:'square', octave:0, detune:5, sub:false, filterType:'lowpass', cutoff:72, q:2.5, fenv:1600, attack:0.005, decay:0.2, sustain:0.6, release:0.16 } },
+  { preset_id:'builtin-chiptune-arp', name:'Chiptune Pluck', author:'Teacher', category:'harmony', notes:'', is_builtin:true,
+    params:{ wave:'triangle', octave:0, detune:0, sub:false, filterType:'lowpass', cutoff:80, q:1.5, fenv:1200, attack:0.005, decay:0.18, sustain:0.15, release:0.12 } },
+  { preset_id:'builtin-detuned-pad', name:'Warm Detuned Pad', author:'Teacher', category:'harmony', notes:'', is_builtin:true,
+    params:{ wave:'sawtooth', octave:0, detune:20, sub:false, filterType:'lowpass', cutoff:54, q:1.5, fenv:500, attack:0.45, decay:0.5, sustain:0.8, release:0.9 } }
+];
+
+let sharedPresets = [...FALLBACK_PRESETS];
+const trackPresetIds = { melody: 'builtin-80s-lead', harmony: 'builtin-chiptune-arp', bass: 'builtin-16ft-bass' };
+
+async function fetchSharedPresets() {
+  try {
+    const res = await fetch('/api/v1/synth-presets');
+    if (res.ok) sharedPresets = await res.json();
+  } catch (e) { /* offline fallback */ }
+  populatePresetDropdowns();
+}
+
+function escapeHtml(s) {
+  return String(s).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+}
+
+function getPresetById(id) {
+  return sharedPresets.find(p => p.preset_id === id) || sharedPresets[0];
+}
+
+function populatePresetDropdowns() {
+  const builtins = sharedPresets.filter(p => p.is_builtin);
+  const community = sharedPresets.filter(p => !p.is_builtin);
+  const buildOptions = () => {
+    let html = '';
+    if (community.length) {
+      html += `<optgroup label="Saved Class Timbres (${community.length})">` +
+        community.map(p => `<option value="${p.preset_id}">${escapeHtml(p.name)} — ${escapeHtml(p.author)}</option>`).join('') +
+        '</optgroup>';
+    }
+    html += `<optgroup label="Built-in Teacher Presets">` +
+      builtins.map(p => `<option value="${p.preset_id}">${escapeHtml(p.name)}</option>`).join('') +
+      '</optgroup>';
+    return html;
+  };
+  const optsHtml = buildOptions();
+
+  const mainSel = document.getElementById('sharedPresetSelect');
+  if (mainSel) {
+    const prev = mainSel.value;
+    mainSel.innerHTML = optsHtml;
+    if (prev && sharedPresets.some(p => p.preset_id === prev)) mainSel.value = prev;
+  }
+  ['melody', 'harmony', 'bass'].forEach(tr => {
+    const sel = document.getElementById(`preset-${tr}`);
+    if (!sel) return;
+    sel.innerHTML = optsHtml;
+    if (sharedPresets.some(p => p.preset_id === trackPresetIds[tr])) sel.value = trackPresetIds[tr];
+    else if (sharedPresets[0]) { trackPresetIds[tr] = sharedPresets[0].preset_id; sel.value = sharedPresets[0].preset_id; }
+  });
+}
+
+function loadSelectedPresetToLab() {
+  const id = document.getElementById('sharedPresetSelect').value;
+  const p = getPresetById(id);
+  if (p) {
+    setLabParams(p.params);
+    showPresetFeedback(`Loaded "${p.name}" into the Synth Lab.`, '#1e40af');
+  }
+}
+
+function assignSelectedPresetToActiveTrack() {
+  if (seqActiveTrack === 'perc') {
+    showPresetFeedback('Select Melody, Harmony, or Bassline to assign a synth timbre.', '#92400e');
+    return;
+  }
+  const id = document.getElementById('sharedPresetSelect').value;
+  const p = getPresetById(id);
+  trackPresetIds[seqActiveTrack] = id;
+  const sel = document.getElementById(`preset-${seqActiveTrack}`);
+  if (sel) sel.value = id;
+  showPresetFeedback(`Assigned "${p.name}" to the ${seqActiveTrack.toUpperCase()} track.`, '#166534');
+}
+
+function assignTrackPreset(track, id) { trackPresetIds[track] = id; }
+
+function showPresetFeedback(msg, color) {
+  const el = document.getElementById('presetFeedback');
+  el.style.color = color;
+  el.textContent = msg;
+}
+
+async function saveCurrentPreset(ev) {
+  ev.preventDefault();
+  const cat = seqActiveTrack === 'perc' ? 'fx' : seqActiveTrack;
+  const payload = {
+    name: document.getElementById('pName').value.trim(),
+    author: document.getElementById('pAuthor').value.trim(),
+    category: cat,
+    notes: '',
+    params: getLabParams()
+  };
+  showPresetFeedback('Saving to shared library...', '#475569');
+  try {
+    const res = await fetch('/api/v1/synth-presets', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const saved = await res.json();
+    sharedPresets.unshift(saved);
+    populatePresetDropdowns();
+    document.getElementById('sharedPresetSelect').value = saved.preset_id;
+    if (seqActiveTrack !== 'perc') {
+      trackPresetIds[seqActiveTrack] = saved.preset_id;
+      document.getElementById(`preset-${seqActiveTrack}`).value = saved.preset_id;
+    }
+    document.getElementById('pName').value = '';
+    showPresetFeedback(`Saved "${saved.name}" by ${saved.author} — now available to everyone!`, '#166534');
+    if (typeof markPresetShared === 'function') markPresetShared();
+  } catch (err) {
+    showPresetFeedback(`Could not save to server (${err.message}).`, '#b91c1c');
+  }
+}
+
+// ================= 5. KEYBOARD =================
+const NOTES = [
+  { id:'C4',  label:'C',  key:'a', freq:261.63, black:false },
+  { id:'C#4', label:'C#', key:'w', freq:277.18, black:true,  offset:27 },
+  { id:'D4',  label:'D',  key:'s', freq:293.66, black:false },
+  { id:'D#4', label:'D#', key:'e', freq:311.13, black:true,  offset:66 },
+  { id:'E4',  label:'E',  key:'d', freq:329.63, black:false },
+  { id:'F4',  label:'F',  key:'f', freq:349.23, black:false },
+  { id:'F#4', label:'F#', key:'t', freq:369.99, black:true,  offset:144 },
+  { id:'G4',  label:'G',  key:'g', freq:392.00, black:false },
+  { id:'G#4', label:'G#', key:'y', freq:415.30, black:true,  offset:183 },
+  { id:'A4',  label:'A',  key:'h', freq:440.00, black:false },
+  { id:'A#4', label:'A#', key:'u', freq:466.16, black:true,  offset:222 },
+  { id:'B4',  label:'B',  key:'j', freq:493.88, black:false },
+  { id:'C5',  label:'C5', key:'k', freq:523.25, black:false }
+];
+const kbdEl = document.getElementById('keyboard');
+NOTES.forEach(n => {
+  const el = document.createElement('div');
+  el.className = n.black ? 'key-black' : 'key-white';
+  el.dataset.note = n.id;
+  if (n.black) el.style.left = `${n.offset}px`;
+  el.innerHTML = `<span>${n.label}</span>`;
+  el.addEventListener('pointerdown', (e) => { e.preventDefault(); startNote(n.id, n.freq); });
+  el.addEventListener('pointerup', () => stopNote(n.id));
+  el.addEventListener('pointerleave', () => stopNote(n.id));
+  kbdEl.appendChild(el);
+});
+const keyMap = Object.fromEntries(NOTES.map(n => [n.key, n]));
+window.addEventListener('keydown', (e) => {
+  if (e.repeat) return;
+  const tag = e.target.tagName;
+  const isTypingField = tag === 'TEXTAREA' || (tag === 'INPUT' && !['range', 'checkbox', 'button'].includes(e.target.type));
+  if (isTypingField) return;
+  const n = keyMap[e.key.toLowerCase()];
+  if (n) startNote(n.id, n.freq);
+});
+window.addEventListener('keyup', (e) => {
+  const n = keyMap[e.key.toLowerCase()];
+  if (n) stopNote(n.id);
+});
+
+// ================= 6. 4-TRACK 16-BAR 80S SEQUENCER =================
+const PITCH_ROWS = [...NOTES].reverse();
+const PERC_ROWS = [
+  { id:'ohat', label:'Open Hat' },
+  { id:'chat', label:'Closed Hat' },
+  { id:'snare', label:'Snare' },
+  { id:'kick', label:'Kick' }
+];
+const TRACK_OCTAVE_SHIFT = { melody: 1, harmony: 0.5, bass: 0.5 };
+const NUM_BARS = 16;
+const STEPS_PER_BAR = 16;
+
+// seqData[track][bar][step] = Map<rowId, lengthInSteps>
+function emptyTrackData() {
+  return Array.from({ length: NUM_BARS }, () => Array.from({ length: STEPS_PER_BAR }, () => new Map()));
+}
+const seqData = { melody: emptyTrackData(), harmony: emptyTrackData(), bass: emptyTrackData(), perc: emptyTrackData() };
+const seqMuted = { melody: false, harmony: false, bass: false, perc: false };
+const trackVolumes = { melody: 1.0, harmony: 1.0, bass: 1.0, perc: 1.0 };
+function setTrackVolume(tr, val) {
+  const v = Math.max(0, Math.min(1.4, parseFloat(val)));
+  trackVolumes[tr] = v;
+  const label = document.getElementById('vol-val-' + tr);
+  if (label) label.textContent = Math.round(v * 100) + '%';
+}
+let seqActiveTrack = 'melody';
+let seqCurrentBar = 0;
+let seqPlayBar = 0;
+let seqPlayStep = -1;
+let seqStepCursor = 0;
+let seqPlaying = false;
+let seqRecArmed = false;
+let seqTimer = null;
+let dragNote = null; // { rowId, startStep }
+
+function buildBarStrip() {
+  const strip = document.getElementById('seqBarStrip');
+  strip.innerHTML = '<span class="seq-bars-label">Bar (1–16):</span>';
+  for (let b = 0; b < NUM_BARS; b++) {
+    const btn = document.createElement('button');
+    btn.className = 'bar-btn';
+    btn.textContent = String(b + 1);
+    btn.dataset.bar = String(b);
+    btn.onclick = () => { seqCurrentBar = b; seqStepCursor = 0; renderBarStrip(); renderSeqGrid(); };
+    strip.appendChild(btn);
+  }
+  renderBarStrip();
+}
+
+function barHasNotes(b) {
+  return ['melody','harmony','bass','perc'].some(tr => seqData[tr][b].some(m => m.size > 0));
+}
+
+function renderBarStrip() {
+  document.querySelectorAll('#seqBarStrip .bar-btn').forEach(btn => {
+    const b = parseInt(btn.dataset.bar, 10);
+    btn.classList.toggle('selected', b === seqCurrentBar);
+    btn.classList.toggle('playing', seqPlaying && b === seqPlayBar);
+    btn.classList.toggle('has-notes', barHasNotes(b));
+  });
+}
+
+function selectSeqTrack(tr) {
+  seqActiveTrack = tr;
+  document.querySelectorAll('#seqTracksBar .track-tab').forEach(el => el.classList.toggle('active', el.dataset.track === tr));
+  renderSeqGrid();
+}
+
+function toggleMute(ev, tr) {
+  ev.stopPropagation();
+  seqMuted[tr] = !seqMuted[tr];
+  ev.target.classList.toggle('muted', seqMuted[tr]);
+}
+
+// Find if a cell (rowId, step) is covered by a note starting at <= step
+function findCoveringNote(track, bar, rowId, step) {
+  for (let s = step; s >= 0; s--) {
+    const len = seqData[track][bar][s].get(rowId);
+    if (len && s + len > step) return { start: s, len };
+  }
+  return null;
+}
+
+function renderSeqGrid() {
+  const grid = document.getElementById('seqGrid');
+  const rows = seqActiveTrack === 'perc' ? PERC_ROWS : PITCH_ROWS;
+  const onClass = `on-${seqActiveTrack}`;
+  let html = '<div class="seq-step-hdr" style="text-align:left;padding-left:6px;">Note</div>';
+  for (let s = 0; s < STEPS_PER_BAR; s++) {
+    const isBeat = s % 4 === 0;
+    const isNow = seqPlaying && seqPlayBar === seqCurrentBar && seqPlayStep === s;
+    const isRecCur = !seqPlaying && seqRecArmed && seqStepCursor === s;
+    html += `<div class="seq-step-hdr ${isBeat ? 'beat' : ''} ${isNow ? 'now' : ''} ${isRecCur ? 'step-cursor' : ''}">${isBeat ? (s/4 + 1) : '&middot;'}</div>`;
+  }
+  rows.forEach(r => {
+    const isSharp = r.label.includes('#');
+    html += `<div class="seq-row-label ${isSharp ? 'sharp' : ''}">${r.label}</div>`;
+    for (let s = 0; s < STEPS_PER_BAR; s++) {
+      const cov = findCoveringNote(seqActiveTrack, seqCurrentBar, r.id, s);
+      const isBeat = s % 4 === 0;
+      const isNow = seqPlaying && seqPlayBar === seqCurrentBar && seqPlayStep === s;
+      const isRecCur = !seqPlaying && seqRecArmed && seqStepCursor === s;
+      let segClass = '';
+      let handleHtml = '';
+      if (cov) {
+        segClass = onClass;
+        const isEnd = (s === cov.start + cov.len - 1);
+        if (cov.len > 1) {
+          if (s === cov.start) segClass += ' note-start';
+          else if (isEnd) segClass += ' note-end';
+          else segClass += ' note-mid';
+        }
+        if (isEnd && seqActiveTrack !== 'perc') {
+          handleHtml = `<span class="note-handle" title="Drag to resize note length" onpointerdown="startNoteResize(event,'${r.id}',${cov.start})"></span>`;
+        }
+      }
+      html += `<div class="seq-cell ${isBeat ? 'beat-col' : ''} ${segClass} ${isNow ? 'playhead' : ''} ${isRecCur ? 'rec-cursor' : ''}" data-row="${r.id}" data-step="${s}" onclick="onSeqCellClick('${r.id}',${s})">${handleHtml}</div>`;
+    }
+  });
+  grid.innerHTML = html;
+}
+
+let resizeState = null; // { rowId, startStep, lastLen, gridLeft, colWidth }
+
+function onSeqCellClick(rowId, step) {
+  if (resizeState) return;
+  const cov = findCoveringNote(seqActiveTrack, seqCurrentBar, rowId, step);
+  if (cov) {
+    seqData[seqActiveTrack][seqCurrentBar][cov.start].delete(rowId);
+  } else {
+    if (seqActiveTrack === 'bass') seqData[seqActiveTrack][seqCurrentBar][step].clear();
+    seqData[seqActiveTrack][seqCurrentBar][step].set(rowId, 1);
+    ensureAudio();
+    if (seqActiveTrack === 'perc') triggerPercVoice(rowId, audioCtx.currentTime, trackVolumes.perc);
+    else {
+      const n = NOTES.find(x => x.id === rowId);
+      const preset = getPresetById(trackPresetIds[seqActiveTrack]);
+      if (n && preset) triggerSynthVoice(n.freq * TRACK_OCTAVE_SHIFT[seqActiveTrack], preset.params, audioCtx.currentTime, 0.22, 0.5 * trackVolumes[seqActiveTrack]);
+    }
+  }
+  seqStepCursor = step;
+  renderSeqGrid();
+  renderBarStrip();
+}
+
+function startNoteResize(ev, rowId, startStep) {
+  ev.preventDefault();
+  ev.stopPropagation();
+  const grid = document.getElementById('seqGrid');
+  const firstCell = grid.querySelector(`.seq-cell[data-row="${rowId}"][data-step="0"]`);
+  const lastCell = grid.querySelector(`.seq-cell[data-row="${rowId}"][data-step="15"]`);
+  if (!firstCell || !lastCell) return;
+  const r0 = firstCell.getBoundingClientRect();
+  const r15 = lastCell.getBoundingClientRect();
+  const totalW = r15.right - r0.left;
+  const curLen = seqData[seqActiveTrack][seqCurrentBar][startStep].get(rowId) || 1;
+  resizeState = { rowId, startStep, lastLen: curLen, left: r0.left, colW: totalW / STEPS_PER_BAR };
+  document.body.style.cursor = 'ew-resize';
+}
+
+window.addEventListener('pointermove', (ev) => {
+  if (!resizeState) return;
+  const rawStep = Math.floor((ev.clientX - resizeState.left) / resizeState.colW);
+  const clampedEnd = Math.max(resizeState.startStep, Math.min(STEPS_PER_BAR - 1, rawStep));
+  const newLen = clampedEnd - resizeState.startStep + 1;
+  if (newLen === resizeState.lastLen) return;
+  resizeState.lastLen = newLen;
+  for (let s = resizeState.startStep + 1; s <= clampedEnd; s++) {
+    seqData[seqActiveTrack][seqCurrentBar][s].delete(resizeState.rowId);
+  }
+  seqData[seqActiveTrack][seqCurrentBar][resizeState.startStep].set(resizeState.rowId, newLen);
+  renderSeqGrid();
+});
+
+window.addEventListener('pointerup', () => {
+  if (!resizeState) return;
+  document.body.style.cursor = '';
+  // Brief delay so mouseup doesn't trigger parent cell onclick
+  setTimeout(() => { resizeState = null; }, 0);
+});
+
+function recordNoteToSequencer(noteId) {
+  const targetBar = seqPlaying ? seqPlayBar : seqCurrentBar;
+  const targetStep = seqPlaying ? Math.max(0, seqPlayStep) : seqStepCursor;
+  if (seqActiveTrack === 'bass') seqData[seqActiveTrack][targetBar][targetStep].clear();
+  const defaultLen = seqActiveTrack === 'harmony' ? 4 : 2;
+  const maxLen = Math.min(defaultLen, STEPS_PER_BAR - targetStep);
+  seqData[seqActiveTrack][targetBar][targetStep].set(noteId, maxLen);
+  if (!seqPlaying) stepChordRecorded = true;
+  renderSeqGrid();
+  renderBarStrip();
+}
+
+function advanceStepCursor(steps = 2) {
+  seqStepCursor = (seqStepCursor + steps) % STEPS_PER_BAR;
+  renderSeqGrid();
+}
+
+function toggleSeqRec() {
+  seqRecArmed = !seqRecArmed;
+  document.getElementById('seqRecBtn').classList.toggle('btn-rec-on', seqRecArmed);
+  renderSeqGrid();
+}
+
+function copyBarToNext() {
+  if (seqCurrentBar >= NUM_BARS - 1) return;
+  const next = seqCurrentBar + 1;
+  ['melody','harmony','bass','perc'].forEach(tr => {
+    for (let s = 0; s < STEPS_PER_BAR; s++) seqData[tr][next][s] = new Map(seqData[tr][seqCurrentBar][s]);
+  });
+  seqCurrentBar = next;
+  renderBarStrip();
+  renderSeqGrid();
+}
+
+function clearCurrentBar() {
+  for (let s = 0; s < STEPS_PER_BAR; s++) seqData[seqActiveTrack][seqCurrentBar][s].clear();
+  renderBarStrip();
+  renderSeqGrid();
+}
+
+function clearAllTracks() {
+  ['melody','harmony','bass','perc'].forEach(tr => {
+    for (let b = 0; b < NUM_BARS; b++)
+      for (let s = 0; s < STEPS_PER_BAR; s++) seqData[tr][b][s].clear();
+  });
+  renderBarStrip();
+  renderSeqGrid();
+}
+
+function toggleSeqPlay() {
+  if (seqPlaying) {
+    seqPlaying = false;
+    clearTimeout(seqTimer);
+    seqPlayStep = -1;
+    document.getElementById('seqPlayBtn').innerHTML = '&#9654; Play';
+    renderBarStrip();
+    renderSeqGrid();
+  } else {
+    if (demoRunning) stopGuidedDemo();
+    ensureAudio();
+    seqPlaying = true;
+    const mode = document.getElementById('seqLoopMode').value;
+    seqPlayBar = mode === 'bar' ? seqCurrentBar : 0;
+    seqPlayStep = -1;
+    document.getElementById('seqPlayBtn').innerHTML = '&#9632; Stop';
+    runSeqStep();
+  }
+}
+
+function runSeqStep() {
+  if (!seqPlaying) return;
+  const bpm = Math.max(70, Math.min(170, parseInt(document.getElementById('seqBpm').value, 10) || 124));
+  const stepSec = (60 / bpm) / 4;
+  const mode = document.getElementById('seqLoopMode').value;
+
+  seqPlayStep++;
+  if (seqPlayStep >= STEPS_PER_BAR) {
+    seqPlayStep = 0;
+    if (mode === 'bar') seqPlayBar = seqCurrentBar;
+    else if (mode === '4bars') seqPlayBar = (seqPlayBar + 1) % 4;
+    else seqPlayBar = (seqPlayBar + 1) % NUM_BARS;
+    if (mode !== 'bar') seqCurrentBar = seqPlayBar;
+  }
+
+  const now = audioCtx.currentTime + 0.015;
+  ['melody', 'harmony', 'bass'].forEach(tr => {
+    if (seqMuted[tr]) return;
+    const notesMap = seqData[tr][seqPlayBar][seqPlayStep];
+    if (!notesMap.size) return;
+    const preset = getPresetById(trackPresetIds[tr]);
+    if (!preset) return;
+    const baseGain = tr === 'harmony' ? 0.28 : (tr === 'bass' ? 0.55 : 0.48);
+    const gain = baseGain * trackVolumes[tr];
+    notesMap.forEach((lenSteps, nid) => {
+      const n = NOTES.find(x => x.id === nid);
+      if (n) {
+        const dur = Math.max(0.06, stepSec * (lenSteps - 0.12));
+        triggerSynthVoice(n.freq * TRACK_OCTAVE_SHIFT[tr], preset.params, now, dur, gain);
+      }
+    });
+  });
+
+  if (!seqMuted.perc) seqData.perc[seqPlayBar][seqPlayStep].forEach((_, d) => triggerPercVoice(d, now, trackVolumes.perc));
+
+  renderBarStrip();
+  renderSeqGrid();
+  seqTimer = setTimeout(runSeqStep, stepSec * 1000);
+}
+
+function loadRetroDemo() {
+  clearAllTracks();
+  // [step, noteId, lengthInSteps]
+  const mel = [
+    [[0,'C5',2],[2,'G4',2],[4,'D#4',2],[6,'F4',2],[8,'G4',2],[10,'A#4',2],[12,'G4',2],[14,'F4',2]],
+    [[0,'G#4',2],[2,'G4',2],[4,'D#4',2],[6,'C4',2],[8,'D#4',2],[10,'G4',2],[12,'G#4',2],[14,'G4',2]],
+    [[0,'A#4',2],[2,'F4',2],[4,'D4',2],[6,'F4',2],[8,'A#4',2],[10,'C5',2],[12,'A#4',2],[14,'G#4',2]],
+    [[0,'G4',2],[2,'F4',2],[4,'D#4',2],[6,'D4',2],[8,'C4',4],[12,'D4',2],[14,'G4',2]]
+  ];
+  const harm = [
+    [[0,'C4',8],[0,'D#4',8],[0,'G4',8],[8,'C4',8],[8,'D#4',8],[8,'G4',8]],
+    [[0,'C4',8],[0,'D#4',8],[0,'G#4',8],[8,'C4',8],[8,'D#4',8],[8,'G#4',8]],
+    [[0,'D4',8],[0,'F4',8],[0,'A#4',8],[8,'D4',8],[8,'F4',8],[8,'A#4',8]],
+    [[0,'D4',8],[0,'G4',8],[0,'B4',8],[8,'D4',8],[8,'G4',8],[8,'B4',8]]
+  ];
+  const bassRoots = ['C4','G#4','A#4','G4'];
+  for (let b = 0; b < 4; b++) {
+    mel[b].forEach(([s, n, l]) => seqData.melody[b][s].set(n, l));
+    harm[b].forEach(([s, n, l]) => seqData.harmony[b][s].set(n, l));
+    for (let s = 0; s < 16; s += 2) seqData.bass[b][s].set(bassRoots[b], 2);
+    [0, 6, 8, 10].forEach(s => seqData.perc[b][s].set('kick', 1));
+    [4, 12].forEach(s => seqData.perc[b][s].set('snare', 1));
+    for (let s = 0; s < 16; s += 2) seqData.perc[b][s].set(s === 14 ? 'ohat' : 'chat', 1);
+  }
+  seqCurrentBar = 0;
+  renderBarStrip();
+  renderSeqGrid();
+}
+
+// ================= 7. SELF-MARKING QUIZ =================
+const QUIZ_QUESTIONS = [
+  {
+    q: "1. A producer wants a warm, steep low-pass filter roll-off on a synth bass (like a classic Moog ladder filter). Which filter slope should they choose?",
+    opts: [
+      "6 dB/octave (1-pole)",
+      "12 dB/octave (2-pole)",
+      "24 dB/octave (4-pole)",
+      "0 dB/octave (all-pass)"
+    ],
+    ans: 2,
+    explain: "A 24 dB/octave (4-pole) filter attenuates frequencies above the cutoff twice as steeply as a 12 dB/octave (2-pole) filter, producing the classic warm, focused Moog bass tone."
+  },
+  {
+    q: "2. How is a crisp 1980s closed hi-hat typically synthesised using subtractive synthesis?",
+    opts: [
+      "Sine wave through a Low-Pass Filter with a 1.5 s Release.",
+      "White Noise through a High-Pass Filter with an instant Attack, very short Decay (~50 ms), and 0% Sustain.",
+      "Sawtooth wave at 16' range with high portamento.",
+      "Triangle wave modulated by a slow 1 Hz LFO on pitch."
+    ],
+    ans: 1,
+    explain: "Hi-hats are unpitched metallic bursts: White Noise provides all frequencies, a High-Pass Filter removes low rumble, and a snappy 0%-sustain envelope creates the short percussive tick."
+  },
+  {
+    q: "3. Why do producers intentionally detune a second oscillator by 6–18 cents in a synth pad or bass?",
+    opts: [
+      "To convert a low-pass filter into a high-pass filter.",
+      "To create subtle phase beating and movement that thickens and warms the timbre.",
+      "To silence all even harmonics so the wave becomes a square wave.",
+      "To stop the VCA Release stage from triggering."
+    ],
+    ans: 1,
+    explain: "Slight detuning (measured in cents, 1/100th of a semitone) causes two oscillators to drift slowly in and out of phase, producing a lush chorus-like thickness inspired by analogue tuning drift."
+  },
+  {
+    q: "4. To program an 80s synth brass stab whose brightness swells open briefly on each note, which setting is most effective?",
+    opts: [
+      "Positive Filter Envelope Amount with a short-to-medium Attack (~50–80 ms) modulating VCF cutoff.",
+      "Setting VCF cutoff to 80 Hz with 0 Hz Filter Envelope Amount.",
+      "Setting VCA Attack to 2.0 seconds and Sustain to 0%.",
+      "Switching the VCO waveform from Sawtooth to Sine."
+    ],
+    ans: 0,
+    explain: "Acoustic brass starts slightly mellow and blooms brighter as air pressure builds. A Filter Envelope with a ~50–80 ms Attack sweeping the Low-Pass Cutoff upwards recreates this iconic 80s brass transient."
+  },
+  {
+    q: "5. What is the main acoustic effect of switching on a -1 octave Sub-Oscillator alongside a bright Sawtooth lead?",
+    opts: [
+      "It doubles the tempo of the sequencer.",
+      "It removes the fundamental frequency to create a thin radio effect.",
+      "It reinforces low-end fundamental weight one octave below without cluttering the upper harmonics.",
+      "It adds rhythmic pitch vibrato via an LFO."
+    ],
+    ans: 2,
+    explain: "A Sub-Oscillator generates a simple wave (usually square or sine) exactly one octave below the main VCO, adding solid low-end weight and body while keeping the top end clear."
+  }
+];
+
+function renderQuiz() {
+  document.getElementById('quizContainer').innerHTML = QUIZ_QUESTIONS.map((item, qi) => `
+    <div class="quiz-q" id="qq-${qi}">
+      <div class="quiz-q-title">${item.q}</div>
+      <div class="quiz-opts">
+        ${item.opts.map((opt, oi) => `
+          <label class="quiz-opt" id="qopt-${qi}-${oi}">
+            <input type="radio" name="q${qi}" value="${oi}" />
+            <span>${opt}</span>
+          </label>
+        `).join('')}
+      </div>
+      <div class="quiz-explain" id="qexp-${qi}"><strong>Explanation:</strong> ${item.explain}</div>
+    </div>
+  `).join('');
+}
+
+function markQuiz() {
+  let correct = 0, answered = 0;
+  QUIZ_QUESTIONS.forEach((item, qi) => {
+    const chosen = document.querySelector(`input[name="q${qi}"]:checked`);
+    item.opts.forEach((_, oi) => {
+      const lbl = document.getElementById(`qopt-${qi}-${oi}`);
+      lbl.classList.remove('is-correct', 'is-wrong');
+      if (oi === item.ans) lbl.classList.add('is-correct');
+    });
+    if (chosen) {
+      answered++;
+      const val = parseInt(chosen.value, 10);
+      if (val === item.ans) correct++;
+      else document.getElementById(`qopt-${qi}-${val}`).classList.add('is-wrong');
+    }
+    document.getElementById(`qexp-${qi}`).classList.add('show');
+  });
+  const pct = Math.round((correct / QUIZ_QUESTIONS.length) * 100);
+  const box = document.getElementById('quizScore');
+  box.style.display = 'block';
+  box.className = 'quiz-score ' + (pct >= 80 ? 'great' : (pct >= 50 ? 'mid' : ''));
+  const msg = pct === 100 ? 'Spot on — full marks!' : (pct >= 80 ? 'Great understanding of the foundations!' : 'Good start — read the explanations below and try again.');
+  box.textContent = `Score: ${correct} / ${QUIZ_QUESTIONS.length} (${pct}%)${answered < QUIZ_QUESTIONS.length ? ` — ${QUIZ_QUESTIONS.length - answered} unanswered` : ''}. ${msg}`;
+}
+
+function resetQuiz() {
+  document.getElementById('quizScore').style.display = 'none';
+  renderQuiz();
+}
+
+// ================= INIT =================
+buildBarStrip();
+loadRetroDemo();
+renderQuiz();
+updateSynthParams();
+renderScopeLoop();
+fetchSharedPresets();
+
+// ================= 8. SECTION GUARDRAIL CHECKPOINTS =================
+const SECTION_ORDER = ['context', 'part1', 'part2', 'part3', 'part4', 'quiz'];
+const SECTION_LABELS = {
+  context: 'Context & Styles',
+  part1: 'Part 1: Signal Flow',
+  part2: 'Part 2: Waveforms & Harmonics',
+  part3: 'Part 3: Interactive Synth Lab',
+  part4: 'Part 4: 4-Track Sequencer',
+  quiz: 'Part 5: Self-Marking Quiz'
+};
+
+const GUARDRAILS = {
+  context: {
+    next: 'part1',
+    questions: [
+      {
+        q: '1. Why were early 1970s synths like the Minimoog mainly used for basslines and lead solos?',
+        opts: ['They were monophonic (one note at a time)', 'They had no pitch control', 'They could only play drum sounds'],
+        ans: 0,
+        hint: 'Monophonic means only one key/note can sound at once — chords required polyphonic synths in the late 70s.'
+      },
+      {
+        q: '2. Which 1981 standard allowed synthesisers, drum machines, and sequencers to communicate?',
+        opts: ['XLR', 'MIDI', 'Phantom Power'],
+        ans: 1,
+        hint: 'Check the Late 1970s–80s Polyphonic Era card above (1981).'
+      },
+      {
+        q: '3. Pushing filter resonance on the Roland TB-303 helped define which genre sound?',
+        opts: ['Squelchy acid house basslines', 'Acoustic string quartets', 'Tape-loop musique concrète'],
+        ans: 0,
+        hint: 'Check the Late 1980s–90s Club Culture card above.'
+      }
+    ]
+  },
+  part1: {
+    next: 'part2',
+    questions: [
+      {
+        q: '1. What is the correct left-to-right audio signal flow in a subtractive synthesiser?',
+        opts: ['VCA → VCF → VCO', 'VCO → VCF → VCA', 'VCF → VCO → LFO'],
+        ans: 1,
+        hint: 'Generate the raw sound first (VCO), sculpt its tone (VCF), then shape its volume (VCA).'
+      },
+      {
+        q: '2. How does an ADSR Envelope differ from an LFO?',
+        opts: ['ADSR is a one-shot shape per key press; LFO is a repeating wave', 'LFO only controls volume; ADSR only controls pitch', 'They are identical'],
+        ans: 0,
+        hint: 'ADSR triggers once per key press, whereas an LFO cycles continuously.'
+      },
+      {
+        q: '3. Which module acts as an automatic volume gate so notes fade out when you release a key?',
+        opts: ['VCO', 'VCF', 'VCA'],
+        ans: 2,
+        hint: 'Voltage Controlled Amplifier (VCA) controls output amplitude.'
+      }
+    ]
+  },
+  part2: {
+    next: 'part3',
+    questions: [
+      {
+        q: '1. Which pitched waveform contains both odd and even harmonics and is ideal for subtractive filtering?',
+        opts: ['Sine', 'Sawtooth', 'Triangle'],
+        ans: 1,
+        hint: 'Sawtooth contains every harmonic (1, 2, 3, 4, 5...) giving the filter plenty of material to carve.'
+      },
+      {
+        q: '2. Why does a Low-Pass Filter have almost no audible effect on a pure Sine wave?',
+        opts: ['A Sine wave only has the fundamental frequency and no upper harmonics', 'A Sine wave bypasses the VCF', 'Low-Pass Filters only work on noise'],
+        ans: 0,
+        hint: 'Subtractive filters can only remove harmonics that already exist in the raw VCO waveform.'
+      },
+      {
+        q: '3. Which waveform contains only odd harmonics (1, 3, 5, 7...) and has a hollow, woody tone?',
+        opts: ['Sawtooth', 'Square', 'White Noise'],
+        ans: 1,
+        hint: 'Square waves have strong odd harmonics — great for hollow leads and sub-basses.'
+      }
+    ]
+  },
+  part3: {
+    next: 'part4',
+    questions: [
+      {
+        q: '1. What happens when you turn up Filter Resonance (Q)?',
+        opts: ['It boosts frequencies right around the cutoff point', 'It transposes the VCO down an octave', 'It lengthens the Release time'],
+        ans: 0,
+        hint: 'Look at the sharp peak on the teal filter curve when you raise Resonance (Q).'
+      },
+      {
+        q: '2. In a standard ADSR envelope, which parameter is a held volume level (%) rather than a time?',
+        opts: ['Attack', 'Decay', 'Sustain'],
+        ans: 2,
+        hint: 'Attack, Decay, and Release are measured in seconds; Sustain is a held amplitude percentage.'
+      },
+      {
+        q: '3. Switching the VCO octave range from 8\' to 16\' does what to the pitch?',
+        opts: ['Drops the pitch by 1 octave into bass register', 'Raises the pitch by 1 octave', 'Mutes the sub-oscillator'],
+        ans: 0,
+        hint: 'Organ-pipe footage: 16\' = 1 octave down, 8\' = normal, 4\' = 1 octave up.'
+      }
+    ]
+  },
+  part4: {
+    next: 'quiz',
+    questions: [
+      {
+        q: '1. How many 16th-note steps make up one 4/4 bar in the sequencer grid?',
+        opts: ['8 steps', '16 steps', '32 steps'],
+        ans: 1,
+        hint: 'Count the columns in the sequencer grid (Steps 1–16).'
+      },
+      {
+        q: '2. Which sequencer track is designed for polyphonic chord voicings?',
+        opts: ['2. Harmony (Chords)', '3. Bassline', '4. Percussion'],
+        ans: 0,
+        hint: 'Track 2 is Harmony (Chords); Track 3 (Bassline) is monophonic.'
+      },
+      {
+        q: '3. What does saving a Timbre Preset in Part 4 store?',
+        opts: ['The VCO, VCF, and ADSR synth settings', 'Only the BPM tempo', 'Only the percussion mute state'],
+        ans: 0,
+        hint: 'Presets capture your Synth Lab VCO/VCF/ADSR settings so any track can reuse that sound.'
+      }
+    ]
+  }
+};
+
+let unlockedLevel = 0;
+let teacherUnlockedAll = false;
+let presetShared = false;
+let part4TourDone = false;
+try {
+  const saved = parseInt(localStorage.getItem('synth_v3_unlocked_level') || '0', 10);
+  if (!Number.isNaN(saved) && saved >= 0 && saved < SECTION_ORDER.length) unlockedLevel = saved;
+  presetShared = localStorage.getItem('synth_v3_preset_shared') === '1' || unlockedLevel >= 5;
+  part4TourDone = localStorage.getItem('synth_v3_part4_tour_done') === '1' || unlockedLevel >= 5;
+} catch (e) {}
+
+function positionPresetTourCallout() {
+  const bar = document.getElementById('presetStripBar');
+  const callout = document.getElementById('presetTourCallout');
+  if (!bar || !callout || !document.body.classList.contains('preset-tour-active')) return;
+  const rect = bar.getBoundingClientRect();
+  const cw = Math.min(440, window.innerWidth - 24);
+  const left = Math.max(12, Math.min(window.innerWidth - cw - 12, rect.left + 12));
+  const top = Math.min(window.innerHeight - callout.offsetHeight - 14, rect.bottom + 14);
+  callout.style.left = left + 'px';
+  callout.style.top = Math.max(14, top) + 'px';
+}
+
+function startPart4PresetTour() {
+  if (part4TourDone) return;
+  const bar = document.getElementById('presetStripBar');
+  if (!bar) return;
+  bar.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  setTimeout(() => {
+    document.body.classList.add('preset-tour-active');
+    const callout = document.getElementById('presetTourCallout');
+    callout.classList.add('visible');
+    positionPresetTourCallout();
+  }, 420);
+}
+
+function closePresetTour() {
+  part4TourDone = true;
+  try { localStorage.setItem('synth_v3_part4_tour_done', '1'); } catch (e) {}
+  document.body.classList.remove('preset-tour-active');
+  document.getElementById('presetTourCallout').classList.remove('visible');
+}
+
+function goToSynthLabFromTour() {
+  closePresetTour();
+  const chassis = document.querySelector('#part3 .synth-chassis');
+  if (chassis) {
+    chassis.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    chassis.classList.add('synth-lab-pulse');
+    setTimeout(() => chassis.classList.remove('synth-lab-pulse'), 2400);
+  }
+}
+
+function markPresetShared() {
+  presetShared = true;
+  try { localStorage.setItem('synth_v3_preset_shared', '1'); } catch (e) {}
+  closePresetTour();
+  renderGuardrailBoxes();
+}
+
+window.addEventListener('scroll', positionPresetTourCallout, { passive: true });
+window.addEventListener('resize', positionPresetTourCallout);
+window.addEventListener('keydown', (e) => { if (e.key === 'Escape' && document.body.classList.contains('preset-tour-active')) closePresetTour(); });
+
+function renderGuardrailBoxes() {
+  const allCompleted = unlockedLevel >= SECTION_ORDER.length - 1;
+  Object.entries(GUARDRAILS).forEach(([secId, cfg]) => {
+    const box = document.getElementById('guardrail-' + secId);
+    if (!box) return;
+    const secIdx = SECTION_ORDER.indexOf(secId);
+    const isPassed = unlockedLevel > secIdx;
+
+    // Once all 5 checkpoints are completed, hide checkpoint boxes completely on this and future visits
+    if (allCompleted) {
+      box.style.display = 'none';
+      box.innerHTML = '';
+      return;
+    }
+
+    box.style.display = '';
+    box.classList.toggle('passed', isPassed);
+    const nextLabel = SECTION_LABELS[cfg.next];
+
+    // Once an individual section checkpoint is passed, collapse & hide its 3 questions cleanly
+    if (isPassed) {
+      box.style.padding = '10px 14px';
+      box.innerHTML = `
+        <div class="guardrail-head" style="margin-bottom:0;">
+          <span style="font-size:13px;font-weight:700;color:#166534;">✓ Checkpoint complete — <strong>${nextLabel}</strong> unlocked</span>
+          <span class="guardrail-badge">Passed ✓</span>
+        </div>
+      `;
+      return;
+    }
+
+    box.style.padding = '';
+    box.innerHTML = `
+      <div class="guardrail-head">
+        <h3 class="guardrail-title">Checkpoint: Unlock ${nextLabel}</h3>
+        <span class="guardrail-badge">${secId === 'part4' ? 'Preset + 3 Questions' : '3 Questions Required'}</span>
+      </div>
+      ${secId === 'part4' ? `
+        <div class="preset-req-banner ${presetShared ? 'done' : ''}">
+          <span>${presetShared ? '✓ Step 1 Complete: Custom timbre preset shared with the class!' : '⚠ Step 1 Required: Sculpt a preset in the Interactive Synth Lab and click Save Preset above before unlocking Part 5.'}</span>
+          ${presetShared ? '' : '<button type="button" class="btn btn-sm btn-primary" onclick="goToSynthLabFromTour()">&#8593; Go to Synth Lab</button>'}
+        </div>
+      ` : ''}
+      ${cfg.questions.map((item, qi) => `
+        <div class="gq-item" id="gq-${secId}-${qi}">
+          <div class="gq-prompt">${item.q}</div>
+          <div class="gq-opts">
+            ${item.opts.map((opt, oi) => `
+              <label class="gq-opt">
+                <input type="radio" name="gq_${secId}_${qi}" value="${oi}" />
+                <span>${opt}</span>
+              </label>
+            `).join('')}
+          </div>
+          <div class="gq-hint">Hint: ${item.hint}</div>
+        </div>
+      `).join('')}
+      <div class="guardrail-actions">
+        <button type="button" class="btn btn-primary btn-sm" onclick="checkGuardrail('${secId}')">Check Answers &amp; Unlock Next Section</button>
+        <span class="guardrail-status" id="gq-status-${secId}" style="color:var(--muted);">
+          Answer all 3 questions correctly to continue.
+        </span>
+      </div>
+    `;
+  });
+}
+
+function applySectionLocks() {
+  const effectiveMax = teacherUnlockedAll ? SECTION_ORDER.length - 1 : unlockedLevel;
+  SECTION_ORDER.forEach((secId, idx) => {
+    const sec = document.getElementById(secId);
+    if (!sec) return;
+    const locked = idx > effectiveMax;
+    sec.classList.toggle('section-locked', locked);
+    let overlay = sec.querySelector('.lock-overlay');
+    if (locked && !overlay) {
+      overlay = document.createElement('div');
+      overlay.className = 'lock-overlay';
+      const prevId = SECTION_ORDER[idx - 1];
+      overlay.innerHTML = `
+        <div class="lock-overlay-card">
+          <h4>&#128274; ${SECTION_LABELS[secId]} Locked</h4>
+          <p>Answer the 3 checkpoint questions at the bottom of <strong>${SECTION_LABELS[prevId]}</strong> to unlock this section.</p>
+          <button type="button" class="btn btn-primary btn-sm" onclick="jumpToActiveCheckpoint()">Go to Current Checkpoint</button>
+        </div>
+      `;
+      sec.appendChild(overlay);
+    }
+    const tocLink = document.querySelector(`#mainToc a[data-sec="${secId}"]`);
+    if (tocLink) {
+      tocLink.classList.toggle('locked-link', locked);
+      tocLink.classList.toggle('passed-link', !locked && idx < unlockedLevel);
+      const baseText = tocLink.dataset.baseLabel || tocLink.textContent.replace(/^(\uD83D\uDD12|\u2713)\s*/u, '');
+      tocLink.dataset.baseLabel = baseText;
+      tocLink.textContent = locked ? `🔒 ${baseText}` : (idx < unlockedLevel ? `✓ ${baseText}` : baseText);
+    }
+  });
+
+  const pill = document.getElementById('guardrailProgressPill');
+  if (pill) {
+    pill.textContent = unlockedLevel >= 5
+      ? '✓ All 5 Checkpoints Completed — Full Revision Mode'
+      : `Checkpoints Passed: ${unlockedLevel} / 5`;
+    pill.classList.toggle('all-done', unlockedLevel >= 5);
+  }
+  const tBtn = document.getElementById('teacherUnlockBtn');
+  if (tBtn) {
+    tBtn.textContent = teacherUnlockedAll ? 'Teacher Preview: Locks Hidden' : 'Teacher Preview: Unlock All';
+  }
+}
+
+function jumpToActiveCheckpoint() {
+  const activeSec = SECTION_ORDER[Math.min(unlockedLevel, SECTION_ORDER.length - 2)];
+  const target = document.getElementById('guardrail-' + activeSec) || document.getElementById(activeSec);
+  if (target) target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+
+function checkGuardrail(secId) {
+  const cfg = GUARDRAILS[secId];
+  if (!cfg) return;
+  let correctCount = 0;
+  cfg.questions.forEach((item, qi) => {
+    const card = document.getElementById(`gq-${secId}-${qi}`);
+    const sel = document.querySelector(`input[name="gq_${secId}_${qi}"]:checked`);
+    const ok = sel && parseInt(sel.value, 10) === item.ans;
+    card.classList.remove('gq-right', 'gq-wrong');
+    card.classList.add(ok ? 'gq-right' : 'gq-wrong');
+    if (ok) correctCount++;
+  });
+
+  const statusEl = document.getElementById(`gq-status-${secId}`);
+  const secIdx = SECTION_ORDER.indexOf(secId);
+  if (correctCount === cfg.questions.length) {
+    if (secId === 'part4' && !presetShared && !teacherUnlockedAll) {
+      statusEl.style.color = '#92400e';
+      statusEl.textContent = '3/3 questions correct! Now create & save 1 custom preset in the Load/Save Timbre bar above to unlock Part 5.';
+      part4TourDone = false;
+      startPart4PresetTour();
+      return;
+    }
+    const wasNewlyUnlocked = unlockedLevel <= secIdx;
+    if (wasNewlyUnlocked) {
+      unlockedLevel = secIdx + 1;
+      try { localStorage.setItem('synth_v3_unlocked_level', String(unlockedLevel)); } catch (e) {}
+    }
+    renderGuardrailBoxes();
+    applySectionLocks();
+    setTimeout(() => {
+      if (cfg.next === 'part4' && !part4TourDone) {
+        startPart4PresetTour();
+      } else {
+        const nextEl = document.getElementById(cfg.next);
+        if (nextEl) nextEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }, 350);
+  } else {
+    statusEl.style.color = '#991b1b';
+    statusEl.textContent = `${correctCount}/3 correct — check the highlighted hint(s) and try again.`;
+  }
+}
+
+function toggleTeacherUnlock() {
+  teacherUnlockedAll = !teacherUnlockedAll;
+  applySectionLocks();
+}
+
+function resetGuardrails() {
+  unlockedLevel = 0;
+  teacherUnlockedAll = false;
+  presetShared = false;
+  part4TourDone = false;
+  try {
+    localStorage.removeItem('synth_v3_unlocked_level');
+    localStorage.removeItem('synth_v3_preset_shared');
+    localStorage.removeItem('synth_v3_part4_tour_done');
+  } catch (e) {}
+  renderGuardrailBoxes();
+  applySectionLocks();
+  document.getElementById('context').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+document.querySelectorAll('#mainToc a[data-sec]').forEach(a => {
+  a.addEventListener('click', (e) => {
+    const idx = SECTION_ORDER.indexOf(a.dataset.sec);
+    const effectiveMax = teacherUnlockedAll ? SECTION_ORDER.length - 1 : unlockedLevel;
+    if (idx > effectiveMax) {
+      e.preventDefault();
+      jumpToActiveCheckpoint();
+    }
+  });
+});
+
+renderGuardrailBoxes();
+applySectionLocks();
+
+
+// ================= 9. GUIDE 1 REAL MODULAR VIEW (REASON-STYLE PATCHING) =================
+let g1RealViewOn = false;
+const g1Patch = { vcoToVcf: true, vcfToVca: true, envToVcf: true, envToVca: true };
+const G1_PATCH_DEFS = [
+  { key: 'vcoToVcf', label: 'VCO Audio → VCF In',        from: 'vcoOut', to: 'vcfIn', fx:198, fy:220, tx:326, ty:220, color:'#38bdf8', dashed:false, droop:44 },
+  { key: 'vcfToVca', label: 'VCF Audio → VCA In',        from: 'vcfOut', to: 'vcaIn', fx:524, fy:220, tx:654, ty:220, color:'#2dd4bf', dashed:false, droop:44 },
+  { key: 'envToVcf', label: 'ADSR Env → VCF Cutoff CV',  from: 'envOut', to: 'vcfCv', fx:790, fy:220, tx:425, ty:220, color:'#fbbf24', dashed:true,  droop:62 },
+  { key: 'envToVca', label: 'ADSR Env → VCA Amp CV',     from: 'envOut', to: 'vcaCv', fx:790, fy:220, tx:722, ty:220, color:'#4ade80', dashed:true,  droop:42 }
+];
+let g1Carried = null;
+let g1KnobDrag = null;
+
+function syncG1UnpatchedStyles() {
+  document.getElementById('mod-vco')?.classList.toggle('mod-unpatched', !g1Patch.vcoToVcf);
+  document.getElementById('mod-vcf')?.classList.toggle('mod-unpatched', !g1Patch.vcoToVcf || !g1Patch.vcfToVca);
+  document.getElementById('mod-env')?.classList.toggle('mod-unpatched', !g1Patch.envToVca && !g1Patch.envToVcf);
+}
+
+function setG1Patch(key, val) {
+  g1Patch[key] = val;
+  syncG1UnpatchedStyles();
+  renderG1RealMoog();
+}
+
+function dropG1Carried() {
+  if (!g1Carried) return;
+  g1Carried = null;
+  renderG1RealMoog();
+}
+
+function pickUpG1Cable(ev, key) {
+  ev.stopPropagation();
+  closeG1CtxMenu();
+  const d = G1_PATCH_DEFS.find(x => x.key === key);
+  if (!d) return;
+  setG1Patch(key, false);
+  g1Carried = { from: d.from, fx: d.fx, fy: d.fy, color: d.color, dashed: d.dashed };
+  renderG1RealMoog();
+  updateG1Dangling(ev);
+}
+
+function clickG1Jack(ev, jackId) {
+  ev.stopPropagation();
+  closeG1CtxMenu();
+  if (g1Carried) {
+    const m = G1_PATCH_DEFS.find(d => d.from === g1Carried.from && d.to === jackId);
+    g1Carried = null;
+    if (m) setG1Patch(m.key, true);
+    else renderG1RealMoog();
+    return;
+  }
+  const out = G1_PATCH_DEFS.find(d => d.from === jackId);
+  if (out) {
+    g1Carried = { from: jackId, fx: out.fx, fy: out.fy, color: out.color, dashed: out.dashed };
+    renderG1RealMoog();
+    updateG1Dangling(ev);
+    return;
+  }
+  const activeIn = G1_PATCH_DEFS.find(d => d.to === jackId && g1Patch[d.key]);
+  if (activeIn) { pickUpG1Cable(ev, activeIn.key); return; }
+  const anyIn = G1_PATCH_DEFS.find(d => d.to === jackId);
+  if (anyIn) setG1Patch(anyIn.key, true);
+}
+
+function updateG1Dangling(ev) {
+  if (!g1Carried) return;
+  const svg = document.getElementById('g1RealMoogSvg');
+  if (!svg) return;
+  let line = svg.querySelector('#g1DanglingPath');
+  if (!line) {
+    line = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    line.setAttribute('id', 'g1DanglingPath');
+    line.setAttribute('fill', 'none'); line.setAttribute('stroke-width', '4');
+    line.setAttribute('stroke-linecap', 'round'); line.setAttribute('pointer-events', 'none');
+    svg.appendChild(line);
+  }
+  const r = svg.getBoundingClientRect(), vb = svg.viewBox.baseVal;
+  const mx = ((ev.clientX - r.left) / r.width) * vb.width;
+  const my = ((ev.clientY - r.top) / r.height) * vb.height;
+  line.setAttribute('d', `M ${g1Carried.fx} ${g1Carried.fy} Q ${((g1Carried.fx+mx)/2).toFixed(1)} ${(Math.max(g1Carried.fy,my)+48).toFixed(1)} ${mx.toFixed(1)} ${my.toFixed(1)}`);
+  line.setAttribute('stroke', g1Carried.color);
+  if (g1Carried.dashed) line.setAttribute('stroke-dasharray', '7,4'); else line.removeAttribute('stroke-dasharray');
+}
+
+function openG1CtxMenu(ev, key, jackId) {
+  ev.preventDefault(); ev.stopPropagation();
+  dropG1Carried();
+  const menu = document.getElementById('g1PatchCtxMenu');
+  let rel = [], title = 'Patch Options';
+  if (key) {
+    const cur = G1_PATCH_DEFS.find(d => d.key === key);
+    if (cur) { title = cur.label; rel = G1_PATCH_DEFS.filter(d => d.from === cur.from); }
+  } else if (jackId) {
+    rel = G1_PATCH_DEFS.filter(d => d.from === jackId || d.to === jackId);
+    title = 'Jack: ' + jackId;
+  }
+  let html = `<div class="patch-ctx-hdr">${title}</div>`;
+  if (key && g1Patch[key]) html += `<button class="patch-ctx-item danger" onclick="setG1Patch('${key}',false);closeG1CtxMenu();">&#10005; Disconnect Cable</button>`;
+  rel.forEach(d => {
+    const on = g1Patch[d.key];
+    if (d.key === key && on) return;
+    html += `<button class="patch-ctx-item" onclick="setG1Patch('${d.key}',${!on});closeG1CtxMenu();">${on ? '&#10005; Unpatch: ' : '&#128268; Connect: '}${d.label}</button>`;
+  });
+  menu.innerHTML = html;
+  menu.classList.add('visible');
+  menu.style.left = Math.min(window.innerWidth - 250, ev.clientX) + 'px';
+  menu.style.top = Math.min(window.innerHeight - 160, ev.clientY) + 'px';
+}
+function closeG1CtxMenu() { document.getElementById('g1PatchCtxMenu')?.classList.remove('visible'); }
+
+function startG1KnobDrag(ev, inputId) {
+  if (ev.button !== 0) return;
+  ev.preventDefault(); ev.stopPropagation();
+  const inp = document.getElementById(inputId);
+  if (!inp) return;
+  if (inp.tagName === 'SELECT') {
+    inp.selectedIndex = (inp.selectedIndex + 1) % inp.options.length;
+    inp.dispatchEvent(new Event('change'));
+    renderG1RealMoog();
+    return;
+  }
+  g1KnobDrag = { inp, startY: ev.clientY, startVal: parseFloat(inp.value), min: parseFloat(inp.min), max: parseFloat(inp.max), step: parseFloat(inp.step) || 1 };
+  document.body.style.cursor = 'ns-resize';
+}
+
+window.addEventListener('pointermove', (ev) => {
+  if (g1Carried) updateG1Dangling(ev);
+  if (!g1KnobDrag) return;
+  const dy = g1KnobDrag.startY - ev.clientY;
+  const raw = g1KnobDrag.startVal + (dy / 140) * (g1KnobDrag.max - g1KnobDrag.min);
+  const snapped = Math.round(Math.max(g1KnobDrag.min, Math.min(g1KnobDrag.max, raw)) / g1KnobDrag.step) * g1KnobDrag.step;
+  g1KnobDrag.inp.value = Number(snapped.toFixed(4));
+  g1KnobDrag.inp.dispatchEvent(new Event('input'));
+  renderG1RealMoog();
+});
+window.addEventListener('pointerup', () => { if (g1KnobDrag) { g1KnobDrag = null; document.body.style.cursor = ''; } });
+window.addEventListener('click', (ev) => {
+  closeG1CtxMenu();
+  if (g1Carried && !ev.target.closest('.moog-jack-hit') && !ev.target.closest('.moog-cable-hit')) dropG1Carried();
+});
+window.addEventListener('keydown', (e) => { if (e.key === 'Escape') { closeG1CtxMenu(); dropG1Carried(); } });
+
+function g1Knob(cx, cy, norm, label, valTxt, accent, inputId) {
+  const n = Math.max(0, Math.min(1, norm));
+  const rad = ((-135 + n * 270) - 90) * Math.PI / 180;
+  const x2 = cx + Math.cos(rad) * 13, y2 = cy + Math.sin(rad) * 13;
+  return `<g class="moog-knob-hit" onpointerdown="startG1KnobDrag(event,'${inputId}')"><circle class="knob-outer" cx="${cx}" cy="${cy}" r="17" fill="#111827" stroke="#64748b" stroke-width="2"/><circle cx="${cx}" cy="${cy}" r="11" fill="#1e293b" stroke="#94a3b8" stroke-width="1"/><line x1="${cx}" y1="${cy}" x2="${x2.toFixed(1)}" y2="${y2.toFixed(1)}" stroke="${accent}" stroke-width="2.8" stroke-linecap="round"/><text x="${cx}" y="${cy+29}" text-anchor="middle" font-size="8.5" font-weight="700" fill="#cbd5e1">${label}</text><text x="${cx}" y="${cy+39}" text-anchor="middle" font-size="8" font-family="ui-monospace,monospace" fill="${accent}">${valTxt}</text></g>`;
+}
+function g1Jack(cx, cy, label, color, jackId, connected) {
+  const valid = g1Carried && G1_PATCH_DEFS.some(d => d.from === g1Carried.from && d.to === jackId);
+  return `<g class="moog-jack-hit${valid ? ' moog-jack-valid' : ''}" onclick="clickG1Jack(event,'${jackId}')" oncontextmenu="openG1CtxMenu(event,null,'${jackId}')"><circle class="jack-outer" cx="${cx}" cy="${cy}" r="10" fill="#020617" stroke="${connected ? color : '#475569'}" stroke-width="2.3"/><circle cx="${cx}" cy="${cy}" r="4.2" fill="${connected ? color : '#1e293b'}"/><text x="${cx}" y="${cy+19}" text-anchor="middle" font-size="8" font-weight="700" fill="${connected ? color : '#64748b'}">${label}</text></g>`;
+}
+function g1Panel(x, y, w, h, code, name, col, active) {
+  return `<g opacity="${active ? '1' : '0.42'}"><rect x="${x}" y="${y}" width="${w}" height="${h}" rx="6" fill="#0f172a" stroke="#334155" stroke-width="1.8"/><rect x="${x}" y="${y}" width="${w}" height="4" rx="2" fill="${active ? col : '#475569'}"/><text x="${x+w/2}" y="${y+22}" text-anchor="middle" font-size="11.5" font-weight="800" fill="${active ? col : '#64748b'}">${code}</text><text x="${x+w/2}" y="${y+35}" text-anchor="middle" font-size="9" fill="#94a3b8">${active ? name : 'UNPATCHED'}</text></g>`;
+}
+
+function renderG1RealMoog() {
+  const svg = document.getElementById('g1RealMoogSvg');
+  if (!svg || !g1RealViewOn) return;
+  const p = getLabParams();
+  const cutHz = sliderToCutoff(p.cutoff);
+  let h = '';
+
+  h += g1Panel(14, 10, 270, 276, '1. 921B VCO', p.wave.toUpperCase() + (p.sub ? ' + SUB' : ''), '#60a5fa', g1Patch.vcoToVcf);
+  h += g1Knob(66, 86, ['sawtooth','square','triangle','sine','noise'].indexOf(p.wave) / 4, 'WAVE (CLICK)', p.wave.toUpperCase(), '#60a5fa', 'waveSelect');
+  h += g1Knob(148, 86, (p.octave + 1) / 2, 'RANGE (CLICK)', p.octave === -1 ? "16'" : (p.octave === 0 ? "8'" : "4'"), '#60a5fa', 'rangeSelect');
+  h += g1Knob(230, 86, p.detune / 35, 'DETUNE', p.detune + 'c', '#60a5fa', 'detuneSlider');
+  h += `<g style="cursor:pointer;" onclick="const c=document.getElementById('subToggle');c.checked=!c.checked;updateSynthParams();renderG1RealMoog();"><rect x="44" y="148" width="110" height="24" rx="5" fill="${p.sub ? '#2563eb' : '#1e293b'}" stroke="#60a5fa"/><text x="99" y="164" text-anchor="middle" font-size="9.5" font-weight="800" fill="#fff">SUB: ${p.sub ? 'ON' : 'OFF'}</text></g>`;
+  h += g1Jack(198, 220, 'VCO OUT', '#60a5fa', 'vcoOut', g1Patch.vcoToVcf);
+
+  h += g1Panel(300, 10, 276, 276, '2. 904A VCF', p.filterType.toUpperCase(), '#2dd4bf', g1Patch.vcoToVcf && g1Patch.vcfToVca);
+  h += g1Knob(354, 86, p.cutoff / 100, 'CUTOFF', cutHz >= 1000 ? (cutHz/1000).toFixed(1)+'k' : cutHz+'Hz', '#2dd4bf', 'cutoffSlider');
+  h += g1Knob(438, 86, (p.q - 0.5) / 17.5, 'RES (Q)', p.q.toFixed(1), '#2dd4bf', 'resSlider');
+  h += g1Knob(522, 86, p.fenv / 4500, 'FILT ENV', p.fenv + 'Hz', '#fbbf24', 'fenvSlider');
+  h += g1Jack(326, 220, 'VCF IN', '#2dd4bf', 'vcfIn', g1Patch.vcoToVcf);
+  h += g1Jack(425, 220, 'CUT CV', '#fbbf24', 'vcfCv', g1Patch.envToVcf);
+  h += g1Jack(524, 220, 'VCF OUT', '#2dd4bf', 'vcfOut', g1Patch.vcfToVca);
+
+  h += g1Panel(592, 10, 314, 276, '3. 902 VCA + 911 ADSR', 'Volume & Contour', '#fbbf24', g1Patch.envToVca || g1Patch.envToVcf);
+  h += g1Knob(636, 86, p.attack / 1.2, 'ATTACK', p.attack.toFixed(2)+'s', '#fbbf24', 'attSlider');
+  h += g1Knob(704, 86, p.decay / 1.2, 'DECAY', p.decay.toFixed(2)+'s', '#fbbf24', 'decSlider');
+  h += g1Knob(772, 86, p.sustain, 'SUSTAIN', Math.round(p.sustain*100)+'%', '#fbbf24', 'susSlider');
+  h += g1Knob(840, 86, p.release / 1.8, 'RELEASE', p.release.toFixed(2)+'s', '#fbbf24', 'relSlider');
+  h += g1Jack(654, 220, 'VCA IN', '#4ade80', 'vcaIn', g1Patch.vcfToVca);
+  h += g1Jack(722, 220, 'VCA CV', '#4ade80', 'vcaCv', g1Patch.envToVca);
+  h += g1Jack(790, 220, 'ENV OUT', '#fbbf24', 'envOut', g1Patch.envToVcf || g1Patch.envToVca);
+
+  G1_PATCH_DEFS.forEach(d => {
+    if (!g1Patch[d.key]) return;
+    if (d.key === 'envToVcf' && p.fenv === 0) return;
+    const mx = (d.fx + d.tx) / 2, my = Math.max(d.fy, d.ty) + d.droop;
+    const dash = d.dashed ? 'stroke-dasharray="7,4"' : '';
+    h += `<path class="moog-cable-hit" onclick="pickUpG1Cable(event,'${d.key}')" oncontextmenu="openG1CtxMenu(event,'${d.key}',null)" d="M ${d.fx} ${d.fy} Q ${mx} ${my} ${d.tx} ${d.ty}" fill="none" stroke="${d.color}" stroke-width="4" ${dash} stroke-linecap="round" opacity="0.92"><title>Left-click to pick up • Right-click for Disconnect / Connect menu</title></path>`;
+  });
+  svg.innerHTML = h;
+}
+
+function toggleG1RealView() {
+  dropG1Carried(); closeG1CtxMenu();
+  g1RealViewOn = !g1RealViewOn;
+  document.getElementById('g1RealMoogView').classList.toggle('visible', g1RealViewOn);
+  document.getElementById('g1SlidersWrap').style.display = g1RealViewOn ? 'none' : '';
+  const btn = document.getElementById('g1RealBtn');
+  btn.classList.toggle('active', g1RealViewOn);
+  btn.innerHTML = g1RealViewOn ? '&#127899; Back to Sliders' : '&#127899; Real Modular View';
+  syncG1UnpatchedStyles();
+  if (g1RealViewOn) renderG1RealMoog();
+}
+
+</script>
+
+<!-- Guided Demo Spotlight Backdrop & Floating Callout -->
+<div id="demoBackdrop" class="demo-backdrop" onclick="stopGuidedDemo()" title="Click anywhere outside to exit Guided Demo"></div>
+<div id="demoCallout" class="demo-callout" role="dialog" aria-live="polite" aria-label="Guided Demo Explanation">
+  <div class="demo-callout-head">
+    <span id="demoCalloutBadge" class="demo-callout-badge">Scene 1 / 6</span>
+    <button type="button" class="btn btn-sm btn-ghost" style="color:#cbd5e1;border-color:#475569;padding:3px 9px;" onclick="stopGuidedDemo()">&#9632; Stop</button>
+  </div>
+  <div id="demoCalloutParam" class="demo-callout-param">Active Control: Waveform</div>
+  <p id="demoCalloutText" class="demo-callout-text">Starting guided synth walkthrough...</p>
+  <div class="demo-callout-prog-bg"><div id="demoCalloutProg" class="demo-callout-prog-fill"></div></div>
+</div>
+
+<!-- Part 4 First-Time Preset Spotlight Overlay -->
+<div id="presetTourBackdrop" class="preset-tour-backdrop" onclick="closePresetTour()"></div>
+<div id="presetTourCallout" class="preset-tour-callout" role="dialog" aria-modal="true" aria-label="Create and share a synth preset">
+  <span class="demo-callout-badge">Part 4 Task • Share Your Timbre</span>
+  <h4>Create &amp; Save a Custom Preset First</h4>
+  <p>
+    Before moving on to the final quiz, use the <strong>Interactive Synth Lab</strong> directly above to design your own custom timbre, then type a <strong>Preset name</strong> and <strong>Your name</strong> in this highlighted bar and click <strong>Save Preset</strong> to share it with the class!
+  </p>
+  <div class="preset-tour-arrow-hint">
+    <span style="font-size:18px;line-height:1;">&#8593;</span>
+    <span>Pointing up: Dial in your sound in <strong>Part 3: Interactive Synth Lab</strong>, then save it right here!</span>
+  </div>
+  <div class="preset-tour-actions">
+    <button type="button" class="btn btn-sm btn-primary" onclick="goToSynthLabFromTour()">&#8593; Go to Interactive Synth Lab</button>
+    <button type="button" class="btn btn-sm" style="background:#1e293b;color:#e2e8f0;border-color:#475569;" onclick="closePresetTour()">Got it — Stay Here</button>
+  </div>
+</div>
+<div id="g1PatchCtxMenu" class="patch-ctx-menu" role="menu"></div>
+</body>
+</html>
