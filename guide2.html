@@ -632,6 +632,39 @@
     filter: drop-shadow(0 0 7px #fbbf24);
   }
 
+
+  /* Teacher PIN Modal & Button */
+  .teacher-pin-btn {
+    font-family: inherit; font-size: 11.5px; font-weight: 700;
+    padding: 5px 10px; border-radius: 999px;
+    background: #1e293b; color: #cbd5e1; border: 1px solid #334155;
+    cursor: pointer; transition: 0.15s; white-space: nowrap;
+  }
+  .teacher-pin-btn:hover { background: #334155; color: #fff; border-color: #fbbf24; }
+  .teacher-pin-btn.active { background: #059669; color: #fff; border-color: #34d399; }
+  .tpin-backdrop {
+    position: fixed; inset: 0; z-index: 10000;
+    background: rgba(2, 6, 23, 0.72); backdrop-filter: blur(5px);
+    display: none; align-items: center; justify-content: center; padding: 18px;
+  }
+  .tpin-backdrop.visible { display: flex; }
+  .tpin-modal {
+    background: #0f172a; color: #f8fafc; border: 1.5px solid #475569;
+    border-radius: 14px; padding: 22px 24px; width: 100%; max-width: 360px;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.55); font-family: inherit;
+  }
+  .tpin-modal h3 { margin: 0 0 6px; font-size: 16px; color: #fbbf24; }
+  .tpin-modal p { margin: 0 0 12px; font-size: 13px; color: #cbd5e1; }
+  .tpin-input {
+    width: 100%; padding: 10px 12px; border-radius: 8px; border: 1.5px solid #475569;
+    background: #1e293b; color: #fff; font-size: 18px; letter-spacing: 0.25em;
+    text-align: center; font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    margin-bottom: 10px; box-sizing: border-box;
+  }
+  .tpin-input:focus { outline: none; border-color: #38bdf8; }
+  .tpin-err { color: #f87171; font-size: 12.5px; font-weight: 700; min-height: 18px; margin-bottom: 8px; }
+  .tpin-actions { display: flex; gap: 8px; justify-content: flex-end; flex-wrap: wrap; }
+
 </style>
 </head>
 <body>
@@ -646,7 +679,7 @@
     </p>
     <div style="display:flex;flex-wrap:wrap;gap:10px;justify-content:center;">
       <a href="/guide1" class="btn btn-primary" style="text-decoration:none;">&larr; Go to Guide 1: Subtractive Basics</a>
-      <button type="button" class="btn" onclick="teacherBypassPrereq()">Teacher Preview: Unlock Guide 2</button>
+      <button type="button" class="teacher-pin-btn" onclick="openTeacherPinModal()">&#128274; Teacher PIN</button>
     </div>
   </div>
 </div>
@@ -686,8 +719,7 @@
       <span style="color:var(--muted);font-size:12.5px;">Complete each 3-question checkpoint once — after finishing, the whole guide stays open with no gatekeeping.</span>
     </div>
     <div style="display:flex;gap:8px;flex-wrap:wrap;">
-      <button type="button" class="btn btn-sm" id="teacherUnlockBtn" onclick="toggleTeacherUnlock()">Teacher Preview: Unlock All</button>
-      <button type="button" class="btn btn-sm" onclick="resetGuardrails()">Reset Guide 2 Locks</button>
+      <button type="button" class="teacher-pin-btn" id="teacherPinBtn" onclick="openTeacherPinModal()">&#128274; Teacher PIN</button>
     </div>
   </div>
 
@@ -4276,5 +4308,117 @@ animLoop();
   <div style="height:5px;background:#1e293b;border-radius:999px;overflow:hidden;"><div id="p4CalloutProg" style="height:100%;width:0%;background:linear-gradient(90deg,#fb7185,#fbbf24,#38bdf8);transition:width 0.15s linear;"></div></div>
 </div>
 <div id="patchCtxMenu" class="patch-ctx-menu" role="menu"></div>
+
+<!-- Teacher PIN Modal -->
+<div class="tpin-backdrop" id="tpinBackdrop" onclick="if(event.target===this)closeTeacherPinModal()">
+  <div class="tpin-modal">
+    <h3 id="tpinTitle">&#128274; Teacher PIN Required</h3>
+    <p id="tpinSubtitle">Enter the 6-digit Teacher PIN to unlock all sections across Guides 1&ndash;3.</p>
+    <div id="tpinFormWrap">
+      <input type="password" inputmode="numeric" maxlength="10" class="tpin-input" id="tpinInput" placeholder="&bull;&bull;&bull;&bull;&bull;&bull;" onkeydown="if(event.key==='Enter')submitTeacherPin()">
+      <div class="tpin-err" id="tpinErr"></div>
+      <div class="tpin-actions">
+        <button type="button" class="teacher-pin-btn" onclick="closeTeacherPinModal()">Cancel</button>
+        <button type="button" class="teacher-pin-btn active" onclick="submitTeacherPin()">Unlock</button>
+      </div>
+    </div>
+    <div id="tpinActiveWrap" style="display:none;">
+      <p style="color:#86efac;font-weight:700;margin-bottom:14px;">&#9989; Teacher Mode is active — all sections &amp; prerequisites across Guides 1&ndash;3 are unlocked.</p>
+      <div class="tpin-actions">
+        <button type="button" class="teacher-pin-btn" onclick="closeTeacherPinModal()">Keep Unlocked</button>
+        <button type="button" class="teacher-pin-btn" style="background:#dc2626;border-color:#f87171;color:#fff;" onclick="exitTeacherMode(true)">Lock &amp; Reset Student View</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ================= TEACHER PIN AUTH (GUIDES 1-3) =================
+const _TPIN_H = 2351199037;
+function _hashPin(s) {
+  let h = 2166136261;
+  for (let i = 0; i < s.length; i++) {
+    h ^= s.charCodeAt(i);
+    h = Math.imul(h, 16777619) >>> 0;
+  }
+  return h;
+}
+function isTeacherAuthed() {
+  return localStorage.getItem('rjc_teacher_mode') === '1';
+}
+function syncTeacherPinBtn() {
+  const b = document.getElementById('teacherPinBtn');
+  if (!b) return;
+  const on = isTeacherAuthed();
+  b.classList.toggle('active', on);
+  b.textContent = on ? '🔓 Teacher Mode' : '🔒 Teacher PIN';
+}
+function openTeacherPinModal() {
+  const bd = document.getElementById('tpinBackdrop');
+  if (!bd) return;
+  const on = isTeacherAuthed();
+  document.getElementById('tpinTitle').innerHTML = on ? '&#128275; Teacher Mode Active' : '&#128274; Teacher PIN Required';
+  document.getElementById('tpinSubtitle').style.display = on ? 'none' : 'block';
+  document.getElementById('tpinFormWrap').style.display = on ? 'none' : 'block';
+  document.getElementById('tpinActiveWrap').style.display = on ? 'block' : 'none';
+  document.getElementById('tpinErr').textContent = '';
+  const inp = document.getElementById('tpinInput');
+  if (inp) { inp.value = ''; if (!on) setTimeout(() => inp.focus(), 40); }
+  bd.classList.add('visible');
+}
+function closeTeacherPinModal() {
+  const bd = document.getElementById('tpinBackdrop');
+  if (bd) bd.classList.remove('visible');
+}
+function applyTeacherModeToPage() {
+  if (!isTeacherAuthed()) return;
+  syncTeacherPinBtn();
+  try {
+    if (typeof teacherUnlockedAll !== 'undefined') teacherUnlockedAll = true;
+    if (typeof checkPrereq === 'function') {
+      const pb = document.getElementById('prereqBanner'); if (pb) pb.classList.remove('visible');
+      const pg = document.getElementById('prereqGate'); if (pg) pg.style.display = 'none';
+    }
+    if (typeof unlockedLevel !== 'undefined') {
+      unlockedLevel = Math.max(unlockedLevel, 5);
+    }
+    if (typeof applyGuardrailState === 'function') applyGuardrailState();
+    if (typeof renderGuardrails === 'function') renderGuardrails();
+  } catch (e) {}
+}
+function submitTeacherPin() {
+  const inp = document.getElementById('tpinInput');
+  const val = (inp ? inp.value : '').trim();
+  if (_hashPin(val) === _TPIN_H) {
+    localStorage.setItem('rjc_teacher_mode', '1');
+    localStorage.setItem('synth_v3_unlocked_level', '5');
+    localStorage.setItem('synth_v3_preset_shared', '1');
+    localStorage.setItem('modular_g2_unlocked_level', '5');
+    localStorage.setItem('minimoog_g3_unlocked_level', '4');
+    localStorage.setItem('minimoog_g3_prereq_ok', '1');
+    closeTeacherPinModal();
+    applyTeacherModeToPage();
+  } else {
+    document.getElementById('tpinErr').textContent = 'Incorrect Teacher PIN. Try again.';
+    if (inp) { inp.value = ''; inp.focus(); }
+  }
+}
+function exitTeacherMode(resetAll) {
+  localStorage.removeItem('rjc_teacher_mode');
+  if (resetAll) {
+    localStorage.removeItem('synth_v3_unlocked_level');
+    localStorage.removeItem('synth_v3_preset_shared');
+    localStorage.removeItem('modular_g2_unlocked_level');
+    localStorage.removeItem('minimoog_g3_unlocked_level');
+    localStorage.removeItem('minimoog_g3_prereq_ok');
+  }
+  location.reload();
+}
+window.addEventListener('DOMContentLoaded', () => {
+  syncTeacherPinBtn();
+  if (isTeacherAuthed()) applyTeacherModeToPage();
+});
+
+</script>
 </body>
 </html>
