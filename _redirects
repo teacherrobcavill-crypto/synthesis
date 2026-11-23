@@ -1,6 +1,3 @@
-/guide1 /guide1.html 200
-/guide2 /guide2.html 200
-/guide3 /guide3.html 200
-/preview/subtractive_synthesis_basics_v3 /guide1.html 301
-/preview/modular_synths_guide2 /guide2.html 301
-/preview/minimoog_guide3 /guide3.html 301
+/preview/subtractive_synthesis_basics_v3 /guide1 301
+/preview/modular_synths_guide2 /guide2 301
+/preview/minimoog_guide3 /guide3 301
