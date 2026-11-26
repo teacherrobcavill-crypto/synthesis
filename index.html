@@ -12,6 +12,7 @@
     --ink: #f8fafc;
     --muted: #94a3b8;
     --blue: #38bdf8;
+    --teal: #2dd4bf;
     --purple: #a78bfa;
     --amber: #fbbf24;
     --green: #34d399;
@@ -69,6 +70,7 @@
     box-shadow: 0 16px 36px rgba(0,0,0,0.45);
   }
   .guide-card.g1:hover { border-color: var(--blue); }
+  .guide-card.g1y1:hover { border-color: var(--teal); }
   .guide-card.g2:hover { border-color: var(--purple); }
   .guide-card.g3:hover { border-color: var(--amber); }
   .guide-card.g4:hover { border-color: var(--green); }
@@ -78,6 +80,7 @@
     padding: 4px 10px; border-radius: 999px;
   }
   .g1 .g-tag { background: rgba(56,189,248,0.16); color: var(--blue); }
+  .g1y1 .g-tag { background: rgba(45,212,191,0.16); color: var(--teal); }
   .g2 .g-tag { background: rgba(167,139,250,0.16); color: var(--purple); }
   .g3 .g-tag { background: rgba(251,191,36,0.16); color: var(--amber); }
   .g4 .g-tag { background: rgba(52,211,153,0.16); color: var(--green); }
@@ -99,6 +102,7 @@
     background: #1e293b; color: #fff; border: 1px solid #334155; transition: 0.15s;
   }
   .g1:hover .cta { background: var(--blue); color: #0f172a; border-color: var(--blue); }
+  .g1y1:hover .cta { background: var(--teal); color: #0f172a; border-color: var(--teal); }
   .g2:hover .cta { background: var(--purple); color: #0f172a; border-color: var(--purple); }
   .g3:hover .cta { background: var(--amber); color: #0f172a; border-color: var(--amber); }
   .g4:hover .cta { background: var(--green); color: #0f172a; border-color: var(--green); }
@@ -215,6 +219,24 @@
   </section>
 
   <main>
+    <a class="guide-card g1y1" href="/guide1-year1">
+      <div>
+        <div class="card-top">
+          <span class="g-tag">Guide 1 &bull; Year 1 Extended</span>
+          <span class="status-pill" id="st1y1">First-Year Workbook</span>
+        </div>
+        <h2>Subtractive Synthesis: Deep Foundations</h2>
+        <p>Drawn-out 10-module first-year workbook explaining every term &amp; function in full (all RAG tiers), with live practical listening labs (LPF, Q, Slope, ADSR, LFO) and auto-saved written tasks.</p>
+        <div class="topics">
+          <span class="topic">10 Modules (~2&times; Depth)</span>
+          <span class="topic">Listen &amp; Write Labs</span>
+          <span class="topic">All RAG Tiers</span>
+          <span class="topic">10-Q Quiz + Glossary</span>
+        </div>
+      </div>
+      <div class="cta">Open Year 1 Extended Guide &rarr;</div>
+    </a>
+
     <a class="guide-card g1" href="/guide1">
       <div>
         <div class="card-top">
@@ -294,9 +316,11 @@
 
   <script>
     const g1 = parseInt(localStorage.getItem('synth_v3_unlocked_level') || '0', 10);
+    const g1y1 = parseInt(localStorage.getItem('synth_y1_ext_unlocked_level') || '0', 10);
     const g2 = parseInt(localStorage.getItem('modular_g2_unlocked_level') || '0', 10);
     const g3 = parseInt(localStorage.getItem('minimoog_g3_unlocked_level') || '0', 10);
     if (g1 >= 5) { const e = document.getElementById('st1'); e.textContent = '✓ Completed'; e.classList.add('done'); }
+    if (g1y1 >= 9) { const e = document.getElementById('st1y1'); e.textContent = '✓ Completed'; e.classList.add('done'); }
     if (g2 >= 5) { const e = document.getElementById('st2'); e.textContent = '✓ Completed'; e.classList.add('done'); }
     if (g3 >= 4) { const e = document.getElementById('st3'); e.textContent = '✓ Completed'; e.classList.add('done'); }
   </script>

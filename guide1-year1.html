@@ -1,0 +1,2627 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Subtractive Synthesis: Year 1 Extended Foundations Workbook — A-Level Music Technology</title>
+<style>
+  :root {
+    --bg: #f8fafc;
+    --surface: #ffffff;
+    --surface-alt: #f1f5f9;
+    --ink: #0f172a;
+    --ink-soft: #334155;
+    --muted: #64748b;
+    --border: #e2e8f0;
+    --vco: #2563eb;
+    --vcf: #0d9488;
+    --vca: #16a34a;
+    --env: #d97706;
+    --lfo: #7c3aed;
+    --rose: #e11d48;
+    --danger: #dc2626;
+    --radius: 14px;
+    --shadow: 0 1px 3px rgba(15, 23, 42, 0.06), 0 8px 24px rgba(15, 23, 42, 0.04);
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Inter, sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    line-height: 1.7;
+    font-size: 15px;
+    -webkit-font-smoothing: antialiased;
+  }
+  body.lab-open { padding-bottom: 420px; }
+  .container { max-width: 1080px; margin: 0 auto; padding: 24px 20px 80px; }
+  .prose { max-width: 76ch; color: var(--ink-soft); }
+  .prose p { margin: 0 0 13px; }
+  .prose p:last-child { margin-bottom: 0; }
+  code {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-size: 0.88em;
+    background: #eff6ff;
+    color: #1e40af;
+    padding: 1px 6px;
+    border-radius: 5px;
+    border: 1px solid #dbeafe;
+  }
+
+  /* Top Series Banner */
+  .series-banner {
+    display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 10px;
+    background: #0f172a; color: #cbd5e1; padding: 10px 16px; border-radius: 12px;
+    font-size: 12.5px; margin-bottom: 16px;
+  }
+  .series-banner a {
+    color: #93c5fd; text-decoration: none; font-weight: 700; margin-left: 12px;
+  }
+  .series-banner a:hover { text-decoration: underline; color: #fff; }
+
+  /* Hero */
+  header.hero {
+    background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f766e 100%);
+    color: #fff;
+    border-radius: 18px;
+    padding: 32px 34px 28px;
+    margin-bottom: 18px;
+    box-shadow: var(--shadow);
+  }
+  .hero-top { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-start; gap: 16px; }
+  .hero-badge {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: rgba(255,255,255,0.14); border: 1px solid rgba(255,255,255,0.25);
+    padding: 4px 12px; border-radius: 999px; font-size: 11.5px; font-weight: 700;
+    letter-spacing: 0.04em; text-transform: uppercase; margin-bottom: 12px;
+  }
+  header.hero h1 { margin: 0 0 8px; font-size: 30px; line-height: 1.2; letter-spacing: -0.015em; }
+  header.hero p.subtitle { margin: 0; color: #cbd5e1; max-width: 70ch; font-size: 15.5px; line-height: 1.55; }
+  .hero-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+  .objectives {
+    margin-top: 22px; padding-top: 16px; border-top: 1px solid rgba(255,255,255,0.16);
+    display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; font-size: 13px; color: #e2e8f0;
+  }
+  @media (max-width: 820px) { .objectives { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 520px) { .objectives { grid-template-columns: 1fr; } }
+  .obj-item { background: rgba(255,255,255,0.09); border-radius: 10px; padding: 10px 12px; line-height: 1.45; }
+  .obj-item strong { color: #5eead4; display: block; font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 3px; }
+
+  /* Vital Training Banner */
+  .vital-banner {
+    background: linear-gradient(135deg, #fff1f2 0%, #ffffff 60%);
+    border: 1.5px solid #fecdd3;
+    border-radius: 14px;
+    padding: 16px 20px;
+    margin-bottom: 18px;
+  }
+  .vital-banner-head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 10px; margin-bottom: 12px; }
+  .vital-banner-title { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+  .vital-badge {
+    font-size: 11px; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase;
+    padding: 3px 10px; border-radius: 999px; background: #ffe4e6; color: #be123c; border: 1px solid #fda4af;
+  }
+  .vital-banner h2 { margin: 0; font-size: 16px; color: var(--ink); }
+  .vital-banner-sub { margin: 0; font-size: 13px; color: var(--muted); }
+  .vital-links { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 10px; }
+  .vital-link {
+    display: flex; align-items: center; justify-content: space-between; gap: 10px;
+    padding: 10px 14px; border-radius: 10px; background: #fff; border: 1px solid #fecdd3;
+    color: var(--ink); text-decoration: none; transition: all 0.15s ease;
+  }
+  .vital-link:hover { border-color: #e11d48; background: #fff1f2; transform: translateY(-1px); }
+  .vital-link-left { display: flex; align-items: center; gap: 10px; }
+  .vital-play {
+    width: 30px; height: 30px; border-radius: 8px; background: #ffe4e6; color: #be123c;
+    display: inline-flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 800;
+  }
+  .vital-link-name { font-weight: 700; font-size: 13.5px; display: block; }
+  .vital-link-meta { font-size: 11.5px; color: var(--muted); display: block; }
+  .vital-arrow { color: #be123c; font-weight: 800; }
+
+  /* Buttons */
+  .btn {
+    border: 1px solid var(--border); background: var(--surface); color: var(--ink);
+    padding: 7px 13px; border-radius: 8px; font-size: 13px; font-weight: 600;
+    cursor: pointer; transition: all 0.15s ease; display: inline-flex; align-items: center; gap: 6px;
+    font-family: inherit;
+  }
+  .btn:hover { background: var(--surface-alt); }
+  .btn-sm { padding: 5px 10px; font-size: 12px; border-radius: 6px; }
+  .btn-primary { background: var(--vco); border-color: var(--vco); color: #fff; }
+  .btn-primary:hover { background: #1d4ed8; }
+  .btn-teal { background: var(--vcf); border-color: var(--vcf); color: #fff; }
+  .btn-teal:hover { background: #0f766e; }
+  .btn-success { background: var(--vca); border-color: var(--vca); color: #fff; }
+  .btn-success:hover { background: #15803d; }
+  .btn-amber { background: var(--env); border-color: var(--env); color: #fff; }
+  .btn-amber:hover { background: #b45309; }
+  .btn-purple { background: var(--lfo); border-color: var(--lfo); color: #fff; }
+  .btn-purple:hover { background: #6d28d9; }
+  .btn-dark { background: #1e293b; border-color: #334155; color: #e2e8f0; }
+  .btn-dark:hover { background: #334155; }
+  .btn-ghost { background: rgba(255,255,255,0.14); border-color: rgba(255,255,255,0.3); color: #fff; }
+  .btn-ghost:hover { background: rgba(255,255,255,0.24); }
+
+  /* Sticky Workbook Progress Bar */
+  .workbook-bar {
+    position: sticky; top: 8px; z-index: 40;
+    background: rgba(255,255,255,0.96); backdrop-filter: blur(8px);
+    border: 1px solid var(--border); border-radius: 12px;
+    padding: 10px 14px; margin-bottom: 16px; box-shadow: var(--shadow);
+    display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 10px;
+  }
+  .wb-left { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+  .wb-pill {
+    font-size: 12px; font-weight: 700; padding: 4px 10px; border-radius: 999px;
+    background: #eff6ff; color: var(--vco); border: 1px solid #bfdbfe;
+  }
+  .wb-pill.green { background: #dcfce7; color: #166534; border-color: #bbf7d0; }
+  .wb-student-input {
+    border: 1px solid var(--border); border-radius: 8px; padding: 5px 10px; font-size: 12.5px; width: 170px;
+  }
+  .wb-right { display: flex; flex-wrap: wrap; gap: 7px; align-items: center; }
+
+  /* TOC */
+  nav.toc { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 20px; }
+  nav.toc a {
+    text-decoration: none; color: var(--ink-soft); background: var(--surface);
+    border: 1px solid var(--border); padding: 5px 11px; border-radius: 999px;
+    font-size: 12px; font-weight: 600; transition: all 0.15s ease;
+  }
+  nav.toc a:hover { color: var(--vco); border-color: var(--vco); background: #eff6ff; }
+  nav.toc a.locked-link { opacity: 0.55; }
+  nav.toc a.passed-link { background: #f0fdf4; border-color: #bbf7d0; color: #166534; }
+
+  /* Section Cards */
+  section.card {
+    background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+    padding: 28px 30px; margin-bottom: 26px; box-shadow: var(--shadow);
+    position: relative;
+  }
+  @media (max-width: 640px) { section.card { padding: 20px 16px; } }
+  section.card.section-locked > *:not(.section-head):not(.lock-overlay) {
+    filter: blur(4px); pointer-events: none; user-select: none; opacity: 0.35; max-height: 220px; overflow: hidden;
+  }
+  .lock-overlay {
+    position: absolute; inset: 56px 0 0 0; display: flex; align-items: center; justify-content: center;
+    padding: 20px; z-index: 5; background: rgba(248, 250, 252, 0.72); border-radius: 0 0 var(--radius) var(--radius);
+  }
+  .lock-overlay-card {
+    background: #fff; border: 1.5px solid #cbd5e1; border-radius: 14px; padding: 20px 24px;
+    max-width: 440px; text-align: center; box-shadow: 0 10px 30px rgba(15,23,42,0.12);
+  }
+  .lock-overlay-card h4 { margin: 0 0 6px; font-size: 16px; }
+  .lock-overlay-card p { margin: 0 0 12px; font-size: 13.5px; color: var(--muted); }
+
+  .section-head {
+    display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 10px;
+    margin-bottom: 10px; padding-bottom: 12px; border-bottom: 1px solid var(--border);
+  }
+  section.card h2 {
+    margin: 0; font-size: 21px; line-height: 1.3;
+    display: flex; align-items: center; flex-wrap: wrap; gap: 10px;
+  }
+  .section-tag {
+    display: inline-flex; align-items: center; padding: 3px 10px; border-radius: 999px;
+    background: #eff6ff; color: var(--vco); font-size: 11px; font-weight: 800;
+    text-transform: uppercase; letter-spacing: 0.05em;
+  }
+  .time-badge {
+    font-size: 11.5px; font-weight: 700; color: var(--muted); background: var(--surface-alt);
+    border: 1px solid var(--border); padding: 3px 10px; border-radius: 999px;
+  }
+  .lead { margin: 0 0 18px; color: var(--muted); font-size: 15px; max-width: 76ch; }
+
+  /* Term Explanation Blocks */
+  .term-block {
+    border: 1px solid var(--border); border-left: 4px solid var(--vco);
+    border-radius: 12px; padding: 18px 20px; margin: 16px 0; background: #fcfdff;
+  }
+  .term-block.teal { border-left-color: var(--vcf); background: #f8fffe; }
+  .term-block.green { border-left-color: var(--vca); background: #f8fff9; }
+  .term-block.amber { border-left-color: var(--env); background: #fffdf7; }
+  .term-block.purple { border-left-color: var(--lfo); background: #fcfaff; }
+  .term-head {
+    display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 8px;
+    margin-bottom: 8px;
+  }
+  .term-head h3 { margin: 0; font-size: 16.5px; color: var(--ink); }
+  .tier-tag {
+    font-size: 10.5px; font-weight: 700; padding: 2px 8px; border-radius: 999px;
+    background: #f1f5f9; color: #475569; border: 1px solid #cbd5e1;
+  }
+  .tier-tag.t0 { background: #fef3c7; color: #92400e; border-color: #fde68a; }
+  .tier-tag.t1 { background: #dbeafe; color: #1e40af; border-color: #bfdbfe; }
+  .tier-tag.t2 { background: #dcfce7; color: #166534; border-color: #bbf7d0; }
+  .tier-tag.t3 { background: #f3e8ff; color: #6b21a8; border-color: #e9d5ff; }
+
+  .term-block p { margin: 0 0 10px; color: var(--ink-soft); font-size: 14.5px; }
+  .term-block p:last-child { margin-bottom: 0; }
+  .analogy-inline {
+    background: #eff6ff; border: 1px solid #dbeafe; border-radius: 8px;
+    padding: 10px 13px; margin: 10px 0; font-size: 13.8px; color: #1e3a8a;
+  }
+  .exam-note {
+    background: #fffbeb; border: 1px solid #fde68a; border-radius: 8px;
+    padding: 9px 13px; margin: 10px 0 0; font-size: 13.3px; color: #78350f;
+  }
+  .worked-math {
+    background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 8px;
+    padding: 11px 14px; margin: 10px 0; font-size: 13.8px; color: var(--ink);
+  }
+
+  /* Written & Practical Task Cards */
+  .task-box {
+    border: 1.5px solid #bfdbfe; background: #f0f7ff;
+    border-radius: 12px; padding: 16px 18px; margin: 16px 0 20px;
+  }
+  .task-box.practical {
+    border-color: #99f6e4; background: #f0fdfa;
+  }
+  .task-header {
+    display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 8px;
+    margin-bottom: 10px;
+  }
+  .task-type {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em;
+    padding: 3px 9px; border-radius: 999px; background: var(--vco); color: #fff;
+  }
+  .task-box.practical .task-type { background: var(--vcf); }
+  .task-status {
+    font-size: 11.5px; font-weight: 700; color: var(--muted);
+  }
+  .task-status.done { color: #166534; }
+  .task-box h4 { margin: 0 0 8px; font-size: 15px; color: var(--ink); }
+  .task-steps { margin: 0 0 12px; padding-left: 20px; font-size: 13.8px; color: var(--ink-soft); }
+  .task-steps li { margin-bottom: 5px; }
+  .task-q { margin-bottom: 12px; }
+  .task-q label {
+    display: block; font-weight: 600; font-size: 13.8px; color: var(--ink); margin-bottom: 5px;
+  }
+  .wb-textarea {
+    width: 100%; min-height: 68px; border: 1px solid #cbd5e1; border-radius: 8px;
+    padding: 9px 11px; font-family: inherit; font-size: 13.8px; color: var(--ink);
+    background: #fff; resize: vertical; line-height: 1.5;
+  }
+  .wb-textarea:focus { outline: none; border-color: var(--vco); box-shadow: 0 0 0 3px rgba(37,99,235,0.12); }
+  .wb-textarea.has-answer { border-color: #86efac; background: #fcfffd; }
+
+  .task-actions { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-top: 8px; }
+  .check-reveal {
+    display: none; margin-top: 10px; padding: 11px 14px; border-radius: 8px;
+    background: #ffffff; border: 1px solid #bbf7d0; border-left: 4px solid var(--vca);
+    font-size: 13.3px; color: var(--ink-soft);
+  }
+  .check-reveal.visible { display: block; }
+  .check-reveal strong { color: #166534; }
+
+  /* Tables & Grids */
+  .grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; margin: 14px 0; }
+  @media (max-width: 720px) { .grid-2 { grid-template-columns: 1fr; } }
+  .info-card { border: 1px solid var(--border); border-radius: 11px; padding: 14px 16px; background: #fff; }
+  .info-card h4 { margin: 0 0 6px; font-size: 14.5px; color: var(--ink); }
+  .info-card p { margin: 0; font-size: 13.5px; color: var(--ink-soft); }
+
+  .data-table { width: 100%; border-collapse: collapse; margin: 14px 0; font-size: 13.5px; }
+  .data-table th, .data-table td {
+    border: 1px solid var(--border); padding: 9px 11px; text-align: left; vertical-align: top;
+  }
+  .data-table th { background: var(--surface-alt); font-weight: 700; color: var(--ink); }
+  .mini-wave { width: 78px; height: 30px; display: block; }
+
+  /* Diagram */
+  .diagram-wrap {
+    background: #f8fafc; border: 1px solid var(--border); border-radius: 12px;
+    padding: 14px; margin: 16px 0; overflow-x: auto;
+  }
+  .diagram-wrap svg { width: 100%; max-width: 920px; height: auto; display: block; margin: 0 auto; }
+  .svg-node { cursor: pointer; transition: opacity 0.15s; }
+  .svg-node:hover { opacity: 0.86; }
+  .svg-node.active rect { stroke-width: 3.5; filter: drop-shadow(0 3px 8px rgba(37,99,235,0.22)); }
+  .node-detail {
+    background: #f8fafc; border: 1px solid #cbd5e1; border-left: 4px solid var(--vco);
+    border-radius: 10px; padding: 14px 16px; margin-bottom: 14px; font-size: 14px;
+  }
+
+  /* Checkpoints */
+  .guardrail-box {
+    margin-top: 22px; border: 1.5px solid #cbd5e1; border-radius: 12px;
+    padding: 16px 18px; background: #f8fafc;
+  }
+  .guardrail-box.passed { background: #f0fdf4; border-color: #86efac; }
+  .guardrail-head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 8px; margin-bottom: 12px; }
+  .guardrail-title { margin: 0; font-size: 15px; color: var(--ink); }
+  .guardrail-badge {
+    font-size: 11px; font-weight: 800; padding: 3px 9px; border-radius: 999px;
+    background: #e2e8f0; color: #334155; text-transform: uppercase;
+  }
+  .guardrail-box.passed .guardrail-badge { background: #dcfce7; color: #166534; }
+  .gq-item {
+    background: #fff; border: 1px solid var(--border); border-radius: 9px;
+    padding: 11px 13px; margin-bottom: 10px;
+  }
+  .gq-item.gq-right { border-color: #86efac; background: #f0fdf4; }
+  .gq-item.gq-wrong { border-color: #fca5a5; background: #fef2f2; }
+  .gq-prompt { font-weight: 700; font-size: 13.5px; margin-bottom: 7px; }
+  .gq-opts { display: flex; flex-direction: column; gap: 5px; }
+  .gq-opt { display: flex; align-items: flex-start; gap: 8px; font-size: 13.2px; cursor: pointer; }
+  .gq-hint { display: none; margin-top: 7px; font-size: 12.5px; color: #991b1b; font-weight: 600; }
+  .gq-item.gq-wrong .gq-hint { display: block; }
+  .guardrail-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-top: 10px; }
+  .guardrail-status { font-size: 13px; font-weight: 600; }
+
+  /* Floating / Dockable Live Synth Lab Drawer */
+  .synth-drawer {
+    position: fixed; left: 0; right: 0; bottom: 0; z-index: 60;
+    background: #0f172a; color: #f8fafc;
+    border-top: 3px solid #38bdf8;
+    box-shadow: 0 -14px 40px rgba(2, 6, 23, 0.55);
+    transform: translateY(100%);
+    transition: transform 0.25s ease;
+    max-height: 78vh;
+    display: flex; flex-direction: column;
+  }
+  .synth-drawer.open { transform: translateY(0); }
+  .drawer-head {
+    display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 10px;
+    padding: 10px 18px; background: #1e293b; border-bottom: 1px solid #334155;
+  }
+  .drawer-title { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; font-weight: 800; font-size: 14px; }
+  .drawer-task-pill {
+    font-size: 11.5px; font-weight: 700; padding: 3px 10px; border-radius: 999px;
+    background: rgba(56,189,248,0.18); color: #7dd3fc; border: 1px solid rgba(56,189,248,0.4);
+  }
+  .drawer-body { overflow-y: auto; padding: 12px 18px 16px; }
+  .drawer-inner { max-width: 1080px; margin: 0 auto; }
+
+  .viz-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; }
+  @media (max-width: 720px) { .viz-grid { grid-template-columns: 1fr; } }
+  .viz-box { background: #020617; border: 1px solid #334155; border-radius: 10px; padding: 8px 10px; }
+  .viz-title {
+    display: flex; justify-content: space-between; font-size: 11px; font-weight: 700;
+    color: #94a3b8; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.04em;
+  }
+  .viz-box canvas { width: 100%; height: 110px; display: block; }
+
+  .synth-modules-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 10px; }
+  @media (max-width: 960px) { .synth-modules-4 { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 560px) { .synth-modules-4 { grid-template-columns: 1fr; } }
+  .s-mod {
+    background: #1e293b; border: 1px solid #334155; border-top: 3px solid var(--vco);
+    border-radius: 10px; padding: 10px 11px;
+  }
+  .s-mod.vcf { border-top-color: var(--vcf); }
+  .s-mod.env { border-top-color: var(--env); }
+  .s-mod.lfo { border-top-color: var(--lfo); }
+  .s-mod h4 {
+    margin: 0 0 8px; font-size: 12px; text-transform: uppercase; letter-spacing: 0.05em;
+    display: flex; justify-content: space-between; color: #e2e8f0;
+  }
+  .s-ctrl { margin-bottom: 7px; font-size: 11.5px; }
+  .s-ctrl:last-child { margin-bottom: 0; }
+  .s-ctrl label { display: flex; justify-content: space-between; color: #cbd5e1; margin-bottom: 2px; font-weight: 600; }
+  .s-ctrl output { color: #7dd3fc; font-family: ui-monospace, monospace; }
+  .s-ctrl select, .s-ctrl input[type="range"] { width: 100%; }
+  .s-ctrl select {
+    background: #0f172a; color: #f8fafc; border: 1px solid #475569; border-radius: 6px; padding: 4px 6px; font-size: 12px;
+  }
+  .s-toggle { display: flex; justify-content: space-between; align-items: center; color: #cbd5e1; font-size: 11.5px; font-weight: 600; margin-top: 4px; }
+
+  .kbd-strip {
+    display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px;
+    background: #1e293b; border: 1px solid #334155; border-radius: 10px; padding: 8px 12px;
+  }
+  .keys { display: flex; position: relative; height: 68px; user-select: none; }
+  .key-white {
+    width: 34px; height: 68px; background: #f8fafc; border: 1px solid #94a3b8;
+    border-radius: 0 0 5px 5px; cursor: pointer; display: flex; align-items: flex-end; justify-content: center;
+    padding-bottom: 4px; font-size: 10px; font-weight: 700; color: #475569;
+  }
+  .key-white.active, .key-white:active { background: #38bdf8; color: #0f172a; }
+  .key-black {
+    width: 22px; height: 42px; background: #0f172a; border: 1px solid #334155;
+    border-radius: 0 0 4px 4px; position: absolute; top: 0; z-index: 2; cursor: pointer;
+  }
+  .key-black.active, .key-black:active { background: #0ea5e9; }
+
+  /* Quiz & Glossary */
+  .quiz-q { border: 1px solid var(--border); border-radius: 11px; padding: 14px 16px; margin-bottom: 12px; background: #fff; }
+  .quiz-q-title { font-weight: 700; font-size: 14.5px; margin-bottom: 8px; }
+  .quiz-opts { display: flex; flex-direction: column; gap: 6px; }
+  .quiz-opt {
+    display: flex; align-items: flex-start; gap: 8px; padding: 7px 10px; border-radius: 8px;
+    border: 1px solid var(--border); cursor: pointer; font-size: 13.5px;
+  }
+  .quiz-opt.is-correct { background: #dcfce7; border-color: #4ade80; color: #14532d; font-weight: 600; }
+  .quiz-opt.is-wrong { background: #fee2e2; border-color: #f87171; color: #7f1d1d; }
+  .quiz-explain {
+    display: none; margin-top: 9px; padding: 9px 12px; border-radius: 8px;
+    background: #eff6ff; border-left: 3px solid var(--vco); font-size: 13px; color: var(--ink-soft);
+  }
+  .quiz-explain.show { display: block; }
+  .quiz-score {
+    display: none; padding: 12px 16px; border-radius: 10px; font-weight: 700; margin-bottom: 14px;
+    background: #fef3c7; border: 1px solid #fcd34d; color: #92400e;
+  }
+  .quiz-score.great { background: #dcfce7; border-color: #86efac; color: #166534; }
+
+  /* Teacher PIN Modal */
+  .modal-backdrop {
+    display: none; position: fixed; inset: 0; z-index: 90;
+    background: rgba(15,23,42,0.65); align-items: center; justify-content: center; padding: 20px;
+  }
+  .modal-backdrop.open { display: flex; }
+  .modal-card {
+    background: #fff; border-radius: 14px; padding: 22px 24px; max-width: 380px; width: 100%;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.35);
+  }
+  .modal-card h3 { margin: 0 0 8px; }
+
+  /* Print Styles */
+  @media print {
+    .series-banner, .vital-banner, .workbook-bar, nav.toc, .synth-drawer, .btn, .lock-overlay, .guardrail-actions { display: none !important; }
+    body.lab-open { padding-bottom: 0 !important; }
+    section.card.section-locked > * { filter: none !important; opacity: 1 !important; max-height: none !important; }
+    section.card { box-shadow: none; break-inside: avoid-page; border: 1px solid #94a3b8; }
+    .wb-textarea { border: 1px solid #64748b; min-height: 50px; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div class="series-banner">
+    <span><strong>RJC Audio &bull; Year 1 Extended Foundations Workbook</strong> (Guide 1 — Detailed Edition)</span>
+    <span>
+      <a href="/">All Guides</a>
+      <a href="/guide1">Standard Guide 1</a>
+      <a href="/guide2">Guide 2: Modular &rarr;</a>
+    </span>
+  </div>
+
+  <header class="hero">
+    <div class="hero-top">
+      <div>
+        <div class="hero-badge">Year 12 / First-Year A-Level Music Technology (Edexcel 9MT0) &bull; Extended Edition</div>
+        <h1>Subtractive Synthesis: First-Year Deep Foundations</h1>
+        <p class="subtitle">A slower, step-by-step workbook covering every core term, acoustic principle, and synthesiser control in full detail — paired with live practical listening tasks and written confirmation checks drawn from all course reference tiers.</p>
+      </div>
+      <div class="hero-actions">
+        <button type="button" class="btn btn-teal" onclick="toggleSynthDrawer()">&#127899; Open Live Synth Lab</button>
+        <button type="button" class="btn btn-ghost" onclick="window.print()">&#128424; Print / Save Workbook PDF</button>
+      </div>
+    </div>
+    <div class="objectives">
+      <div class="obj-item"><strong>10 Scaffolded Modules</strong>~2&times; the depth and guided practice time of the standard Guide 1.</div>
+      <div class="obj-item"><strong>Every Term Explained</strong>Grounded in Pearson Spec (Tier 1), AOS 2/3 packs (Tier 2), Logic Manual (Tier 3) &amp; Acoustics (Tier 0).</div>
+      <div class="obj-item"><strong>Listen &amp; Write Labs</strong>Move live controls (LPF, Q, Slope, ADSR, LFO) and log exactly what you hear and see.</div>
+      <div class="obj-item"><strong>Auto-Saved Workbook</strong>Every written answer saves automatically in your browser ready to print or review.</div>
+    </div>
+  </header>
+
+  <section class="vital-banner" aria-label="Vital Synth Training">
+    <div class="vital-banner-head">
+      <div class="vital-banner-title">
+        <span class="vital-badge">Vital Training</span>
+        <h2>Essential Vital Synth Training Videos</h2>
+      </div>
+      <p class="vital-banner-sub">Watch both training videos on SharePoint alongside this extended Year 1 workbook.</p>
+    </div>
+    <div class="vital-links">
+      <a class="vital-link" href="https://qmcollege-my.sharepoint.com/:v:/g/personal/rob_cavill_qmc_ac_uk/IQCe6BtYgyLDTpO_o49LrX_HAaXw6y6iriAWWqm4KEP155E?e=cHPW5G" target="_blank" rel="noopener noreferrer">
+        <span class="vital-link-left">
+          <span class="vital-play">&#9654;</span>
+          <span>
+            <span class="vital-link-name">Vital Training — Part 1</span>
+            <span class="vital-link-meta">Watch video on QMC SharePoint</span>
+          </span>
+        </span>
+        <span class="vital-arrow">&#8599;</span>
+      </a>
+      <a class="vital-link" href="https://qmcollege-my.sharepoint.com/:v:/g/personal/rob_cavill_qmc_ac_uk/IQDWCjr6lETDR5Yaic0Y05C1AR6F3yXgK8VqQQexSUWRYTg?e=MnvYPx" target="_blank" rel="noopener noreferrer">
+        <span class="vital-link-left">
+          <span class="vital-play">&#9654;</span>
+          <span>
+            <span class="vital-link-name">Vital Training — Part 2</span>
+            <span class="vital-link-meta">Watch video on QMC SharePoint</span>
+          </span>
+        </span>
+        <span class="vital-arrow">&#8599;</span>
+      </a>
+    </div>
+  </section>
+
+  <!-- Sticky Workbook Progress Bar -->
+  <div class="workbook-bar">
+    <div class="wb-left">
+      <input type="text" id="studentNameInput" class="wb-student-input" placeholder="Your Name (saved for print)" oninput="saveStudentName(this.value)" />
+      <span class="wb-pill" id="wbTasksPill">Written/Lab Boxes: 0 / 35</span>
+      <span class="wb-pill green" id="wbCheckpointsPill">Checkpoints: 0 / 9</span>
+    </div>
+    <div class="wb-right">
+      <button type="button" class="btn btn-sm btn-teal" onclick="toggleSynthDrawer()">&#127899; Toggle Synth Lab</button>
+      <button type="button" class="btn btn-sm" onclick="openTeacherPinModal()">&#128274; Teacher PIN</button>
+    </div>
+  </div>
+
+  <!-- Table of Contents -->
+  <nav class="toc" id="mainToc">
+    <a href="#mod1" data-sec="mod1">1. History &amp; Context</a>
+    <a href="#mod2" data-sec="mod2">2. Signal Flow</a>
+    <a href="#mod3" data-sec="mod3">3. Harmonics &amp; Timbre</a>
+    <a href="#mod4" data-sec="mod4">4. VCO Waveforms &amp; Pitch</a>
+    <a href="#mod5" data-sec="mod5">5. Filters (VCF)</a>
+    <a href="#mod6" data-sec="mod6">6. Amp Envelopes (ADSR)</a>
+    <a href="#mod7" data-sec="mod7">7. Filter Envelopes</a>
+    <a href="#mod8" data-sec="mod8">8. LFO Modulation</a>
+    <a href="#mod9" data-sec="mod9">9. Patch Recipes &amp; Lab</a>
+    <a href="#mod10" data-sec="mod10">10. Term Check, Quiz &amp; Exam</a>
+  </nav>
+
+  <!-- ==================== MODULE 1 ==================== -->
+  <section id="mod1" class="card">
+    <div class="section-head">
+      <h2><span class="section-tag">Module 1</span> Historical Context: How Synthesisers Reshaped Music</h2>
+      <span class="time-badge">Est. 15–20 mins</span>
+    </div>
+    <p class="lead">Before you touch a single knob, you need to understand <em>what</em> synthesis is, why musicians adopted synthesisers from the 1960s onwards, and the exact vocabulary used to describe them in A-Level Music Technology.</p>
+
+    <div class="term-block">
+      <div class="term-head">
+        <h3>1.1 What Is Synthesis? (Artificial Sound Creation)</h3>
+        <span class="tier-tag t1">Tier 1 &bull; Component 2 Study Guide</span>
+      </div>
+      <p><strong>Definition:</strong> In Music Technology, <strong>synthesis</strong> means creating musical sounds <em>artificially</em> using electronic waveforms, without recording any acoustic instrument or microphone source. It is a compulsory element of A-Level Component 2 (Technology-Based Composition).</p>
+      <p>In the 1950s, pioneers at the <strong>BBC Radiophonic Workshop</strong> (such as Delia Derbyshire) and <strong>IRCAM</strong> had to splice magnetic tape loops and wire up laboratory test oscillators just to create a single melody. There were no piano keyboards attached, so programming even a few seconds of music took hours.</p>
+    </div>
+
+    <div class="term-block">
+      <div class="term-head">
+        <h3>1.2 Voltage Control &amp; Early Hardware (1960s–1970s)</h3>
+        <span class="tier-tag t2">Tier 2 &bull; AOS 3 Overview</span>
+      </div>
+      <p><strong>Definition:</strong> <strong>Voltage Control</strong> means using electrical voltages to automatically control a synthesiser's pitch, brightness, and loudness. Engineers like <strong>Robert Moog</strong> and <strong>Alan Pearlman (ARP)</strong> combined voltage-controlled oscillators, filters, and amplifiers with a standard piano keyboard.</p>
+      <p>Early 1960s modular systems (like the Moog Modular) were huge, expensive, fragile, and needed physical patch cords. In <strong>1970</strong>, the <strong>Minimoog</strong> packed the most important modular stages into a compact, portable keyboard with <em>no patch cords required</em> — making synthesisers practical for live rock, funk, and prog bands (Pink Floyd, Stevie Wonder, Yes, Kraftwerk).</p>
+    </div>
+
+    <div class="term-block teal">
+      <div class="term-head">
+        <h3>1.3 Monophonic vs. Polyphonic</h3>
+        <span class="tier-tag t1">Tier 1 &bull; Pearson Spec p.49</span>
+      </div>
+      <p><strong>Monophonic:</strong> A synthesiser that can only play <strong>one note at a time</strong> (one voice). Early 1970s keyboards like the Minimoog were monophonic, which is why they became famous for heavy <strong>basslines</strong> and expressive single-note <strong>lead solos</strong> (using pitch-bend wheels and <strong>portamento/glide</strong> — sliding smoothly from one note's pitch to the next).</p>
+      <p><strong>Polyphonic:</strong> A synthesiser capable of playing <strong>multiple notes simultaneously</strong> (chords). Late-1970s and 1980s polyphonic synths — such as the <strong>Sequential Circuits Prophet-5</strong>, <strong>Roland Juno/Jupiter</strong>, and <strong>Yamaha CS-80</strong> — unlocked lush string pads, sustained chord progressions, and bright 80s synth brass.</p>
+    </div>
+
+    <div class="term-block purple">
+      <div class="term-head">
+        <h3>1.4 MIDI (1983), Drum Machines &amp; Modern DAW Soft Synths</h3>
+        <span class="tier-tag t2">Tier 2 &bull; AOS 3 Overview p.11–12</span>
+      </div>
+      <p><strong>MIDI (Musical Instrument Digital Interface):</strong> Introduced commercially in <strong>1983</strong>, MIDI is a universal digital communication standard allowing synthesisers, drum machines (TR-808, LinnDrum), sequencers, and computers to talk to each other. MIDI does <em>not</em> carry audio — it sends serial digital instruction messages (bits and bytes), such as <strong>Note Number</strong> (pitch &amp; octave, e.g. C3) and <strong>Velocity</strong> (how hard a key is struck, from <code>1</code> to <code>127</code>).</p>
+      <p><strong>Analogue Tuning Drift &amp; DAW Soft Synths:</strong> Vintage analogue oscillators drifted slightly out of tune as their circuits warmed up. Modern DAW software synths (Logic Pro's <em>Retro Synth</em>, <em>ES2</em>, <em>Vital</em>, <em>Serum</em>) recreate classic subtractive architecture digitally — and producers still deliberately add tiny amounts of detuning because that slight drift makes synths sound warm and thick.</p>
+    </div>
+
+    <div class="task-box">
+      <div class="task-header">
+        <span class="task-type">&#9997; Written Confirmation Task 1A</span>
+        <span class="task-status" id="st-t1a">Not completed yet</span>
+      </div>
+      <h4>Confirming Historical &amp; Core Terms (Short-Form Questions)</h4>
+      <div class="task-q">
+        <label for="ans-t1a-1">1. In your own words, define "synthesis" and explain how it differs from recording an acoustic instrument.</label>
+        <textarea class="wb-textarea" id="ans-t1a-1" data-task="t1a" placeholder="Write 1–2 clear sentences..."></textarea>
+      </div>
+      <div class="task-q">
+        <label for="ans-t1a-2">2. Explain the difference between a <em>monophonic</em> synth (e.g. 1970 Minimoog) and a <em>polyphonic</em> synth (e.g. Prophet-5), and give one typical musical role for each.</label>
+        <textarea class="wb-textarea" id="ans-t1a-2" data-task="t1a" placeholder="Monophonic = ... Polyphonic = ..."></textarea>
+      </div>
+      <div class="task-q">
+        <label for="ans-t1a-3">3. Does a MIDI cable carry audio sound? State two pieces of musical performance data that MIDI sends instead (including the numerical range for velocity).</label>
+        <textarea class="wb-textarea" id="ans-t1a-3" data-task="t1a" placeholder="Write your answer here..."></textarea>
+      </div>
+      <div class="task-actions">
+        <button type="button" class="btn btn-sm btn-primary" onclick="toggleReveal('rev-t1a')">Reveal Self-Check Key Points</button>
+      </div>
+      <div class="check-reveal" id="rev-t1a">
+        <strong>Self-Check Key Points:</strong>
+        (1) Synthesis creates sound artificially from electronic waveforms without any acoustic source or microphone recording.
+        (2) Monophonic plays one note at a time (ideal for basslines and expressive lead solos with pitch bend/portamento); polyphonic plays multiple notes at once (chords, lush string pads, synth brass).
+        (3) No — MIDI carries digital control messages (bits &amp; bytes), not audio. Key data includes <strong>Note Number</strong> (pitch/octave) and <strong>Velocity</strong> (key strike force from <code>1</code> to <code>127</code>).
+      </div>
+    </div>
+
+    <div class="guardrail-box" id="guardrail-mod1"></div>
+  </section>
+
+  <!-- ==================== MODULE 2 ==================== -->
+  <section id="mod2" class="card">
+    <div class="section-head">
+      <h2><span class="section-tag">Module 2</span> Subtractive Synthesis &amp; Audio Signal Flow (VCO &rarr; VCF &rarr; VCA)</h2>
+      <span class="time-badge">Est. 15–20 mins</span>
+    </div>
+    <p class="lead">Every subtractive synthesiser — from a 1970 Minimoog to Logic's Retro Synth or Vital — follows one universal left-to-right blueprint. Let's break down every single block and why the order matters.</p>
+
+    <div class="term-block">
+      <div class="term-head">
+        <h3>2.1 What Does "Subtractive" Mean?</h3>
+        <span class="tier-tag t3">Tier 3 &bull; Logic Pro Instruments Guide p.728</span>
+      </div>
+      <p><strong>Definition:</strong> <strong>Subtractive synthesis</strong> builds a musical timbre by starting with a raw, harmonically rich waveform and <em>removing (subtracting)</em> unwanted frequencies using a filter, then shaping its volume over time.</p>
+      <div class="analogy-inline">
+        <strong>The Marble Sculptor Analogy:</strong> When Michelangelo was asked how he carved the statue of David out of a block of marble, he replied: <em>"I just cut away everything that doesn't look like David."</em> In subtractive synthesis, the <strong>Oscillator</strong> gives you the raw block of stone, the <strong>Filter</strong> is your chisel removing frequencies you don't want, and the <strong>Amplifier</strong> controls how loudly the finished sound appears and fades out.
+      </div>
+    </div>
+
+    <div class="term-block">
+      <div class="term-head">
+        <h3>2.2 Stage 1 — VCO (Voltage-Controlled Oscillator)</h3>
+        <span class="tier-tag t1">Tier 1 &bull; Core Synth Architecture</span>
+      </div>
+      <p><strong>Function:</strong> The <strong>sound source</strong>. An oscillator generates a continuous, repeating electrical waveform at a controlled pitch (frequency). Without a VCO, there is no audio signal at all.</p>
+      <p><strong>Key fact:</strong> An analogue VCO never stops oscillating — it hums continuously inside the synthesiser as long as the power is on. That is why we need a VCA at the end of the chain to turn notes on and off cleanly.</p>
+    </div>
+
+    <div class="term-block teal">
+      <div class="term-head">
+        <h3>2.3 Stage 2 — VCF (Voltage-Controlled Filter)</h3>
+        <span class="tier-tag t1">Tier 1 &bull; Component 2 Study Guide</span>
+      </div>
+      <p><strong>Function:</strong> The <strong>tone sculptor</strong>. The VCF receives the raw, bright waveform from the VCO and attenuates (turns down) selected frequency ranges to shape the timbre — for example, removing harsh high frequencies with a Low-Pass Filter to turn a buzzy sawtooth into a warm bass.</p>
+      <p><strong>Why must the VCF sit after the VCO?</strong> Because the VCO must generate the harmonically rich raw sound <em>first</em> before the filter has any frequencies to subtract.</p>
+    </div>
+
+    <div class="term-block green">
+      <div class="term-head">
+        <h3>2.4 Stage 3 — VCA (Voltage-Controlled Amplifier)</h3>
+        <span class="tier-tag t1">Tier 1 &bull; Core Synth Architecture</span>
+      </div>
+      <p><strong>Function:</strong> The <strong>automatic volume gate</strong>. The VCA sits at the end of the audio chain and controls the overall output amplitude (loudness) of the filtered signal. When you press a key, an envelope opens the VCA; when you release the key, the VCA closes so the note fades back to silence.</p>
+    </div>
+
+    <div class="term-block purple">
+      <div class="term-head">
+        <h3>2.5 Audio Path vs. Modulators (Control Signals)</h3>
+        <span class="tier-tag t3">Tier 3 &bull; Logic Pro Instruments Guide p.738</span>
+      </div>
+      <p>A synthesiser has two completely different types of signals flowing inside it:</p>
+      <ul>
+        <li><strong>Audio Signal (Solid black arrows below):</strong> The actual sound you hear travelling in series: <code>VCO &rarr; VCF &rarr; VCA &rarr; Speaker Out</code>.</li>
+        <li><strong>Control / Modulation Signals (Dashed arrows below):</strong> Invisible "hands" that move knobs automatically — you never hear them directly. The two main modulators are the <strong>ADSR Envelope Generator</strong> (a <em>one-shot</em> contour triggered once per key press) and the <strong>LFO</strong> (a <em>repeating</em> cyclic wave for vibrato or wobble).</li>
+      </ul>
+    </div>
+
+    <div class="diagram-wrap">
+      <svg viewBox="0 0 920 248" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Interactive subtractive synthesis signal flow diagram">
+        <defs>
+          <marker id="arr-audio" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M 0 1 L 10 5 L 0 9 z" fill="#0f172a"/></marker>
+          <marker id="arr-lfo" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M 0 1 L 10 5 L 0 9 z" fill="#7c3aed"/></marker>
+          <marker id="arr-env" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M 0 1 L 10 5 L 0 9 z" fill="#d97706"/></marker>
+        </defs>
+        <line x1="24" y1="16" x2="54" y2="16" stroke="#0f172a" stroke-width="2.5" marker-end="url(#arr-audio)"/>
+        <text x="62" y="20" font-size="11.5" font-weight="600" fill="#334155">Audio Signal (What you hear)</text>
+        <line x1="252" y1="16" x2="282" y2="16" stroke="#d97706" stroke-width="2" stroke-dasharray="5,4" marker-end="url(#arr-env)"/>
+        <text x="290" y="20" font-size="11.5" font-weight="600" fill="#b45309">ADSR Envelope (One-shot per key press)</text>
+        <line x1="530" y1="16" x2="560" y2="16" stroke="#7c3aed" stroke-width="2" stroke-dasharray="5,4" marker-end="url(#arr-lfo)"/>
+        <text x="568" y="20" font-size="11.5" font-weight="600" fill="#5b21b6">LFO (Repeating cyclic movement)</text>
+
+        <line x1="230" y1="86" x2="310" y2="86" stroke="#0f172a" stroke-width="3" marker-end="url(#arr-audio)"/>
+        <line x1="510" y1="86" x2="590" y2="86" stroke="#0f172a" stroke-width="3" marker-end="url(#arr-audio)"/>
+        <line x1="770" y1="86" x2="830" y2="86" stroke="#0f172a" stroke-width="3" marker-end="url(#arr-audio)"/>
+
+        <g class="svg-node active" id="flow-vco" onclick="selectNode('vco')">
+          <rect x="24" y="42" width="206" height="88" rx="10" fill="#eff6ff" stroke="#2563eb" stroke-width="2.5"/>
+          <text x="127" y="68" text-anchor="middle" font-size="15" font-weight="800" fill="#1e40af">1. VCO (Oscillator)</text>
+          <text x="127" y="88" text-anchor="middle" font-size="12" font-weight="600" fill="#1e3a8a">Creates the raw waveform</text>
+          <text x="127" y="109" text-anchor="middle" font-size="11" fill="#475569">Pitch (16'/8'/4') &bull; Shape &bull; Sub</text>
+        </g>
+        <g class="svg-node" id="flow-vcf" onclick="selectNode('vcf')">
+          <rect x="314" y="42" width="196" height="88" rx="10" fill="#f0fdfa" stroke="#0d9488" stroke-width="2.5"/>
+          <text x="412" y="68" text-anchor="middle" font-size="15" font-weight="800" fill="#115e59">2. VCF (Filter)</text>
+          <text x="412" y="88" text-anchor="middle" font-size="12" font-weight="600" fill="#134e4a">Subtracts frequencies</text>
+          <text x="412" y="109" text-anchor="middle" font-size="11" fill="#475569">Cutoff Hz &bull; Slope &bull; Resonance (Q)</text>
+        </g>
+        <g class="svg-node" id="flow-vca" onclick="selectNode('vca')">
+          <rect x="594" y="42" width="176" height="88" rx="10" fill="#f0fdf4" stroke="#16a34a" stroke-width="2.5"/>
+          <text x="682" y="68" text-anchor="middle" font-size="15" font-weight="800" fill="#166534">3. VCA (Amplifier)</text>
+          <text x="682" y="88" text-anchor="middle" font-size="12" font-weight="600" fill="#14532d">Controls output volume</text>
+          <text x="682" y="109" text-anchor="middle" font-size="11" fill="#475569">Start &bull; Hold &bull; Fade-out</text>
+        </g>
+        <rect x="836" y="60" width="66" height="52" rx="8" fill="#0f172a"/>
+        <text x="869" y="84" text-anchor="middle" font-size="12" font-weight="700" fill="#fff">SPEAKER</text>
+        <text x="869" y="99" text-anchor="middle" font-size="10.5" fill="#94a3b8">OUT</text>
+
+        <g class="svg-node" id="flow-lfo" onclick="selectNode('lfo')">
+          <rect x="41" y="172" width="236" height="62" rx="10" fill="#f5f3ff" stroke="#7c3aed" stroke-width="2"/>
+          <text x="159" y="198" text-anchor="middle" font-size="13.5" font-weight="800" fill="#5b21b6">LFO (Modulator)</text>
+          <text x="159" y="217" text-anchor="middle" font-size="10.5" fill="#475569">Repeating wobble / vibrato / tremolo</text>
+        </g>
+        <g class="svg-node" id="flow-env" onclick="selectNode('env')">
+          <rect x="440" y="172" width="246" height="62" rx="10" fill="#fffbeb" stroke="#d97706" stroke-width="2"/>
+          <text x="563" y="198" text-anchor="middle" font-size="13.5" font-weight="800" fill="#b45309">ADSR Envelopes (Modulators)</text>
+          <text x="563" y="217" text-anchor="middle" font-size="11" fill="#475569">One-shot shape for VCF &amp; VCA</text>
+        </g>
+
+        <path d="M 127 172 L 127 135" fill="none" stroke="#7c3aed" stroke-width="2" stroke-dasharray="5,4" marker-end="url(#arr-lfo)"/>
+        <path d="M 205 172 L 205 152 L 365 152 L 365 135" fill="none" stroke="#7c3aed" stroke-width="2" stroke-dasharray="5,4" marker-end="url(#arr-lfo)"/>
+        <path d="M 500 172 L 500 152 L 435 152 L 435 135" fill="none" stroke="#d97706" stroke-width="2" stroke-dasharray="5,4" marker-end="url(#arr-env)"/>
+        <path d="M 625 172 L 625 152 L 682 152 L 682 135" fill="none" stroke="#d97706" stroke-width="2" stroke-dasharray="5,4" marker-end="url(#arr-env)"/>
+      </svg>
+      <p style="text-align:center;font-size:12px;color:var(--muted);margin:6px 0 0;">Click any module box in the diagram above to inspect its role and A-Level exam keyword.</p>
+    </div>
+
+    <div id="nodeDetail" class="node-detail">
+      <strong>1. VCO (Voltage-Controlled Oscillator):</strong> Generates the raw, continuous pitched waveform. <em>Exam Keyword: Harmonic Richness.</em>
+    </div>
+
+    <div class="task-box">
+      <div class="task-header">
+        <span class="task-type">&#9997; Written Confirmation Task 2A</span>
+        <span class="task-status" id="st-t2a">Not completed yet</span>
+      </div>
+      <h4>Signal Flow &amp; Stage Roles</h4>
+      <div class="task-q">
+        <label for="ans-t2a-1">1. Write out the full names of VCO, VCF, and VCA in the exact order that audio flows through them, and give a 5–10 word job description for each.</label>
+        <textarea class="wb-textarea" id="ans-t2a-1" data-task="t2a" placeholder="1. VCO (...) -> 2. VCF (...) -> 3. VCA (...)"></textarea>
+      </div>
+      <div class="task-q">
+        <label for="ans-t2a-2">2. Why would a synthesiser drone non-stop if there were no VCA + Envelope at the end of the chain?</label>
+        <textarea class="wb-textarea" id="ans-t2a-2" data-task="t2a" placeholder="Explain what the VCO does continuously..."></textarea>
+      </div>
+      <div class="task-q">
+        <label for="ans-t2a-3">3. What is the difference between an <em>audio signal</em> and a <em>modulation/control signal</em> (such as an ADSR or LFO)?</label>
+        <textarea class="wb-textarea" id="ans-t2a-3" data-task="t2a" placeholder="Write your answer here..."></textarea>
+      </div>
+      <div class="task-actions">
+        <button type="button" class="btn btn-sm btn-primary" onclick="toggleReveal('rev-t2a')">Reveal Self-Check Key Points</button>
+      </div>
+      <div class="check-reveal" id="rev-t2a">
+        <strong>Self-Check Key Points:</strong>
+        (1) <strong>VCO</strong> (Voltage-Controlled Oscillator: creates raw pitched waveform) &rarr; <strong>VCF</strong> (Voltage-Controlled Filter: removes/sculpts frequencies) &rarr; <strong>VCA</strong> (Voltage-Controlled Amplifier: controls final loudness/volume gate).
+        (2) Because the VCO oscillates continuously while powered on; the VCA + Envelope opens volume on key press and closes it to silence on release.
+        (3) Audio signals carry the actual sound you hear to the speakers; modulation/control signals are silent automation instructions that move synth parameters (pitch, cutoff, volume) automatically.
+      </div>
+    </div>
+
+    <div class="guardrail-box" id="guardrail-mod2"></div>
+  </section>
+
+  <!-- ==================== MODULE 3 ==================== -->
+  <section id="mod3" class="card">
+    <div class="section-head">
+      <h2><span class="section-tag">Module 3</span> Pitch, Frequency, Harmonics &amp; Timbre (The Physics of Sound)</h2>
+      <span class="time-badge">Est. 20 mins</span>
+    </div>
+    <p class="lead">Why does a flute playing Middle C sound completely different from a trumpet or a synth bass playing the exact same note? To master subtractive synthesis, you need to understand what lives <em>inside</em> a waveform.</p>
+
+    <div class="term-block">
+      <div class="term-head">
+        <h3>3.1 Periodic Waveforms, Cycles, Oscillograms &amp; Frequency (Hz)</h3>
+        <span class="tier-tag t0">Tier 0 &bull; Advanced Acoustics</span>
+        <span class="tier-tag t3">Tier 3 &bull; Logic Pro Guide p.723</span>
+      </div>
+      <p><strong>Periodic Waveform &amp; Cycle:</strong> Sounds that have a clear, definite musical pitch vibrate in a repeating pattern called a <strong>periodic waveform</strong>. One complete peak-and-trough repetition is called a <strong>cycle</strong>. A graph showing a waveform's amplitude (vertical axis) against time (horizontal axis) is called an <strong>oscillogram</strong> (what you see on an oscilloscope).</p>
+      <p><strong>Frequency (Hz):</strong> The number of complete cycles that occur every second, measured in <strong>Hertz (Hz)</strong>. Faster cycles = higher frequency = higher perceived pitch. Human hearing spans roughly <code>20 Hz</code> (deepest sub-bass) to <code>20,000 Hz / 20 kHz</code> (highest sparkle).</p>
+    </div>
+
+    <div class="term-block teal">
+      <div class="term-head">
+        <h3>3.2 Fundamental Frequency, Harmonics &amp; Overtones</h3>
+        <span class="tier-tag t0">Tier 0 &bull; Advanced Acoustics</span>
+        <span class="tier-tag t2">Tier 2 &bull; AOS 2 Numeracy Pack</span>
+      </div>
+      <p><strong>Fundamental Frequency (<em>f</em> or 1st Harmonic):</strong> The lowest frequency in a periodic waveform. It is the main musical pitch your ear hears and sings (e.g. <code>100 Hz</code> or Concert A <code>440 Hz</code>).</p>
+      <p><strong>Harmonics:</strong> Additional, higher frequencies stacked above the fundamental that occur at exact <strong>whole-number (integer) multiples</strong> of the fundamental: <code>2&times;f, 3&times;f, 4&times;f, 5&times;f...</code> Using a mathematical process called <strong>Fourier Analysis</strong>, any complex repeating waveform can be displayed as a <strong>line spectrum</strong> (FFT graph) showing each harmonic bar individually.</p>
+      <div class="worked-math">
+        <strong>Worked Example (AOS 2 Numeracy):</strong> If a note has a <strong>fundamental frequency of 100 Hz</strong>:
+        <br>&bull; <strong>1st Harmonic (Fundamental):</strong> <code>1 &times; 100 Hz = 100 Hz</code>
+        <br>&bull; <strong>2nd Harmonic (1st Overtone):</strong> <code>2 &times; 100 Hz = 200 Hz</code> <em>(one octave above the fundamental!)</em>
+        <br>&bull; <strong>3rd Harmonic (2nd Overtone):</strong> <code>3 &times; 100 Hz = 300 Hz</code>
+        <br>&bull; <strong>4th Harmonic (3rd Overtone):</strong> <code>4 &times; 100 Hz = 400 Hz</code>
+        <br>&bull; <strong>5th Harmonic (4th Overtone):</strong> <code>5 &times; 100 Hz = 500 Hz</code>
+      </div>
+      <div class="exam-note">
+        <strong>Watch Out for Overtone Numbering (Tier 0 Acoustics):</strong> The 1st harmonic IS the fundamental. Therefore, the <strong>2nd harmonic is called the 1st overtone</strong>, the 3rd harmonic is the 2nd overtone, and so on!
+      </div>
+    </div>
+
+    <div class="term-block amber">
+      <div class="term-head">
+        <h3>3.3 Timbre, Partials &amp; The Golden Rule of Subtractive Synthesis</h3>
+        <span class="tier-tag t2">Tier 2 &bull; AOS 2 Numeracy Pack s.2 &amp; s.11</span>
+      </div>
+      <p><strong>Timbre (Tone Colour):</strong> The unique sonic character that separates a flute from a trumpet playing the same pitch. Timbre is created by the combination of the <strong>fundamental frequency</strong>, the <strong>strength and pattern of harmonics</strong>, and any unpitched <strong>partials</strong> (non-mathematically related frequencies, like breath noise, metallic clatter, or white noise).</p>
+      <p><strong>The Golden Rule of Subtractive Synthesis:</strong> A filter can <strong>ONLY subtract harmonics that are already present</strong> in the oscillator waveform — it can <em>never</em> invent new ones. If you feed a pure sine wave (zero upper harmonics) into a low-pass filter, the filter has nothing to carve away!</p>
+    </div>
+
+    <div class="task-box">
+      <div class="task-header">
+        <span class="task-type">&#9997; Written Confirmation Task 3A (Numeracy &amp; Terms)</span>
+        <span class="task-status" id="st-t3a">Not completed yet</span>
+      </div>
+      <h4>Harmonics, Frequency Maths &amp; The Golden Rule</h4>
+      <div class="task-q">
+        <label for="ans-t3a-1">1. A synthesiser oscillator plays a note with a fundamental frequency of <strong>50 Hz</strong>. Calculate the frequencies of the <strong>2nd, 3rd, 4th, and 5th harmonics</strong>.</label>
+        <textarea class="wb-textarea" id="ans-t3a-1" data-task="t3a" placeholder="2nd harmonic = ... Hz, 3rd = ... Hz, 4th = ... Hz, 5th = ... Hz"></textarea>
+      </div>
+      <div class="task-q">
+        <label for="ans-t3a-2">2. What is the difference between a <em>harmonic</em> and a non-harmonic <em>partial</em> (like white noise)?</label>
+        <textarea class="wb-textarea" id="ans-t3a-2" data-task="t3a" placeholder="Harmonics are... whereas non-harmonic partials are..."></textarea>
+      </div>
+      <div class="task-q">
+        <label for="ans-t3a-3">3. State the <strong>Golden Rule of Subtractive Synthesis</strong> and explain what it means if you try to make a bright brass sound starting from a Sine wave.</label>
+        <textarea class="wb-textarea" id="ans-t3a-3" data-task="t3a" placeholder="Write your answer here..."></textarea>
+      </div>
+      <div class="task-actions">
+        <button type="button" class="btn btn-sm btn-primary" onclick="toggleReveal('rev-t3a')">Reveal Self-Check Key Points</button>
+      </div>
+      <div class="check-reveal" id="rev-t3a">
+        <strong>Self-Check Key Points:</strong>
+        (1) 2nd = <strong>100 Hz</strong> (2&times;50), 3rd = <strong>150 Hz</strong> (3&times;50), 4th = <strong>200 Hz</strong> (4&times;50), 5th = <strong>250 Hz</strong> (5&times;50).
+        (2) Harmonics are exact whole-number (integer) multiples of the fundamental frequency; non-harmonic partials are randomised or non-mathematically related frequencies (such as white noise hiss or distortion).
+        (3) A filter can only subtract harmonics already present in the waveform — it cannot invent new ones. Because a sine wave has zero upper harmonics, a filter cannot turn it into a bright brass tone.
+      </div>
+    </div>
+
+    <div class="guardrail-box" id="guardrail-mod3"></div>
+  </section>
+
+  <!-- ==================== MODULE 4 ==================== -->
+  <section id="mod4" class="card">
+    <div class="section-head">
+      <h2><span class="section-tag">Module 4</span> Oscillator Waveforms &amp; VCO Controls (Deep Dive + Live Lab)</h2>
+      <span class="time-badge">Est. 25 mins</span>
+    </div>
+    <p class="lead">Every standard subtractive synthesiser offers five core oscillator waveforms plus pitch, octave footage, detune, and sub-oscillator controls. Read each explanation carefully, then test every single one with your own ears in the live Synth Lab.</p>
+
+    <div class="term-block">
+      <div class="term-head">
+        <h3>4.1 The Five Classic Oscillator Waveforms</h3>
+        <span class="tier-tag t0">Tier 0 &bull; Advanced Acoustics</span>
+        <span class="tier-tag t2">Tier 2 &bull; AOS 2</span>
+        <span class="tier-tag t3">Tier 3 &bull; Logic Pro Guide p.730–731</span>
+      </div>
+      <div style="overflow-x:auto;">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Waveform</th>
+              <th>Shape</th>
+              <th>Exact Harmonic Content</th>
+              <th>Sound Character</th>
+              <th>Classic Musical Uses</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Sine</strong></td>
+              <td><svg class="mini-wave" viewBox="0 0 78 30"><path d="M2 15 Q11 2 20 15 T38 15 T56 15 T74 15" fill="none" stroke="#2563eb" stroke-width="2.2"/></svg></td>
+              <td><strong>Fundamental only</strong> (1st harmonic). <strong>Zero</strong> upper harmonics.</td>
+              <td>Pure, smooth, whistle-like, zero buzz.</td>
+              <td>Deep 808-style sub-bass, pure test tones, gentle flute tones.</td>
+            </tr>
+            <tr>
+              <td><strong>Triangle</strong></td>
+              <td><svg class="mini-wave" viewBox="0 0 78 30"><path d="M2 15 L11 4 L29 26 L47 4 L65 26 L74 15" fill="none" stroke="#2563eb" stroke-width="2.2"/></svg></td>
+              <td>Fundamental + <strong>odd harmonics only</strong> (3rd, 5th, 7th...), fading <em>very quickly</em> in amplitude.</td>
+              <td>Soft, mellow, slightly warmer than a sine wave.</td>
+              <td>Flutes, rounded electric keys, classic 8-bit NES basslines.</td>
+            </tr>
+            <tr>
+              <td><strong>Sawtooth</strong></td>
+              <td><svg class="mini-wave" viewBox="0 0 78 30"><path d="M2 26 L26 4 L26 26 L50 4 L50 26 L74 4" fill="none" stroke="#2563eb" stroke-width="2.2"/></svg></td>
+              <td><strong>ALL harmonics</strong> — both <strong>odd and even</strong> (f, 2f, 3f, 4f, 5f...), decreasing steadily. Richest wave!</td>
+              <td>Bright, buzzy, dense, brassy, cutting.</td>
+              <td>80s synth brass, detuned string pads, fat basses, cutting leads.</td>
+            </tr>
+            <tr>
+              <td><strong>Square / Pulse</strong></td>
+              <td><svg class="mini-wave" viewBox="0 0 78 30"><path d="M2 26 L2 4 L20 4 L20 26 L38 26 L38 4 L56 4 L56 26 L74 26 L74 4" fill="none" stroke="#2563eb" stroke-width="2.2"/></svg></td>
+              <td>Fundamental + <strong>strong odd harmonics only</strong> (1st, 3rd, 5th, 7th... e.g. 100, 300, 500, 700 Hz).</td>
+              <td>Hollow, woody, punchy (becomes thinner/nasal as pulse width narrows).</td>
+              <td>Clarinets/reeds, retro arcade leads, chunky synth bass, sub-oscillators.</td>
+            </tr>
+            <tr>
+              <td><strong>White Noise</strong></td>
+              <td><svg class="mini-wave" viewBox="0 0 78 30"><path d="M2 15 L6 6 L10 24 L14 9 L18 22 L22 4 L26 25 L30 11 L34 21 L38 5 L42 26 L46 8 L50 20 L54 4 L58 23 L62 10 L66 25 L70 7 L74 16" fill="none" stroke="#64748b" stroke-width="1.8"/></svg></td>
+              <td><strong>Unpitched</strong> — completely random frequencies at equal average energy across the spectrum. <em>(Pink noise emphasises lower frequencies.)</em></td>
+              <td>Static hiss (like an untuned radio or waterfall).</td>
+              <td>Synthesised hi-hats &amp; snare snap (via HPF), wind, surf, risers &amp; explosions.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="exam-note">
+        <strong>Bonus Term — Pulse Width &amp; PWM (Tier 3 Master Reference):</strong> A standard Square wave spends 50% of each cycle high and 50% low (a <strong>50% duty cycle</strong>). Narrowing that pulse width makes the tone thinner and more nasal; modulating it continuously with an LFO is called <strong>Pulse Width Modulation (PWM)</strong>, creating a thick, swirling chorus-like shimmer.
+      </div>
+    </div>
+
+    <div class="term-block teal">
+      <div class="term-head">
+        <h3>4.2 VCO Pitch &amp; Layering Controls: Octave Footage, Detune &amp; Sub-Oscillator</h3>
+        <span class="tier-tag t1">Tier 1 &bull; Pearson Spec p.49</span>
+        <span class="tier-tag t3">Tier 3 &bull; Logic Pro Guide p.300 &amp; p.310</span>
+      </div>
+      <p><strong>Octave Range in Feet (<code>16'</code>, <code>8'</code>, <code>4'</code>):</strong> Borrowed from pipe organ pipe lengths — the longer the pipe, the deeper the pitch! <code>8'</code> is normal concert pitch, <code>16'</code> is <strong>one octave lower</strong> (half the frequency, ideal for bass), and <code>4'</code> is <strong>one octave higher</strong> (double the frequency, ideal for high leads). Remember the octave rule: <code>f_octave = 2 &times; f</code>.</p>
+      <p><strong>Coarse Tuning vs. Fine Tuning (Detune in Cents):</strong> <strong>Coarse tuning</strong> shifts pitch in whole semitones (or octaves). <strong>Fine tuning / Detune</strong> shifts pitch by tiny fractions called <strong>cents</strong> (<code>100 cents = 1 semitone</code>). Detuning a second oscillator by <code>6–20 cents</code> creates slow phase beating between the two waves, thickening and warming the sound dramatically.</p>
+      <p><strong>Sub-Oscillator:</strong> A dedicated helper oscillator locked exactly <strong>1 octave (or 2 octaves) below</strong> the main VCO (usually a simple square or sine wave at 50% duty cycle). It adds solid low-end weight and fundamental body without cluttering the bright upper harmonics.</p>
+    </div>
+
+    <div class="task-box practical">
+      <div class="task-header">
+        <span class="task-type">&#127911; Practical Listening Lab 4A — Comparing Waveforms</span>
+        <span class="task-status" id="st-t4a">Not completed yet</span>
+      </div>
+      <h4>Hear &amp; See Every Waveform Live (Filter Wide Open)</h4>
+      <ol class="task-steps">
+        <li>Click the button below to open the Live Synth Lab with the filter wide open (12 kHz) and a pure <strong>Sine</strong> wave selected.</li>
+        <li>Click <strong>Hold C Note</strong> in the Synth Lab so the note plays continuously.</li>
+        <li>Switch the <strong>Waveform</strong> dropdown one by one: <code>Sine &rarr; Triangle &rarr; Square &rarr; Sawtooth &rarr; White Noise</code>. Watch both the <strong>Oscilloscope</strong> (left) and the <strong>Blue Harmonic Bars</strong> (right) as you listen.</li>
+      </ol>
+      <div class="task-actions" style="margin-bottom:12px;">
+        <button type="button" class="btn btn-sm btn-teal" onclick="loadLabTask('task4a')">&#127899; Open Synth Lab for Task 4A (Open Filter + Sine)</button>
+      </div>
+      <div class="task-q">
+        <label for="ans-t4a-1">1. Compare <strong>Sine</strong> vs. <strong>Sawtooth</strong>: Describe both what you <em>heard</em> and what changed on the blue harmonic bar graph.</label>
+        <textarea class="wb-textarea" id="ans-t4a-1" data-task="t4a" placeholder="When I switched from Sine to Sawtooth, I heard... and on the harmonic graph I saw..."></textarea>
+      </div>
+      <div class="task-q">
+        <label for="ans-t4a-2">2. Switch back and forth between <strong>Square</strong> and <strong>Sawtooth</strong>. Describe the difference in tone colour (timbre) and explain <em>why</em> (which harmonics are missing in Square?).</label>
+        <textarea class="wb-textarea" id="ans-t4a-2" data-task="t4a" placeholder="Square sounded more... because it only contains..."></textarea>
+      </div>
+      <div class="task-q">
+        <label for="ans-t4a-3">3. Select <strong>White Noise</strong> and play different keys on the keyboard. Does the pitch change? Explain why.</label>
+        <textarea class="wb-textarea" id="ans-t4a-3" data-task="t4a" placeholder="Write what you observed..."></textarea>
+      </div>
+      <div class="task-actions">
+        <button type="button" class="btn btn-sm btn-primary" onclick="toggleReveal('rev-t4a')">Reveal Self-Check Key Points</button>
+      </div>
+      <div class="check-reveal" id="rev-t4a">
+        <strong>Self-Check Key Points:</strong>
+        (1) Sine sounds pure and smooth with only 1 blue bar (the fundamental); Sawtooth sounds bright, buzzy, and full with a dense staircase of odd &amp; even harmonic bars across the whole graph.
+        (2) Square sounds hollow and woody compared to Sawtooth because Square omits all even harmonics (showing gaps on the harmonic graph: only 1st, 3rd, 5th, 7th...).
+        (3) No — White Noise is unpitched because it contains all frequencies randomly at equal energy with no repeating periodic fundamental.
+      </div>
+    </div>
+
+    <div class="task-box practical">
+      <div class="task-header">
+        <span class="task-type">&#127911; Practical Listening Lab 4B — Octave Footage, Detune &amp; Sub-Oscillator</span>
+        <span class="task-status" id="st-t4b">Not completed yet</span>
+      </div>
+      <h4>Experimenting with VCO Pitch &amp; Layering Controls</h4>
+      <ol class="task-steps">
+        <li>Click below to load a single <strong>Sawtooth</strong> wave at <code>8'</code> with <code>0 cents</code> detune and Sub-Oscillator OFF.</li>
+        <li>Click <strong>Hold C Note</strong>. First toggle <strong>Octave Range</strong> between <code>16'</code>, <code>8'</code>, and <code>4'</code>.</li>
+        <li>Next, slowly drag <strong>Detune (2nd Osc)</strong> from <code>0 cents</code> up to <code>25 cents</code>, then back to <code>10 cents</code>.</li>
+        <li>Finally, tick the <strong>Sub-Oscillator (-1 Octave)</strong> checkbox on and off while listening to the bottom end.</li>
+      </ol>
+      <div class="task-actions" style="margin-bottom:12px;">
+        <button type="button" class="btn btn-sm btn-teal" onclick="loadLabTask('task4b')">&#127899; Open Synth Lab for Task 4B (Clean 8' Sawtooth)</button>
+      </div>
+      <div class="task-q">
+        <label for="ans-t4b-1">1. What happened to the pitch when you switched from <code>8'</code> to <code>16'</code>, and why is it measured in "feet"?</label>
+        <textarea class="wb-textarea" id="ans-t4b-1" data-task="t4b" placeholder="Switching from 8' to 16' made the pitch..."></textarea>
+      </div>
+      <div class="task-q">
+        <label for="ans-t4b-2">2. Describe what you heard as you raised <strong>Detune</strong> from 0 to 12 cents vs. pushing it high to 25+ cents.</label>
+        <textarea class="wb-textarea" id="ans-t4b-2" data-task="t4b" placeholder="At 0 cents it sounded... At ~10 cents it sounded... At 25+ cents..."></textarea>
+      </div>
+      <div class="task-q">
+        <label for="ans-t4b-3">3. What did switching on the <strong>Sub-Oscillator</strong> add to the sound?</label>
+        <textarea class="wb-textarea" id="ans-t4b-3" data-task="t4b" placeholder="Switching on the sub-oscillator added..."></textarea>
+      </div>
+      <div class="task-actions">
+        <button type="button" class="btn btn-sm btn-primary" onclick="toggleReveal('rev-t4b')">Reveal Self-Check Key Points</button>
+      </div>
+      <div class="check-reveal" id="rev-t4b">
+        <strong>Self-Check Key Points:</strong>
+        (1) Pitch dropped by exactly one octave (halving the frequency). The footage system comes from organ pipe lengths — longer pipes (16') produce deeper bass notes.
+        (2) At 0 cents it sounds thin/static; around 8–12 cents subtle phase beating thickens and warms the timbre like an analogue chorus; at 25+ cents the two oscillators start sounding noticeably out of tune / dissonant.
+        (3) It reinforced the deep low-end fundamental weight one octave below without muddying the bright upper harmonics.
+      </div>
+    </div>
+
+    <div class="guardrail-box" id="guardrail-mod4"></div>
+  </section>
+
+  <!-- ==================== MODULE 5 ==================== -->
+  <section id="mod5" class="card">
+    <div class="section-head">
+      <h2><span class="section-tag">Module 5</span> Filters (VCF): Types, Cutoff, Slope &amp; Resonance</h2>
+      <span class="time-badge">Est. 30 mins</span>
+    </div>
+    <p class="lead">The Voltage-Controlled Filter (VCF) is the heart of subtractive synthesis. Here we break down every single filter type and control so you can hear, see, and explain exactly what each one does.</p>
+
+    <div class="term-block teal">
+      <div class="term-head">
+        <h3>5.1 Filter Types: Low-Pass (LPF), High-Pass (HPF) &amp; Band-Pass (BPF)</h3>
+        <span class="tier-tag t1">Tier 1 &bull; Component 1 &amp; 2 Study Guides</span>
+        <span class="tier-tag t3">Tier 3 &bull; Logic Pro Guide p.597</span>
+      </div>
+      <ul>
+        <li><strong>Low-Pass Filter (LPF):</strong> Allows all frequencies <em>below</em> the cutoff frequency to pass unaffected, while attenuating (removing) high frequencies <em>above</em> the cutoff. It is the most common synth filter — turning bright, buzzy waveforms into warm basses, mellow pads, or smooth leads.</li>
+        <li><strong>High-Pass Filter (HPF):</strong> The opposite of an LPF — allows frequencies <em>above</em> the cutoff to pass, while removing low frequencies <em>below</em> the cutoff. Essential for removing rumble or sculpting crisp hi-hats and snares from white noise.</li>
+        <li><strong>Band-Pass Filter (BPF):</strong> Allows only a narrow <em>band</em> of frequencies centred around the cutoff frequency to pass, cutting both the lows below it and the highs above it (creating a hollow, telephone-like or vocal sound).</li>
+      </ul>
+    </div>
+
+    <div class="term-block">
+      <div class="term-head">
+        <h3>5.2 Cutoff Frequency (Hz)</h3>
+        <span class="tier-tag t1">Tier 1 &bull; Component 2 Study Guide</span>
+      </div>
+      <p><strong>Definition:</strong> The <strong>Cutoff Frequency</strong> (measured in Hz) sets the exact frequency threshold (technically the <code>-3 dB</code> point) where the filter begins to attenuate the signal.</p>
+      <p>On a Low-Pass Filter, turning the cutoff knob <strong>down</strong> (counter-clockwise, e.g. from 10 kHz down to 300 Hz) strips away more and more upper harmonics, making the sound darker and warmer. Turning it <strong>up</strong> lets more upper harmonics through, making the sound brighter and buzzier.</p>
+      <div class="analogy-inline">
+        <strong>Everyday Analogy:</strong> Lowering a Low-Pass Cutoff is like slowly closing a heavy studio door on a bright synth speaker — the sharp treble fizz disappears first, leaving only the warm low bass thumping through the wood.
+      </div>
+    </div>
+
+    <div class="term-block amber">
+      <div class="term-head">
+        <h3>5.3 Filter Slope (dB/octave &amp; Poles: LP6, LP12, LP24)</h3>
+        <span class="tier-tag t1">Tier 1 &bull; Component 1 &amp; 2 Study Guides</span>
+        <span class="tier-tag t3">Tier 3 &bull; Logic Pro Guide p.213</span>
+      </div>
+      <p><strong>Definition:</strong> A filter never cuts frequencies off like a vertical brick wall — it rolls them off gradually. <strong>Filter Slope</strong> measures how steeply frequencies beyond the cutoff are reduced, expressed in <strong>decibels per octave (dB/oct)</strong>. Filters are often labelled with two letters and a number, such as <code>LP12</code> or <code>LP24</code>.</p>
+      <ul>
+        <li><strong>6 dB/oct (1-pole, e.g. LP6):</strong> Very gentle roll-off — lets lots of upper harmonics leak through.</li>
+        <li><strong>12 dB/oct (2-pole, e.g. LP12):</strong> Medium, brighter, airy roll-off (classic Oberheim / Roland / Korg MS-20 feel).</li>
+        <li><strong>24 dB/oct (4-pole, e.g. LP24):</strong> Very steep, tight, warm roll-off — Robert Moog's signature <strong>24 dB/oct transistor ladder filter</strong>, famed for thick, focused synth bass weight.</li>
+      </ul>
+      <div class="worked-math">
+        <strong>Worked Numeracy Example (Component 2 Study Guide):</strong> Remember that doubling a frequency raises pitch by one octave (<code>f_octave = 2 &times; f</code>).
+        <br>Suppose an LPF is set to a cutoff of <strong>200 Hz</strong>:
+        <br>&bull; With a <strong>12 dB/oct (LP12)</strong> slope: at <code>400 Hz</code> (1 octave above) the signal is attenuated by <strong>-12 dB</strong>; at <code>800 Hz</code> (2 octaves above) it is attenuated by <strong>-24 dB</strong>.
+        <br>&bull; With a <strong>24 dB/oct (LP24)</strong> slope: at <code>400 Hz</code> it is already attenuated by <strong>-24 dB</strong>; at <code>800 Hz</code> it is attenuated by <strong>-48 dB</strong>!
+      </div>
+    </div>
+
+    <div class="term-block purple">
+      <div class="term-head">
+        <h3>5.4 Resonance (Q / Emphasis) &amp; Self-Oscillation</h3>
+        <span class="tier-tag t1">Tier 1 &bull; Component 2 Study Guide</span>
+      </div>
+      <p><strong>Definition:</strong> <strong>Resonance</strong> (also labelled <strong>Q</strong>, or <strong>Emphasis</strong> on a Minimoog) creates a narrow <strong>volume boost right at the cutoff frequency</strong> by feeding part of the filter's output back into its input.</p>
+      <ul>
+        <li><strong>Low/Zero Resonance (Q &asymp; 0.7–1.5):</strong> Smooth, natural tone shaping with no peak.</li>
+        <li><strong>Moderate Resonance (Q &asymp; 3–8):</strong> Adds a distinct nasal punch, vocal edge, or focused presence right at the cutoff point.</li>
+        <li><strong>High Resonance (Q &asymp; 12–18+):</strong> Creates a sharp whistling, squelchy "acid" accent (iconic on the Roland TB-303). On analogue synths, pushing resonance to the extreme causes <strong>self-oscillation</strong> — the filter itself begins oscillating and generates its own pure sine-like pitch at the cutoff frequency!</li>
+      </ul>
+    </div>
+
+    <!-- Practical Lab 5A -->
+    <div class="task-box practical">
+      <div class="task-header">
+        <span class="task-type">&#127911; Practical Listening Lab 5A — Moving the Low-Pass Filter (Sawtooth vs. Sine)</span>
+        <span class="task-status" id="st-t5a">Not completed yet</span>
+      </div>
+      <h4>Hearing Cutoff Frequency &amp; Proving the Golden Rule</h4>
+      <ol class="task-steps">
+        <li>Click below to open the Live Synth Lab with a <strong>Sawtooth</strong> wave and the <strong>Low-Pass Filter</strong> wide open at 12 kHz (Resonance low at 1.0, Filter Env at 0 Hz).</li>
+        <li>Click <strong>Hold C Note</strong>. Very slowly drag the <strong>Cutoff Frequency</strong> slider all the way down from <code>12 kHz</code> to <code>150 Hz</code>, then slowly back up again. Watch the teal curve and the blue harmonic bars.</li>
+        <li>Now keep the note held, switch the <strong>Waveform</strong> to <strong>Sine</strong>, and sweep the <strong>Cutoff Frequency</strong> from <code>12 kHz</code> down to <code>300 Hz</code>.</li>
+      </ol>
+      <div class="task-actions" style="margin-bottom:12px;">
+        <button type="button" class="btn btn-sm btn-teal" onclick="loadLabTask('task5a')">&#127899; Open Synth Lab for Task 5A (Sawtooth + Open LPF)</button>
+      </div>
+      <div class="task-q">
+        <label for="ans-t5a-1">1. Describe in detail what you <strong>heard</strong> and <strong>saw on the graph</strong> as you dragged the Low-Pass Cutoff down from 12 kHz to 150 Hz on the <strong>Sawtooth</strong> wave.</label>
+        <textarea class="wb-textarea" id="ans-t5a-1" data-task="t5a" placeholder="As I lowered the cutoff, the sound became... and on the graph the blue bars..."></textarea>
+      </div>
+      <div class="task-q">
+        <label for="ans-t5a-2">2. What happened when you performed the exact same LPF sweep on the <strong>Sine</strong> wave (between 12 kHz and 300 Hz), and why?</label>
+        <textarea class="wb-textarea" id="ans-t5a-2" data-task="t5a" placeholder="On the Sine wave, sweeping the LPF above the fundamental... because..."></textarea>
+      </div>
+      <div class="task-actions">
+        <button type="button" class="btn btn-sm btn-primary" onclick="toggleReveal('rev-t5a')">Reveal Self-Check Key Points</button>
+      </div>
+      <div class="check-reveal" id="rev-t5a">
+        <strong>Self-Check Key Points:</strong>
+        (1) As cutoff dropped, the bright, buzzy upper harmonics were progressively removed from right to left on the graph, transforming the harsh sawtooth into a warm, muffled, smooth bass tone (until almost only the fundamental remained).
+        (2) Almost nothing changed until the cutoff dropped right down to the fundamental pitch itself — because a sine wave has zero upper harmonics for the LPF to subtract!
+      </div>
+    </div>
+
+    <!-- Practical Lab 5B -->
+    <div class="task-box practical">
+      <div class="task-header">
+        <span class="task-type">&#127911; Practical Listening Lab 5B — Slope (12 vs. 24 dB/oct), Resonance (Q) &amp; HPF/BPF</span>
+        <span class="task-status" id="st-t5b">Not completed yet</span>
+      </div>
+      <h4>Testing Steepness, Resonance Peaks &amp; Other Filter Types</h4>
+      <ol class="task-steps">
+        <li>Click below to load a <strong>Sawtooth</strong> wave with LPF Cutoff at <code>600 Hz</code> and Slope at <code>12 dB/oct</code>. Click <strong>Hold C Note</strong>.</li>
+        <li>Toggle <strong>Filter Slope</strong> back and forth between <code>12 dB/oct</code> and <code>24 dB/oct</code>. Listen closely to the upper buzz and watch how steeply the teal curve drops.</li>
+        <li>Keep <code>24 dB/oct</code> selected. Raise <strong>Resonance (Q)</strong> from <code>1.0</code> up to <code>14.0</code>, then slowly sweep <strong>Cutoff</strong> up and down between <code>250 Hz</code> and <code>3 kHz</code>.</li>
+        <li>Finally, reset Resonance to <code>1.5</code>, switch <strong>Filter Type</strong> to <strong>High-Pass (HPF)</strong> and then <strong>Band-Pass (BPF)</strong> while sweeping Cutoff.</li>
+      </ol>
+      <div class="task-actions" style="margin-bottom:12px;">
+        <button type="button" class="btn btn-sm btn-teal" onclick="loadLabTask('task5b')">&#127899; Open Synth Lab for Task 5B (600 Hz LPF)</button>
+      </div>
+      <div class="task-q">
+        <label for="ans-t5b-1">1. Describe the audible and visual difference between the <strong>12 dB/oct</strong> slope and the <strong>24 dB/oct</strong> slope at 600 Hz.</label>
+        <textarea class="wb-textarea" id="ans-t5b-1" data-task="t5b" placeholder="24 dB/oct sounded... compared to 12 dB/oct because..."></textarea>
+      </div>
+      <div class="task-q">
+        <label for="ans-t5b-2">2. What did raising <strong>Resonance (Q)</strong> to 14.0 do to the filter curve, and what did sweeping Cutoff sound like?</label>
+        <textarea class="wb-textarea" id="ans-t5b-2" data-task="t5b" placeholder="Raising Q created a... and sweeping cutoff sounded..."></textarea>
+      </div>
+      <div class="task-q">
+        <label for="ans-t5b-3">3. What frequencies disappeared when you switched to <strong>High-Pass (HPF)</strong>, and how did <strong>Band-Pass (BPF)</strong> change the tone?</label>
+        <textarea class="wb-textarea" id="ans-t5b-3" data-task="t5b" placeholder="HPF removed... BPF sounded..."></textarea>
+      </div>
+      <div class="task-q">
+        <label for="ans-t5b-4">4. <strong>Filter Maths Check:</strong> An LP24 filter has a cutoff of <strong>500 Hz</strong>. How many dB of attenuation occur at <strong>1,000 Hz</strong> and at <strong>2,000 Hz</strong>?</label>
+        <textarea class="wb-textarea" id="ans-t5b-4" data-task="t5b" placeholder="At 1,000 Hz = ... dB; at 2,000 Hz = ... dB"></textarea>
+      </div>
+      <div class="task-actions">
+        <button type="button" class="btn btn-sm btn-primary" onclick="toggleReveal('rev-t5b')">Reveal Self-Check Key Points</button>
+      </div>
+      <div class="check-reveal" id="rev-t5b">
+        <strong>Self-Check Key Points:</strong>
+        (1) 24 dB/oct drops twice as steeply past 600 Hz, cutting upper harmonics much more aggressively for a darker, tighter, warmer bass sound; 12 dB/oct sounds brighter and more open.
+        (2) High Q lifted a sharp spike/peak right at the cutoff frequency; sweeping cutoff produced a whistling, nasal, squelchy acid sweep as that narrow peak moved across each harmonic.
+        (3) HPF removed the warm low-end fundamental weight, leaving only thin/buzzy highs; BPF cut both lows and highs, leaving a narrow, hollow/telephone-like band around cutoff.
+        (4) 1,000 Hz is 1 octave above 500 Hz = <strong>-24 dB</strong>; 2,000 Hz is 2 octaves above 500 Hz = <strong>-48 dB</strong>.
+      </div>
+    </div>
+
+    <div class="guardrail-box" id="guardrail-mod5"></div>
+  </section>
+
+  <!-- ==================== MODULE 6 ==================== -->
+  <section id="mod6" class="card">
+    <div class="section-head">
+      <h2><span class="section-tag">Module 6</span> Amplitude Envelopes (VCA ADSR): Shaping Volume Over Time</h2>
+      <span class="time-badge">Est. 20–25 mins</span>
+    </div>
+    <p class="lead">An oscillator + filter gives you a tone colour, but real instruments also have a distinct <em>volume shape</em>: a plucked guitar explodes instantly and dies away, while a bowed violin fades in gently. In synthesis, that volume shape is controlled by an <strong>ADSR Amplitude Envelope</strong>.</p>
+
+    <div class="term-block amber">
+      <div class="term-head">
+        <h3>6.1 What Is an Envelope? (Axes &amp; The 4 ADSR Stages)</h3>
+        <span class="tier-tag t1">Tier 1 &bull; Component 2 &amp; 4 Study Guides</span>
+        <span class="tier-tag t3">Tier 3 &bull; Logic Pro Guide p.736</span>
+      </div>
+      <p><strong>Definition:</strong> An <strong>Amplitude Envelope</strong> is a graph showing how a note's loudness changes over time from the moment you press a key until after you let go. The horizontal <strong>X-axis measures Time</strong> (seconds or milliseconds) and the vertical <strong>Y-axis measures Amplitude/Volume</strong> (dB or %).</p>
+      <div class="grid-2">
+        <div class="info-card">
+          <h4>A — Attack (Time: ms / s)</h4>
+          <p>The <strong>time</strong> it takes for the sound to rise from silence (0%) to its loudest peak (100%) once a key is pressed. <em>Fast Attack (0.005 s)</em> = instant percussive snap (piano, pluck, bass); <em>Slow Attack (0.5–1.2 s)</em> = gentle fade-in (bowed strings, ambient pad).</p>
+        </div>
+        <div class="info-card">
+          <h4>D — Decay (Time: ms / s)</h4>
+          <p>The <strong>time</strong> it takes for the volume to fall from that initial 100% peak down to the Sustain level (while you are still holding the key). A short Decay with 0% Sustain makes a crisp pluck or drum hit.</p>
+        </div>
+        <div class="info-card" style="border-color:#f59e0b;background:#fffbeb;">
+          <h4>S — Sustain (LEVEL %, NOT Time!)</h4>
+          <p>The <strong>held volume level</strong> at which the note stays for as long as you keep holding the key down. <em>100% Sustain</em> holds at full loudness (organ); <em>0% Sustain</em> dies away completely even while you hold the key (plucked guitar / hi-hat).</p>
+        </div>
+        <div class="info-card">
+          <h4>R — Release (Time: ms / s)</h4>
+          <p>The <strong>time</strong> it takes for the sound to fade from its current level back down to complete silence <em>after</em> you let go of the key. <em>Short Release</em> = tight, dry bassline; <em>Long Release</em> = dreamy, overlapping pad tail.</p>
+        </div>
+      </div>
+      <div class="exam-note">
+        <strong>#1 First-Year Exam Trap (Tier 1 Component 4):</strong> Attack, Decay, and Release are all <strong>TIMES</strong> (seconds/ms). <strong>Sustain is a LEVEL (%)</strong> — never write "Sustain is how long the note lasts"!
+      </div>
+    </div>
+
+    <div class="term-block">
+      <div class="term-head">
+        <h3>6.2 Velocity Sensitivity</h3>
+        <span class="tier-tag t3">Tier 3 &bull; Logic Pro Guide p.311 &amp; p.346</span>
+      </div>
+      <p><strong>Definition:</strong> <strong>Velocity</strong> measures how hard a MIDI key is struck (<code>1</code> = softest pianissimo, <code>127</code> = hardest fortissimo). When an envelope responds to velocity, playing softly produces a quieter (or darker) note, while striking firmly produces maximum level and punch.</p>
+    </div>
+
+    <div class="task-box practical">
+      <div class="task-header">
+        <span class="task-type">&#127911; Practical Sculpting Lab 6A — Building 3 Contrasting ADSR Shapes</span>
+        <span class="task-status" id="st-t6a">Not completed yet</span>
+      </div>
+      <h4>Sculpt a Pluck, a Slow Pad, and an Organ — Then Record Your Observations</h4>
+      <ol class="task-steps">
+        <li>Click below to open the Live Synth Lab. Tap and hold keys on the keyboard (e.g. keys <code>A, S, D, F</code> or click the piano keys) — do <strong>not</strong> use Hold C Note, because you need to hear both pressing AND releasing keys!</li>
+        <li><strong>Shape 1 (Snappy Pluck):</strong> Set Attack <code>0.005 s</code>, Decay <code>0.20 s</code>, Sustain <code>0%</code>, Release <code>0.15 s</code>. Hold a key down for 3 full seconds.</li>
+        <li><strong>Shape 2 (Slow Ambient Pad):</strong> Set Attack <code>0.80 s</code>, Decay <code>0.50 s</code>, Sustain <code>80%</code>, Release <code>1.40 s</code>. Play a 3-note chord, hold it, then let go.</li>
+        <li><strong>Shape 3 (Tight Bass):</strong> Set Attack <code>0.01 s</code>, Decay <code>0.25 s</code>, Sustain <code>55%</code>, Release <code>0.08 s</code>. Play quick alternating bass notes.</li>
+      </ol>
+      <div class="task-actions" style="margin-bottom:12px;">
+        <button type="button" class="btn btn-sm btn-amber" onclick="loadLabTask('task6a')">&#127899; Open Synth Lab for Task 6A (ADSR Playground)</button>
+      </div>
+      <div class="task-q">
+        <label for="ans-t6a-1">1. In <strong>Shape 1 (Pluck)</strong>, what happened to the sound while you kept holding the key down for 3 seconds, and which ADSR slider caused that?</label>
+        <textarea class="wb-textarea" id="ans-t6a-1" data-task="t6a" placeholder="Even though I held the key down, the sound... because..."></textarea>
+      </div>
+      <div class="task-q">
+        <label for="ans-t6a-2">2. In <strong>Shape 2 (Pad)</strong>, describe how <strong>Attack</strong> affected the start of the chord and how <strong>Release</strong> affected what happened after you lifted your fingers.</label>
+        <textarea class="wb-textarea" id="ans-t6a-2" data-task="t6a" placeholder="Attack made the chord... Release made the chord..."></textarea>
+      </div>
+      <div class="task-q">
+        <label for="ans-t6a-3">3. Why does a fast 1970s bassline need a <strong>short Release</strong> (~0.08–0.18 s) rather than a long 1.4 s Release?</label>
+        <textarea class="wb-textarea" id="ans-t6a-3" data-task="t6a" placeholder="If a bassline had a long release..."></textarea>
+      </div>
+      <div class="task-actions">
+        <button type="button" class="btn btn-sm btn-primary" onclick="toggleReveal('rev-t6a')">Reveal Self-Check Key Points</button>
+      </div>
+      <div class="check-reveal" id="rev-t6a">
+        <strong>Self-Check Key Points:</strong>
+        (1) The sound faded out to complete silence within ~0.20 s even while the key was held, because <strong>Sustain was set to 0%</strong> (so Decay dropped straight to zero).
+        (2) Slow Attack (0.80 s) caused a smooth, gradual fade-in with no harsh click; long Release (1.40 s) let the chord linger and fade gently after lifting fingers.
+        (3) A long release on bass causes consecutive low notes to bleed into each other, creating muddy, clashing low-end overlap.
+      </div>
+    </div>
+
+    <div class="guardrail-box" id="guardrail-mod6"></div>
+  </section>
+
+  <!-- ==================== MODULE 7 ==================== -->
+  <section id="mod7" class="card">
+    <div class="section-head">
+      <h2><span class="section-tag">Module 7</span> Filter Envelopes (VCF ADSR): Shaping Brightness Over Time</h2>
+      <span class="time-badge">Est. 15–20 mins</span>
+    </div>
+    <p class="lead">An envelope doesn't only control loudness! Routing an envelope to the <strong>Filter Cutoff Frequency</strong> lets a note's <em>brightness</em> evolve automatically every time you press a key.</p>
+
+    <div class="term-block teal">
+      <div class="term-head">
+        <h3>7.1 Why Route an Envelope to the Filter? (Filter Envelope Amount / Punch)</h3>
+        <span class="tier-tag t1">Tier 1 &bull; Component 2 Study Guide</span>
+        <span class="tier-tag t3">Tier 3 &bull; Logic Pro Guide p.311</span>
+      </div>
+      <p><strong>Definition:</strong> A <strong>Filter Envelope</strong> modulates the VCF's Cutoff Frequency over the duration of each note. The <strong>Filter Env Amount / Punch (Hz)</strong> control decides <em>how far</em> the envelope pushes the cutoff frequency upwards (positive modulation) from its static resting position.</p>
+      <p>Real acoustic instruments change timbre as they play:</p>
+      <ul>
+        <li><strong>Punchy Bass / Plucked String (Fast Attack + Short Decay):</strong> When you pluck a string, the initial transient is bright, then upper harmonics fade faster than the low fundamental. Setting a low static Cutoff (~350 Hz) + positive Filter Env Punch (~2500 Hz) + instant Attack + short Decay gives each bass note a bright "snap" that immediately settles into warm bass weight.</li>
+        <li><strong>80s Synth Brass Swell (Medium/Slow Attack):</strong> Acoustic brass starts mellow and blooms brighter as air pressure builds. Linking a Low-Pass Filter to a slower envelope Attack (~60–150 ms) causes the note to start muffled and bloom open into bright harmonics!</li>
+      </ul>
+    </div>
+
+    <div class="task-box practical">
+      <div class="task-header">
+        <span class="task-type">&#127911; Practical Listening Lab 7A — Hearing Filter Envelope Punch</span>
+        <span class="task-status" id="st-t7a">Not completed yet</span>
+      </div>
+      <h4>Turning a Dull Static Bass into a Punchy Funk Bass &amp; Brass Swell</h4>
+      <ol class="task-steps">
+        <li>Click below to load a dark, static <strong>Sawtooth</strong> bass with Cutoff at <code>300 Hz</code> and <strong>Filter Env Punch</strong> at <code>0 Hz</code>. Tap a few notes on the keyboard — notice how dull and muddy it sounds.</li>
+        <li>Now raise <strong>Filter Env Punch</strong> from <code>0 Hz</code> up to <code>2800 Hz</code> and tap the exact same notes again.</li>
+        <li>Next, keep Filter Env Punch at <code>2800 Hz</code>, switch Octave to <code>8'</code>, and slowly raise <strong>Attack</strong> from <code>0.01 s</code> to <code>0.15 s</code> (and Decay to <code>0.45 s</code>) to hear the classic 80s brass "bloom".</li>
+      </ol>
+      <div class="task-actions" style="margin-bottom:12px;">
+        <button type="button" class="btn btn-sm btn-teal" onclick="loadLabTask('task7a')">&#127899; Open Synth Lab for Task 7A (Static 300 Hz Bass)</button>
+      </div>
+      <div class="task-q">
+        <label for="ans-t7a-1">1. Compare playing notes with <strong>Filter Env Punch at 0 Hz</strong> vs. <strong>2800 Hz</strong>. What changed at the start of every note?</label>
+        <textarea class="wb-textarea" id="ans-t7a-1" data-task="t7a" placeholder="At 0 Hz each note sounded... At 2800 Hz each note gained..."></textarea>
+      </div>
+      <div class="task-q">
+        <label for="ans-t7a-2">2. What happened to the brightness when you increased <strong>Attack</strong> to ~0.15 s with high Filter Env Punch, and which real acoustic instrument family does this emulate?</label>
+        <textarea class="wb-textarea" id="ans-t7a-2" data-task="t7a" placeholder="Increasing Attack caused the brightness to... which emulates..."></textarea>
+      </div>
+      <div class="task-actions">
+        <button type="button" class="btn btn-sm btn-primary" onclick="toggleReveal('rev-t7a')">Reveal Self-Check Key Points</button>
+      </div>
+      <div class="check-reveal" id="rev-t7a">
+        <strong>Self-Check Key Points:</strong>
+        (1) At 0 Hz the cutoff stayed stuck at 300 Hz (dull/muffled); at 2800 Hz each key press briefly snapped the filter open to ~3100 Hz before decaying back to 300 Hz, adding crisp percussive transient punch while keeping deep warm bass sustain.
+        (2) The note started muffled and bloomed progressively brighter — emulating acoustic <strong>brass</strong> instruments (trumpets/horns/80s synth brass).
+      </div>
+    </div>
+
+    <div class="guardrail-box" id="guardrail-mod7"></div>
+  </section>
+
+  <!-- ==================== MODULE 8 ==================== -->
+  <section id="mod8" class="card">
+    <div class="section-head">
+      <h2><span class="section-tag">Module 8</span> LFO Modulation: Continuous Cyclic Movement</h2>
+      <span class="time-badge">Est. 20–25 mins</span>
+    </div>
+    <p class="lead">An ADSR Envelope fires <em>once</em> per key press. What if you want a parameter to wobble, pulse, or shimmer continuously back and forth? That is the job of the <strong>LFO (Low-Frequency Oscillator)</strong>.</p>
+
+    <div class="term-block purple">
+      <div class="term-head">
+        <h3>8.1 What Is an LFO? (Rate, Depth, Sync &amp; Waveforms)</h3>
+        <span class="tier-tag t1">Tier 1 &bull; Component 2 Study Guide</span>
+        <span class="tier-tag t3">Tier 3 &bull; Logic Pro Guide p.345, p.609, p.738</span>
+      </div>
+      <p><strong>Definition:</strong> An <strong>LFO (Low-Frequency Oscillator)</strong> is an oscillator that vibrates <em>below human hearing</em> — typically between <code>0.1 Hz</code> and <code>20 Hz</code> (Component 2 highlights <code>0.5 Hz – 15 Hz</code>). You never hear an LFO directly in the audio path; instead, it acts as an invisible hand automatically turning a knob back and forth in a repeating cycle.</p>
+      <ul>
+        <li><strong>LFO Rate (Hz) &amp; Tempo Sync:</strong> Controls the <em>speed</em> of the repeating wave (e.g. 5 Hz = 5 cycles per second). Turning on <strong>Sync</strong> locks the LFO speed to the DAW project tempo (e.g. 1/4, 1/8, or 1/16 rhythmic pulses).</li>
+        <li><strong>LFO Depth / Amount:</strong> Controls the <em>intensity</em> (width) of the movement — subtle depth adds gentle musical expression, extreme depth creates wild sirens or dubstep wobbles.</li>
+        <li><strong>LFO Waveform Shape:</strong> <em>Sine / Triangle</em> = smooth, natural back-and-forth (ideal for vibrato); <em>Square</em> = jumps sharply between two values (e.g. trilling between two pitches); <em>Sawtooth</em> = rhythmic rising/falling ramp (bubbling / helicopter effects).</li>
+      </ul>
+    </div>
+
+    <div class="term-block">
+      <div class="term-head">
+        <h3>8.2 The Three Classic LFO Destinations (Must Know for Exams!)</h3>
+        <span class="tier-tag t1">Tier 1 &bull; Pearson Spec p.49</span>
+      </div>
+      <div style="overflow-x:auto;">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>LFO Destination</th>
+              <th>What Is Modulated</th>
+              <th>Musical Term / Effect</th>
+              <th>Typical Musical Use</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>LFO &rarr; VCO Pitch</strong></td>
+              <td>Oscillator frequency goes slightly up &amp; down</td>
+              <td><strong>Vibrato</strong></td>
+              <td>Expressive synth leads &amp; strings (like a violinist rocking their finger; often controlled by the Mod Wheel)</td>
+            </tr>
+            <tr>
+              <td><strong>LFO &rarr; VCA Volume</strong></td>
+              <td>Amplifier loudness pulses up &amp; down</td>
+              <td><strong>Tremolo</strong></td>
+              <td>Retro electric piano shimmer, pulsing synth pads</td>
+            </tr>
+            <tr>
+              <td><strong>LFO &rarr; VCF Cutoff</strong></td>
+              <td>Filter cutoff sweeps open &amp; closed</td>
+              <td><strong>Filter Wobble / Auto-Wah</strong></td>
+              <td>Rhythmic EDM/dubstep bass wobbles, sweeping spacey pads</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="exam-note">
+        <strong>Exam Distinction:</strong> Never mix up <strong>Vibrato</strong> (pitch modulation: LFO &rarr; VCO) and <strong>Tremolo</strong> (volume modulation: LFO &rarr; VCA). And always distinguish <strong>LFO</strong> (repeating/cyclic) from <strong>ADSR Envelope</strong> (one-shot contour per note).
+      </div>
+    </div>
+
+    <div class="task-box practical">
+      <div class="task-header">
+        <span class="task-type">&#127911; Practical Listening Lab 8A — Testing All 3 LFO Destinations</span>
+        <span class="task-status" id="st-t8a">Not completed yet</span>
+      </div>
+      <h4>Hear Vibrato, Tremolo, and Filter Wobble Live</h4>
+      <ol class="task-steps">
+        <li>Click below to open the Live Synth Lab with a smooth sustained <strong>Sawtooth</strong> wave and the <strong>4. LFO</strong> module active. Click <strong>Hold C Note</strong>.</li>
+        <li>Set <strong>LFO Target</strong> to <code>VCO Pitch (Vibrato)</code>, Rate to <code>5.5 Hz</code>, Depth to <code>35%</code>. Try switching LFO Shape from <code>Sine</code> to <code>Square</code>!</li>
+        <li>Switch <strong>LFO Target</strong> to <code>VCA Amp (Tremolo)</code> with Rate at <code>4.0 Hz</code> and Depth at <code>65%</code>.</li>
+        <li>Switch <strong>LFO Target</strong> to <code>VCF Cutoff (Wobble)</code> with Cutoff around <code>900 Hz</code>, Resonance at <code>5.0</code>, Rate at <code>2.5 Hz</code>, and Depth at <code>75%</code>.</li>
+      </ol>
+      <div class="task-actions" style="margin-bottom:12px;">
+        <button type="button" class="btn btn-sm btn-purple" onclick="loadLabTask('task8a')">&#127899; Open Synth Lab for Task 8A (LFO Lab)</button>
+      </div>
+      <div class="task-q">
+        <label for="ans-t8a-1">1. Describe what you heard when routing the LFO to <strong>VCO Pitch</strong> with a Sine wave vs. a Square wave.</label>
+        <textarea class="wb-textarea" id="ans-t8a-1" data-task="t8a" placeholder="With Sine LFO on Pitch I heard... With Square LFO on Pitch I heard..."></textarea>
+      </div>
+      <div class="task-q">
+        <label for="ans-t8a-2">2. Explain the audible difference between <strong>Vibrato</strong> (LFO &rarr; VCO) and <strong>Tremolo</strong> (LFO &rarr; VCA).</label>
+        <textarea class="wb-textarea" id="ans-t8a-2" data-task="t8a" placeholder="Vibrato modulates... whereas Tremolo modulates..."></textarea>
+      </div>
+      <div class="task-q">
+        <label for="ans-t8a-3">3. Describe what happened when you routed the LFO to <strong>VCF Cutoff</strong> with Resonance raised to 5.0, and state one genre where this technique is iconic.</label>
+        <textarea class="wb-textarea" id="ans-t8a-3" data-task="t8a" placeholder="Routing LFO to VCF Cutoff created..."></textarea>
+      </div>
+      <div class="task-actions">
+        <button type="button" class="btn btn-sm btn-primary" onclick="toggleReveal('rev-t8a')">Reveal Self-Check Key Points</button>
+      </div>
+      <div class="check-reveal" id="rev-t8a">
+        <strong>Self-Check Key Points:</strong>
+        (1) Sine LFO created smooth, expressive musical pitch vibrato; Square LFO jumped abruptly back and forth between two distinct pitches like an alarm or trill.
+        (2) Vibrato cyclically changes <strong>pitch</strong> (frequency); Tremolo cyclically changes <strong>volume</strong> (amplitude).
+        (3) It created a rhythmic "wah-wah" filter wobble sweeping back and forth across the harmonics — iconic in dubstep, drum &amp; bass, acid house, and psychedelic electronic pads.
+      </div>
+    </div>
+
+    <div class="guardrail-box" id="guardrail-mod8"></div>
+  </section>
+
+  <!-- ==================== MODULE 9 ==================== -->
+  <section id="mod9" class="card">
+    <div class="section-head">
+      <h2><span class="section-tag">Module 9</span> Putting It All Together: Classic Patch Recipes &amp; Sound Design Lab</h2>
+      <span class="time-badge">Est. 20 mins</span>
+    </div>
+    <p class="lead">Now you know every single module! Let's reverse-engineer 4 iconic A-Level synthesiser patches — explaining <em>why</em> every setting works — and then design and document your own custom sound.</p>
+
+    <div class="grid-2">
+      <div class="info-card" style="border-top:3px solid var(--vco);">
+        <h4>1. 1970s Analogue Funk Bass (Minimoog Style)</h4>
+        <p><strong>VCO:</strong> Sawtooth at <code>16'</code> + subtle detune (6 cents) + <code>-1 oct</code> Sub-Oscillator.<br>
+        <strong>VCF:</strong> LPF at <code>24 dB/oct</code>, low Cutoff (~400 Hz), moderate Q (~3–5), Filter Env Punch ~1800 Hz.<br>
+        <strong>VCA ADSR:</strong> Instant Attack (0.01 s), short Decay (0.25 s), medium Sustain (45%), short Release (0.18 s).</p>
+        <button type="button" class="btn btn-sm btn-primary" style="margin-top:8px;" onclick="loadLabTask('recipe_bass')">Load &amp; Audition Bass</button>
+      </div>
+      <div class="info-card" style="border-top:3px solid var(--vcf);">
+        <h4>2. 1980s Polyphonic String / Juno Pad</h4>
+        <p><strong>VCO:</strong> Sawtooth at <code>8'</code> + wider detune (18 cents) for lush chorus shimmer + Sub-Osc.<br>
+        <strong>VCF:</strong> LPF at <code>12 dB/oct</code> (airy), medium Cutoff (~1.8 kHz), low Q (1.5).<br>
+        <strong>VCA ADSR:</strong> Slow Attack (0.60 s), long Sustain (80%), long Release (1.10 s).</p>
+        <button type="button" class="btn btn-sm btn-teal" style="margin-top:8px;" onclick="loadLabTask('recipe_pad')">Load &amp; Audition Pad</button>
+      </div>
+      <div class="info-card" style="border-top:3px solid var(--env);">
+        <h4>3. 1980s Synth Brass Stab</h4>
+        <p><strong>VCO:</strong> Sawtooth (all harmonics) at <code>8'</code> + 12 cents detune.<br>
+        <strong>VCF:</strong> LPF <code>24 dB/oct</code>, Cutoff ~950 Hz, high Filter Env Punch (2900 Hz) so brightness blooms open.<br>
+        <strong>VCA ADSR:</strong> Medium-fast Attack (0.06 s) for brass bloom, Decay 0.35 s, Sustain 65%, Release 0.28 s.</p>
+        <button type="button" class="btn btn-sm btn-amber" style="margin-top:8px;" onclick="loadLabTask('recipe_brass')">Load &amp; Audition Brass</button>
+      </div>
+      <div class="info-card" style="border-top:3px solid var(--lfo);">
+        <h4>4. Synthesised 1980s Closed Hi-Hat</h4>
+        <p><strong>VCO:</strong> <strong>White Noise</strong> (unpitched random frequencies across the whole spectrum).<br>
+        <strong>VCF:</strong> <strong>High-Pass Filter (HPF)</strong> at ~6–7 kHz to strip away all low/mid rumble, leaving metallic sizzle.<br>
+        <strong>VCA ADSR:</strong> Instant Attack (0.005 s), very short Decay (0.06 s), <strong>0% Sustain</strong>, short Release (0.05 s).</p>
+        <button type="button" class="btn btn-sm btn-purple" style="margin-top:8px;" onclick="loadLabTask('recipe_hat')">Load &amp; Audition Hi-Hat</button>
+      </div>
+    </div>
+
+    <div class="task-box practical">
+      <div class="task-header">
+        <span class="task-type">&#127911; Practical Design &amp; Documentation Task 9A</span>
+        <span class="task-status" id="st-t9a">Not completed yet</span>
+      </div>
+      <h4>Build &amp; Justify Your Own Custom Sound (Component 2 Style Log)</h4>
+      <p style="font-size:13.8px;color:var(--ink-soft);margin:0 0 10px;">In A-Level Component 2, you must log <em>how</em> you designed your own synth sounds using technical vocabulary. Open the Live Synth Lab, design your own original timbre (e.g. a sci-fi wobble lead, mellow flute, or acid bass), then fill out your technical patch log below.</p>
+      <div class="task-actions" style="margin-bottom:12px;">
+        <button type="button" class="btn btn-sm btn-teal" onclick="toggleSynthDrawer(true)">&#127899; Open Live Synth Lab to Design Your Patch</button>
+      </div>
+      <div class="task-q">
+        <label for="ans-t9a-1">1. Patch Name &amp; VCO Choices: State your chosen <strong>Waveform</strong>, <strong>Octave Footage</strong>, <strong>Detune</strong>, and <strong>Sub-Oscillator</strong> setting — and explain <em>why</em> you chose them.</label>
+        <textarea class="wb-textarea" id="ans-t9a-1" data-task="t9a" placeholder="My patch is called... I chose a ... wave at ... because..."></textarea>
+      </div>
+      <div class="task-q">
+        <label for="ans-t9a-2">2. VCF &amp; Modulation Choices: State your <strong>Filter Type</strong>, <strong>Cutoff (Hz)</strong>, <strong>Slope</strong>, <strong>Resonance (Q)</strong>, <strong>ADSR</strong>, and any <strong>LFO</strong> routing — and explain the sonic effect of each.</label>
+        <textarea class="wb-textarea" id="ans-t9a-2" data-task="t9a" placeholder="I used a ... filter at ... Hz with ... dB/oct slope and Q = ..."></textarea>
+      </div>
+    </div>
+
+    <div class="guardrail-box" id="guardrail-mod9"></div>
+  </section>
+
+  <!-- ==================== MODULE 10 ==================== -->
+  <section id="mod10" class="card">
+    <div class="section-head">
+      <h2><span class="section-tag">Module 10</span> Master Term Confirmation, 10-Question Quiz &amp; Scaffolded Exam Practice</h2>
+      <span class="time-badge">Est. 25 mins</span>
+    </div>
+    <p class="lead">Tick off every core term you can confidently explain without peeking, complete the 10-question self-marking quiz, and draft your first scaffolded 8-mark A-Level exam response.</p>
+
+    <h3 style="margin:0 0 8px;">10.1 Master Terminology Confirmation Checklist (All RAG Tiers)</h3>
+    <p style="font-size:13.5px;color:var(--muted);margin:0 0 10px;">Tick each box once you can define the term and explain its musical effect in your own words. Your ticks are saved automatically.</p>
+    <div style="overflow-x:auto;">
+      <table class="data-table" id="glossaryTable">
+        <thead>
+          <tr>
+            <th style="width:42px;">Got It</th>
+            <th>Term</th>
+            <th>Clear First-Year Definition</th>
+            <th>RAG Source Tier</th>
+          </tr>
+        </thead>
+        <tbody id="glossaryBody"></tbody>
+      </table>
+    </div>
+
+    <h3 style="margin:26px 0 8px;">10.2 Extended Self-Marking Quiz (10 Questions)</h3>
+    <p style="font-size:13.5px;color:var(--muted);margin:0 0 12px;">Answer all 10 questions covering Modules 1–9, then click <strong>Mark My Quiz</strong> for full explanations.</p>
+    <div id="quizScore" class="quiz-score"></div>
+    <div id="quizContainer"></div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:10px;">
+      <button type="button" class="btn btn-primary" onclick="markQuiz()">Mark My Quiz</button>
+      <button type="button" class="btn" onclick="resetQuiz()">Reset &amp; Try Again</button>
+    </div>
+
+    <h3 style="margin:28px 0 8px;">10.3 Scaffolded A-Level Extended Response Practice (8 Marks)</h3>
+    <div class="task-box">
+      <div class="task-header">
+        <span class="task-type">&#9997; Exam Question (AO1 / AO2 / AO3 — 8 Marks)</span>
+        <span class="task-status" id="st-t10a">Not completed yet</span>
+      </div>
+      <h4>"Explain how a producer would program a punchy 1970s analogue synth bass on a subtractive synthesiser, referring to the VCO, VCF, Filter Envelope, and VCA Envelope."</h4>
+      <p style="font-size:13.2px;color:var(--muted);margin:0 0 12px;">Use the 4 structured boxes below (2 marks per stage) to build a complete Band 4 / A* answer:</p>
+      <div class="task-q">
+        <label for="ans-t10a-1">Stage 1 — VCO (Waveform, Harmonics, 16' Octave, Detune / Sub-Osc):</label>
+        <textarea class="wb-textarea" id="ans-t10a-1" data-task="t10a" placeholder="Start by selecting a harmonically rich..."></textarea>
+      </div>
+      <div class="task-q">
+        <label for="ans-t10a-2">Stage 2 — VCF (Filter Type, 24 dB/oct Slope, Cutoff Hz, Resonance Q):</label>
+        <textarea class="wb-textarea" id="ans-t10a-2" data-task="t10a" placeholder="Route the VCO into a Low-Pass Filter with a..."></textarea>
+      </div>
+      <div class="task-q">
+        <label for="ans-t10a-3">Stage 3 — Filter Envelope (Amount/Punch, Attack, Decay, Sustain):</label>
+        <textarea class="wb-textarea" id="ans-t10a-3" data-task="t10a" placeholder="Apply a positive Filter Envelope with..."></textarea>
+      </div>
+      <div class="task-q">
+        <label for="ans-t10a-4">Stage 4 — VCA Amplitude Envelope (Attack, Sustain level, short Release):</label>
+        <textarea class="wb-textarea" id="ans-t10a-4" data-task="t10a" placeholder="Shape the output loudness using a..."></textarea>
+      </div>
+      <div class="task-actions">
+        <button type="button" class="btn btn-sm btn-primary" onclick="toggleReveal('rev-t10a')">Toggle Band 4 / A* Mark Scheme Breakdown</button>
+        <button type="button" class="btn btn-sm btn-success" onclick="window.print()">&#128424; Print / Save Full Completed Workbook</button>
+      </div>
+      <div class="check-reveal" id="rev-t10a">
+        <strong>Band 4 / A* Mark Scheme Breakdown (7–8 Marks):</strong>
+        <ul style="margin:6px 0 0;padding-left:20px;">
+          <li><strong>VCO (2 marks):</strong> Select a harmonically rich <strong>Sawtooth</strong> (all odd &amp; even harmonics) or <strong>Square</strong> wave set to <code>16'</code> octave range, optionally layering a slightly detuned 2nd oscillator (5–10 cents) or <code>-1 octave</code> sub-oscillator for warm low-end weight.</li>
+          <li><strong>VCF (2 marks):</strong> Route into a <strong>Low-Pass Filter</strong> with a steep <code>24 dB/octave</code> (4-pole Moog ladder) slope and low static cutoff (250–600 Hz) to remove harsh upper harmonics, plus moderate <strong>Resonance (Q)</strong> to boost the cutoff point for nasal punch.</li>
+          <li><strong>Filter Envelope (2 marks):</strong> Apply positive <strong>Filter Envelope Amount</strong> with instant <strong>Attack</strong> (~5–10 ms), short <strong>Decay</strong> (150–300 ms), and low <strong>Sustain</strong> so each note opens brightly on the transient and snaps back to a warm fundamental.</li>
+          <li><strong>VCA Envelope (2 marks):</strong> Instant <strong>Attack</strong> for immediate punch, medium <strong>Sustain level</strong> to hold bass weight while keys are held, and a short <strong>Release</strong> (100–200 ms) to prevent muddy overlap between consecutive bass notes.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div style="margin-top:22px;padding:16px 18px;border-radius:12px;background:#0f172a;color:#f8fafc;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px;">
+      <div>
+        <div style="font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:0.06em;color:#5eead4;">Year 1 Foundations Workbook Complete</div>
+        <div style="font-size:16px;font-weight:800;margin-top:2px;">Ready for the 16-Bar Sequencer in Standard Guide 1 or Guide 2: Modular Synths!</div>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        <a href="/guide1" class="btn btn-teal" style="text-decoration:none;">Open Guide 1 Sequencer</a>
+        <a href="/guide2" class="btn btn-primary" style="text-decoration:none;">Guide 2: Modular Synths &rarr;</a>
+      </div>
+    </div>
+  </section>
+
+  <footer style="text-align:center;font-size:12.5px;color:var(--muted);padding:10px 0 30px;">
+    RJC Audio &bull; Year 1 Extended Subtractive Synthesis Workbook (Edexcel 9MT0) &bull; Grounded in Tier 0–3 Course Resources
+  </footer>
+</div>
+
+<!-- ==================== FLOATING / DOCKABLE LIVE SYNTH LAB DRAWER ==================== -->
+<aside class="synth-drawer" id="synthDrawer" aria-label="Live Interactive Synth Lab">
+  <div class="drawer-head">
+    <div class="drawer-title">
+      <span>&#127899; Live Year 1 Synth Lab</span>
+      <span class="drawer-task-pill" id="drawerTaskLabel">Free Exploration Mode</span>
+    </div>
+    <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+      <button type="button" class="btn btn-sm btn-primary" id="holdBtn" onclick="toggleHold()">&#9654; Hold C Note</button>
+      <button type="button" class="btn btn-sm btn-dark" onclick="stopAllNotes()">&#9632; Stop Sound</button>
+      <button type="button" class="btn btn-sm btn-dark" onclick="toggleSynthDrawer(false)">&times; Hide Lab</button>
+    </div>
+  </div>
+  <div class="drawer-body">
+    <div class="drawer-inner">
+      <div class="viz-grid">
+        <div class="viz-box">
+          <div class="viz-title">
+            <span>Oscilloscope (Waveform Shape)</span>
+            <span id="vizWaveLabel">Sawtooth &bull; 8'</span>
+          </div>
+          <canvas id="scopeCanvas" width="480" height="110"></canvas>
+        </div>
+        <div class="viz-box">
+          <div class="viz-title">
+            <span>Harmonics (Blue) &amp; Filter Curve (Teal)</span>
+            <span id="vizFilterLabel">LPF 24 dB/oct &bull; 12 kHz &bull; Q 1.0</span>
+          </div>
+          <canvas id="filterCanvas" width="480" height="110"></canvas>
+        </div>
+      </div>
+
+      <div class="synth-modules-4">
+        <!-- 1. VCO -->
+        <div class="s-mod">
+          <h4><span>1. VCO</span><span style="color:#60a5fa">Source</span></h4>
+          <div class="s-ctrl">
+            <label>Waveform</label>
+            <select id="waveSelect" onchange="updateSynthParams()">
+              <option value="sine">Sine (Fundamental only)</option>
+              <option value="triangle">Triangle (Soft odd)</option>
+              <option value="square">Square (Strong odd)</option>
+              <option value="sawtooth" selected>Sawtooth (All harmonics)</option>
+              <option value="noise">White Noise (Unpitched)</option>
+            </select>
+          </div>
+          <div class="s-ctrl">
+            <label>Octave Range (ft)</label>
+            <select id="rangeSelect" onchange="updateSynthParams()">
+              <option value="-1">16' (Bass — 1 oct down)</option>
+              <option value="0" selected>8' (Normal pitch)</option>
+              <option value="1">4' (High — 1 oct up)</option>
+            </select>
+          </div>
+          <div class="s-ctrl">
+            <label>Detune (2nd Osc) <output id="detuneOut">0 cents</output></label>
+            <input id="detuneSlider" type="range" min="0" max="35" value="0" oninput="updateSynthParams()" />
+          </div>
+          <label class="s-toggle">
+            <span>Sub-Oscillator (-1 Oct)</span>
+            <input id="subToggle" type="checkbox" onchange="updateSynthParams()" />
+          </label>
+        </div>
+
+        <!-- 2. VCF -->
+        <div class="s-mod vcf">
+          <h4><span>2. VCF</span><span style="color:#2dd4bf">Filter</span></h4>
+          <div class="s-ctrl">
+            <label>Filter Type</label>
+            <select id="filterType" onchange="updateSynthParams()">
+              <option value="lowpass" selected>Low-Pass (LPF — cuts highs)</option>
+              <option value="highpass">High-Pass (HPF — cuts lows)</option>
+              <option value="bandpass">Band-Pass (BPF — narrow band)</option>
+            </select>
+          </div>
+          <div class="s-ctrl">
+            <label>Filter Slope</label>
+            <select id="slopeSelect" onchange="updateSynthParams()">
+              <option value="12">12 dB/oct (2-pole, gentler)</option>
+              <option value="24" selected>24 dB/oct (4-pole, steeper)</option>
+            </select>
+          </div>
+          <div class="s-ctrl">
+            <label>Cutoff Freq <output id="cutoffOut">12.00 kHz</output></label>
+            <input id="cutoffSlider" type="range" min="0" max="100" value="100" oninput="updateSynthParams()" />
+          </div>
+          <div class="s-ctrl">
+            <label>Resonance (Q) <output id="resOut">1.0</output></label>
+            <input id="resSlider" type="range" min="0.5" max="18" step="0.5" value="1" oninput="updateSynthParams()" />
+          </div>
+          <div class="s-ctrl">
+            <label>Filter Env Punch <output id="fenvOut">0 Hz</output></label>
+            <input id="fenvSlider" type="range" min="0" max="4500" step="50" value="0" oninput="updateSynthParams()" />
+          </div>
+        </div>
+
+        <!-- 3. ADSR -->
+        <div class="s-mod env">
+          <h4><span>3. ADSR Env</span><span style="color:#fbbf24">Shape</span></h4>
+          <svg id="adsrSvg" viewBox="0 0 220 40" preserveAspectRatio="none" style="width:100%;height:34px;margin-bottom:4px;background:#0f172a;border-radius:6px;">
+            <path id="adsrFill" fill="rgba(245, 158, 11, 0.22)" d=""></path>
+            <path id="adsrPath" fill="none" stroke="#fbbf24" stroke-width="2.2" d=""></path>
+          </svg>
+          <div class="s-ctrl">
+            <label>Attack (Time) <output id="attOut">0.01 s</output></label>
+            <input id="attSlider" type="range" min="0.005" max="1.2" step="0.005" value="0.01" oninput="updateSynthParams()" />
+          </div>
+          <div class="s-ctrl">
+            <label>Decay (Time) <output id="decOut">0.25 s</output></label>
+            <input id="decSlider" type="range" min="0.02" max="1.2" step="0.01" value="0.25" oninput="updateSynthParams()" />
+          </div>
+          <div class="s-ctrl">
+            <label>Sustain (Level %) <output id="susOut">80%</output></label>
+            <input id="susSlider" type="range" min="0" max="1" step="0.01" value="0.80" oninput="updateSynthParams()" />
+          </div>
+          <div class="s-ctrl">
+            <label>Release (Time) <output id="relOut">0.20 s</output></label>
+            <input id="relSlider" type="range" min="0.02" max="1.8" step="0.01" value="0.20" oninput="updateSynthParams()" />
+          </div>
+        </div>
+
+        <!-- 4. LFO -->
+        <div class="s-mod lfo">
+          <h4><span>4. LFO</span><span style="color:#c084fc">Modulator</span></h4>
+          <div class="s-ctrl">
+            <label>LFO Destination</label>
+            <select id="lfoTarget" onchange="updateSynthParams()">
+              <option value="off" selected>Off (No LFO)</option>
+              <option value="pitch">VCO Pitch (Vibrato)</option>
+              <option value="amp">VCA Volume (Tremolo)</option>
+              <option value="cutoff">VCF Cutoff (Wobble)</option>
+            </select>
+          </div>
+          <div class="s-ctrl">
+            <label>LFO Waveform</label>
+            <select id="lfoWave" onchange="updateSynthParams()">
+              <option value="sine" selected>Sine (Smooth)</option>
+              <option value="triangle">Triangle (Even)</option>
+              <option value="square">Square (Stepped)</option>
+              <option value="sawtooth">Sawtooth (Ramp)</option>
+            </select>
+          </div>
+          <div class="s-ctrl">
+            <label>LFO Rate <output id="lfoRateOut">4.0 Hz</output></label>
+            <input id="lfoRateSlider" type="range" min="0.5" max="15" step="0.5" value="4" oninput="updateSynthParams()" />
+          </div>
+          <div class="s-ctrl">
+            <label>LFO Depth <output id="lfoDepthOut">40%</output></label>
+            <input id="lfoDepthSlider" type="range" min="0" max="100" step="1" value="40" oninput="updateSynthParams()" />
+          </div>
+        </div>
+      </div>
+
+      <div class="kbd-strip">
+        <div class="keys" id="keyboard"></div>
+        <div style="font-size:12px;color:#94a3b8;max-width:340px;">
+          Click keys or use computer keys <strong style="color:#f8fafc;">A S D F G H J K</strong> (sharps <strong style="color:#f8fafc;">W E T Y U</strong>). Click <strong style="color:#38bdf8;">Hold C Note</strong> to free both hands for sweeping sliders!
+        </div>
+      </div>
+    </div>
+  </div>
+</aside>
+
+<!-- Teacher PIN Modal -->
+<div class="modal-backdrop" id="tpinBackdrop">
+  <div class="modal-card">
+    <h3 id="tpinTitle">&#128274; Teacher PIN Required</h3>
+    <p id="tpinSubtitle" style="font-size:13.5px;color:var(--muted);margin:0 0 12px;">Enter the teacher PIN to unlock all 10 modules immediately for classroom demonstration.</p>
+    <div id="tpinFormWrap">
+      <input type="password" inputmode="numeric" maxlength="10" id="tpinInput" style="width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:8px;font-size:16px;margin-bottom:8px;" placeholder="&bull;&bull;&bull;&bull;&bull;&bull;" onkeydown="if(event.key==='Enter')submitTeacherPin()" />
+      <div id="tpinErr" style="color:var(--danger);font-size:12.5px;font-weight:600;min-height:18px;margin-bottom:8px;"></div>
+      <div style="display:flex;justify-content:flex-end;gap:8px;">
+        <button type="button" class="btn btn-sm" onclick="closeTeacherPinModal()">Cancel</button>
+        <button type="button" class="btn btn-sm btn-primary" onclick="submitTeacherPin()">Unlock All</button>
+      </div>
+    </div>
+    <div id="tpinActiveWrap" style="display:none;">
+      <p style="color:#166534;font-weight:700;font-size:13.5px;margin:0 0 12px;">&#9989; Teacher Mode is active — all 10 modules are unlocked.</p>
+      <div style="display:flex;justify-content:flex-end;gap:8px;">
+        <button type="button" class="btn btn-sm" onclick="closeTeacherPinModal()">Keep Unlocked</button>
+        <button type="button" class="btn btn-sm" style="background:var(--danger);color:#fff;border-color:var(--danger);" onclick="exitTeacherMode()">Lock Student View</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ================= 1. SIGNAL FLOW INTERACTION =================
+const NODE_INFO = {
+  vco: "<strong>1. VCO (Voltage-Controlled Oscillator):</strong> The sound source. Generates a continuous periodic waveform (Sine, Triangle, Square, Sawtooth, or White Noise) at a pitch set in organ footage (16'/8'/4'). <em>Exam Keyword: Harmonic Richness.</em>",
+  vcf: "<strong>2. VCF (Voltage-Controlled Filter):</strong> The tone sculptor. Removes unwanted frequencies above (LPF), below (HPF), or around (BPF) the Cutoff frequency at a set slope (12 or 24 dB/oct), with Resonance (Q) boosting right at cutoff. <em>Exam Keyword: Roll-off Slope (dB/octave).</em>",
+  vca: "<strong>3. VCA (Voltage-Controlled Amplifier):</strong> The automatic volume gate at the end of the audio path. Controlled by the Amplitude ADSR envelope so notes start cleanly on key press and fade to silence on release. <em>Exam Keyword: Amplitude Articulation.</em>",
+  env: "<strong>ADSR Envelope Generators (Modulators):</strong> One-shot control contours triggered once per key press. The Amp ADSR shapes loudness (VCA), while the Filter ADSR sweeps brightness (VCF). <em>Exam Trap: Sustain is a LEVEL (%), not a time!</em>",
+  lfo: "<strong>LFO (Low-Frequency Oscillator):</strong> A sub-audio (0.1–20 Hz) repeating modulator. Routes to VCO Pitch for Vibrato, VCA Volume for Tremolo, or VCF Cutoff for rhythmic Filter Wobble. <em>Exam Keyword: Cyclic Modulation.</em>"
+};
+function selectNode(id) {
+  document.querySelectorAll('.svg-node').forEach(el => el.classList.remove('active'));
+  const el = document.getElementById('flow-' + id);
+  if (el) el.classList.add('active');
+  const box = document.getElementById('nodeDetail');
+  if (box && NODE_INFO[id]) box.innerHTML = NODE_INFO[id];
+}
+
+// ================= 2. LIVE SYNTH LAB DRAWER & PRESETS =================
+const LAB_TASKS = {
+  task4a: { label: 'Task 4A: Waveform Comparison (Open LPF)', wave: 'sine', octave: 0, detune: 0, sub: false, filterType: 'lowpass', slope: 24, cutoff: 100, q: 1, fenv: 0, attack: 0.01, decay: 0.2, sustain: 0.85, release: 0.2, lfoTarget: 'off', lfoWave: 'sine', lfoRate: 4, lfoDepth: 40 },
+  task4b: { label: 'Task 4B: Footage, Detune & Sub-Osc', wave: 'sawtooth', octave: 0, detune: 0, sub: false, filterType: 'lowpass', slope: 24, cutoff: 88, q: 1, fenv: 0, attack: 0.01, decay: 0.2, sustain: 0.85, release: 0.2, lfoTarget: 'off', lfoWave: 'sine', lfoRate: 4, lfoDepth: 40 },
+  task5a: { label: 'Task 5A: Sweep LPF Cutoff (Saw vs Sine)', wave: 'sawtooth', octave: -1, detune: 4, sub: false, filterType: 'lowpass', slope: 24, cutoff: 100, q: 1, fenv: 0, attack: 0.01, decay: 0.2, sustain: 0.85, release: 0.2, lfoTarget: 'off', lfoWave: 'sine', lfoRate: 4, lfoDepth: 40 },
+  task5b: { label: 'Task 5B: Slope, Resonance (Q) & HPF/BPF', wave: 'sawtooth', octave: -1, detune: 4, sub: false, filterType: 'lowpass', slope: 12, cutoff: 40, q: 1, fenv: 0, attack: 0.01, decay: 0.2, sustain: 0.85, release: 0.2, lfoTarget: 'off', lfoWave: 'sine', lfoRate: 4, lfoDepth: 40 },
+  task6a: { label: 'Task 6A: ADSR Volume Sculpting', wave: 'sawtooth', octave: 0, detune: 8, sub: false, filterType: 'lowpass', slope: 24, cutoff: 65, q: 1.5, fenv: 0, attack: 0.005, decay: 0.2, sustain: 0.0, release: 0.15, lfoTarget: 'off', lfoWave: 'sine', lfoRate: 4, lfoDepth: 40 },
+  task7a: { label: 'Task 7A: Filter Envelope Punch', wave: 'sawtooth', octave: -1, detune: 6, sub: true, filterType: 'lowpass', slope: 24, cutoff: 26, q: 2.5, fenv: 0, attack: 0.01, decay: 0.22, sustain: 0.5, release: 0.16, lfoTarget: 'off', lfoWave: 'sine', lfoRate: 4, lfoDepth: 40 },
+  task8a: { label: 'Task 8A: LFO Vibrato / Tremolo / Wobble', wave: 'sawtooth', octave: 0, detune: 6, sub: false, filterType: 'lowpass', slope: 24, cutoff: 58, q: 2.0, fenv: 0, attack: 0.02, decay: 0.25, sustain: 0.85, release: 0.25, lfoTarget: 'pitch', lfoWave: 'sine', lfoRate: 5.5, lfoDepth: 35 },
+  recipe_bass:  { label: 'Recipe 1: 1970s Funk Bass', wave: 'sawtooth', octave: -1, detune: 6, sub: true, filterType: 'lowpass', slope: 24, cutoff: 34, q: 3.5, fenv: 1800, attack: 0.01, decay: 0.25, sustain: 0.45, release: 0.18, lfoTarget: 'off', lfoWave: 'sine', lfoRate: 4, lfoDepth: 40 },
+  recipe_pad:   { label: 'Recipe 2: 1980s Juno String Pad', wave: 'sawtooth', octave: 0, detune: 18, sub: true, filterType: 'lowpass', slope: 12, cutoff: 62, q: 1.5, fenv: 400, attack: 0.60, decay: 0.60, sustain: 0.80, release: 1.10, lfoTarget: 'off', lfoWave: 'sine', lfoRate: 4, lfoDepth: 40 },
+  recipe_brass: { label: 'Recipe 3: 1980s Synth Brass Stab', wave: 'sawtooth', octave: 0, detune: 12, sub: false, filterType: 'lowpass', slope: 24, cutoff: 48, q: 2.0, fenv: 2900, attack: 0.06, decay: 0.35, sustain: 0.65, release: 0.28, lfoTarget: 'off', lfoWave: 'sine', lfoRate: 4, lfoDepth: 40 },
+  recipe_hat:   { label: 'Recipe 4: Synthesised Closed Hi-Hat', wave: 'noise', octave: 0, detune: 0, sub: false, filterType: 'highpass', slope: 24, cutoff: 88, q: 1.0, fenv: 0, attack: 0.005, decay: 0.06, sustain: 0.0, release: 0.05, lfoTarget: 'off', lfoWave: 'sine', lfoRate: 4, lfoDepth: 40 }
+};
+
+function toggleSynthDrawer(forceState) {
+  const drawer = document.getElementById('synthDrawer');
+  const next = typeof forceState === 'boolean' ? forceState : !drawer.classList.contains('open');
+  drawer.classList.toggle('open', next);
+  document.body.classList.toggle('lab-open', next);
+  if (!next) stopAllNotes();
+}
+
+function loadLabTask(taskKey) {
+  const p = LAB_TASKS[taskKey];
+  if (!p) return;
+  stopAllNotes();
+  document.getElementById('waveSelect').value = p.wave;
+  document.getElementById('rangeSelect').value = String(p.octave);
+  document.getElementById('detuneSlider').value = p.detune;
+  document.getElementById('subToggle').checked = !!p.sub;
+  document.getElementById('filterType').value = p.filterType;
+  document.getElementById('slopeSelect').value = String(p.slope);
+  document.getElementById('cutoffSlider').value = p.cutoff;
+  document.getElementById('resSlider').value = p.q;
+  document.getElementById('fenvSlider').value = p.fenv;
+  document.getElementById('attSlider').value = p.attack;
+  document.getElementById('decSlider').value = p.decay;
+  document.getElementById('susSlider').value = p.sustain;
+  document.getElementById('relSlider').value = p.release;
+  document.getElementById('lfoTarget').value = p.lfoTarget;
+  document.getElementById('lfoWave').value = p.lfoWave;
+  document.getElementById('lfoRateSlider').value = p.lfoRate;
+  document.getElementById('lfoDepthSlider').value = p.lfoDepth;
+  document.getElementById('drawerTaskLabel').textContent = p.label;
+  updateSynthParams();
+  toggleSynthDrawer(true);
+}
+
+// ================= 3. UPGRADED WEB AUDIO ENGINE (12/24 dB/oct + LFO) =================
+let audioCtx = null, analyser = null, masterGain = null, noiseBuffer = null, holdActive = false;
+const activeVoices = new Map();
+
+function ensureAudio() {
+  if (!audioCtx) {
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    analyser = audioCtx.createAnalyser();
+    analyser.fftSize = 1024;
+    masterGain = audioCtx.createGain();
+    masterGain.gain.value = 0.28;
+    masterGain.connect(analyser);
+    analyser.connect(audioCtx.destination);
+    noiseBuffer = audioCtx.createBuffer(1, audioCtx.sampleRate * 2, audioCtx.sampleRate);
+    const data = noiseBuffer.getChannelData(0);
+    for (let i = 0; i < data.length; i++) data[i] = Math.random() * 2 - 1;
+  }
+  if (audioCtx.state === 'suspended') audioCtx.resume();
+}
+
+function sliderToCutoff(val) { return Math.round(80 * Math.pow(12000 / 80, val / 100)); }
+
+function getLabParams() {
+  return {
+    wave: document.getElementById('waveSelect').value,
+    octave: parseInt(document.getElementById('rangeSelect').value, 10),
+    detune: parseFloat(document.getElementById('detuneSlider').value),
+    sub: document.getElementById('subToggle').checked,
+    filterType: document.getElementById('filterType').value,
+    slope: parseInt(document.getElementById('slopeSelect').value, 10),
+    cutoff: parseFloat(document.getElementById('cutoffSlider').value),
+    q: parseFloat(document.getElementById('resSlider').value),
+    fenv: parseFloat(document.getElementById('fenvSlider').value),
+    attack: parseFloat(document.getElementById('attSlider').value),
+    decay: parseFloat(document.getElementById('decSlider').value),
+    sustain: parseFloat(document.getElementById('susSlider').value),
+    release: parseFloat(document.getElementById('relSlider').value),
+    lfoTarget: document.getElementById('lfoTarget').value,
+    lfoWave: document.getElementById('lfoWave').value,
+    lfoRate: parseFloat(document.getElementById('lfoRateSlider').value),
+    lfoDepth: parseFloat(document.getElementById('lfoDepthSlider').value)
+  };
+}
+
+function triggerSynthVoice(baseFreq, p, startTime) {
+  ensureAudio();
+  const cutoffHz = sliderToCutoff(p.cutoff);
+  const freq = baseFreq * Math.pow(2, p.octave);
+
+  // Two cascaded filters so 24 dB/oct genuinely doubles roll-off steepness!
+  const vcf1 = audioCtx.createBiquadFilter();
+  const vcf2 = audioCtx.createBiquadFilter();
+  vcf1.type = p.filterType;
+  vcf2.type = p.slope === 24 ? p.filterType : 'allpass';
+  vcf1.Q.setValueAtTime(p.q, startTime);
+  vcf2.Q.setValueAtTime(p.slope === 24 ? Math.max(0.7, p.q * 0.45) : 0.7, startTime);
+  vcf1.frequency.setValueAtTime(cutoffHz, startTime);
+  vcf2.frequency.setValueAtTime(cutoffHz, startTime);
+
+  if (p.fenv > 0) {
+    const peakHz = Math.min(18000, cutoffHz + p.fenv);
+    const susHz = Math.max(60, cutoffHz + p.fenv * p.sustain);
+    [vcf1, vcf2].forEach(f => {
+      f.frequency.linearRampToValueAtTime(peakHz, startTime + p.attack);
+      f.frequency.exponentialRampToValueAtTime(susHz, startTime + p.attack + p.decay);
+    });
+  }
+
+  const tremGain = audioCtx.createGain();
+  tremGain.gain.setValueAtTime(1.0, startTime);
+
+  const vca = audioCtx.createGain();
+  const gainScale = 0.72;
+  vca.gain.setValueAtTime(0.0001, startTime);
+  vca.gain.linearRampToValueAtTime(gainScale, startTime + p.attack);
+  vca.gain.linearRampToValueAtTime(Math.max(0.0001, gainScale * p.sustain), startTime + p.attack + p.decay);
+
+  vcf1.connect(vcf2);
+  vcf2.connect(tremGain);
+  tremGain.connect(vca);
+  vca.connect(masterGain);
+
+  const sources = [];
+  const oscBusGain = audioCtx.createGain();
+  oscBusGain.gain.setValueAtTime(p.wave === 'noise' ? 0.0001 : 1.0, startTime);
+  oscBusGain.connect(vcf1);
+
+  const safeWave = p.wave === 'noise' ? 'sawtooth' : p.wave;
+  const osc1 = audioCtx.createOscillator();
+  osc1.type = safeWave;
+  osc1.frequency.setValueAtTime(freq, startTime);
+  osc1.detune.setValueAtTime(p.detune > 0 ? -p.detune / 2 : 0, startTime);
+  osc1.connect(oscBusGain);
+  osc1.start(startTime);
+  sources.push(osc1);
+
+  const osc2 = audioCtx.createOscillator();
+  osc2.type = safeWave;
+  osc2.frequency.setValueAtTime(freq, startTime);
+  osc2.detune.setValueAtTime(p.detune, startTime);
+  const osc2Gain = audioCtx.createGain();
+  osc2Gain.gain.setValueAtTime(p.detune > 0 ? 0.6 : 0.0001, startTime);
+  osc2.connect(osc2Gain);
+  osc2Gain.connect(oscBusGain);
+  osc2.start(startTime);
+  sources.push(osc2);
+
+  const subOsc = audioCtx.createOscillator();
+  subOsc.type = 'square';
+  subOsc.frequency.setValueAtTime(freq / 2, startTime);
+  const subGain = audioCtx.createGain();
+  subGain.gain.setValueAtTime(p.sub ? 0.35 : 0.0001, startTime);
+  subOsc.connect(subGain);
+  subGain.connect(oscBusGain);
+  subOsc.start(startTime);
+  sources.push(subOsc);
+
+  const noiseSrc = audioCtx.createBufferSource();
+  noiseSrc.buffer = noiseBuffer;
+  noiseSrc.loop = true;
+  const noiseGain = audioCtx.createGain();
+  noiseGain.gain.setValueAtTime(p.wave === 'noise' ? 0.9 : 0.0001, startTime);
+  noiseSrc.connect(noiseGain);
+  noiseGain.connect(vcf1);
+  noiseSrc.start(startTime);
+  sources.push(noiseSrc);
+
+  // LFO routing to Pitch, Amp, or Cutoff
+  const lfoOsc = audioCtx.createOscillator();
+  lfoOsc.type = p.lfoWave;
+  lfoOsc.frequency.setValueAtTime(p.lfoRate, startTime);
+
+  const lfoPitchGain = audioCtx.createGain();
+  const lfoAmpGain = audioCtx.createGain();
+  const lfoCutGain = audioCtx.createGain();
+  lfoPitchGain.gain.setValueAtTime(p.lfoTarget === 'pitch' ? p.lfoDepth * 1.4 : 0, startTime);
+  lfoAmpGain.gain.setValueAtTime(p.lfoTarget === 'amp' ? (p.lfoDepth / 100) * 0.48 : 0, startTime);
+  lfoCutGain.gain.setValueAtTime(p.lfoTarget === 'cutoff' ? (p.lfoDepth / 100) * Math.max(400, cutoffHz * 0.85) : 0, startTime);
+
+  lfoOsc.connect(lfoPitchGain);
+  lfoPitchGain.connect(osc1.detune);
+  lfoPitchGain.connect(osc2.detune);
+  lfoPitchGain.connect(subOsc.detune);
+
+  lfoOsc.connect(lfoAmpGain);
+  lfoAmpGain.connect(tremGain.gain);
+
+  lfoOsc.connect(lfoCutGain);
+  lfoCutGain.connect(vcf1.frequency);
+  lfoCutGain.connect(vcf2.frequency);
+
+  lfoOsc.start(startTime);
+  sources.push(lfoOsc);
+
+  return {
+    sources, vcf1, vcf2, vca, tremGain, osc1, osc2, osc2Gain, subOsc, subGain,
+    oscBusGain, noiseGain, lfoOsc, lfoPitchGain, lfoAmpGain, lfoCutGain, baseFreq, gainScale
+  };
+}
+
+function startNote(noteId, baseFreq) {
+  ensureAudio();
+  if (activeVoices.has(noteId)) stopNote(noteId);
+  const voice = triggerSynthVoice(baseFreq, getLabParams(), audioCtx.currentTime);
+  activeVoices.set(noteId, voice);
+  const keyEl = document.querySelector(`[data-note="${noteId}"]`);
+  if (keyEl) keyEl.classList.add('active');
+}
+
+function stopNote(noteId) {
+  const voice = activeVoices.get(noteId);
+  if (!voice || !audioCtx) return;
+  const p = getLabParams();
+  const now = audioCtx.currentTime;
+  voice.vca.gain.cancelScheduledValues(now);
+  voice.vca.gain.setValueAtTime(Math.max(0.0001, voice.vca.gain.value), now);
+  voice.vca.gain.exponentialRampToValueAtTime(0.0001, now + p.release);
+  const stopAt = now + p.release + 0.04;
+  voice.sources.forEach(s => { try { s.stop(stopAt); } catch(e){} });
+  activeVoices.delete(noteId);
+  const keyEl = document.querySelector(`[data-note="${noteId}"]`);
+  if (keyEl) keyEl.classList.remove('active');
+}
+
+function stopAllNotes() {
+  holdActive = false;
+  const hb = document.getElementById('holdBtn');
+  if (hb) hb.innerHTML = '&#9654; Hold C Note';
+  Array.from(activeVoices.keys()).forEach(stopNote);
+}
+
+function toggleHold() {
+  if (holdActive) stopAllNotes();
+  else {
+    holdActive = true;
+    document.getElementById('holdBtn').innerHTML = '&#9632; Release C Note';
+    startNote('C4', 261.63);
+  }
+}
+
+function updateSynthParams() {
+  const p = getLabParams();
+  const cutoffHz = sliderToCutoff(p.cutoff);
+  document.getElementById('detuneOut').textContent = `${p.detune} cents`;
+  document.getElementById('cutoffOut').textContent = cutoffHz >= 1000 ? `${(cutoffHz/1000).toFixed(2)} kHz` : `${cutoffHz} Hz`;
+  document.getElementById('resOut').textContent = p.q.toFixed(1);
+  document.getElementById('fenvOut').textContent = `${p.fenv} Hz`;
+  document.getElementById('attOut').textContent = `${p.attack.toFixed(2)} s`;
+  document.getElementById('decOut').textContent = `${p.decay.toFixed(2)} s`;
+  document.getElementById('susOut').textContent = `${Math.round(p.sustain * 100)}%`;
+  document.getElementById('relOut').textContent = `${p.release.toFixed(2)} s`;
+  document.getElementById('lfoRateOut').textContent = `${p.lfoRate.toFixed(1)} Hz`;
+  document.getElementById('lfoDepthOut').textContent = `${Math.round(p.lfoDepth)}%`;
+
+  const rangeLabel = p.octave === -1 ? "16'" : (p.octave === 0 ? "8'" : "4'");
+  const waveName = p.wave.charAt(0).toUpperCase() + p.wave.slice(1);
+  const fLabel = p.filterType === 'lowpass' ? 'LPF' : (p.filterType === 'highpass' ? 'HPF' : 'BPF');
+  document.getElementById('vizWaveLabel').textContent = `${waveName} \u2022 ${rangeLabel}`;
+  document.getElementById('vizFilterLabel').textContent = `${fLabel} ${p.slope} dB/oct \u2022 ${cutoffHz} Hz \u2022 Q ${p.q.toFixed(1)}`;
+
+  if (audioCtx && activeVoices.size > 0) {
+    const now = audioCtx.currentTime;
+    const isNoise = p.wave === 'noise';
+    activeVoices.forEach(v => {
+      v.vcf1.type = p.filterType;
+      v.vcf2.type = p.slope === 24 ? p.filterType : 'allpass';
+      [v.vcf1, v.vcf2].forEach((f, idx) => {
+        f.frequency.cancelScheduledValues(now);
+        f.frequency.setTargetAtTime(Math.max(40, cutoffHz), now, 0.015);
+        f.Q.cancelScheduledValues(now);
+        f.Q.setTargetAtTime(idx === 0 ? p.q : (p.slope === 24 ? Math.max(0.7, p.q * 0.45) : 0.7), now, 0.015);
+      });
+      const freq = v.baseFreq * Math.pow(2, p.octave);
+      if (!isNoise) { v.osc1.type = p.wave; v.osc2.type = p.wave; }
+      v.osc1.frequency.setTargetAtTime(freq, now, 0.015);
+      v.osc2.frequency.setTargetAtTime(freq, now, 0.015);
+      v.subOsc.frequency.setTargetAtTime(freq / 2, now, 0.015);
+      v.osc1.detune.setTargetAtTime(p.detune > 0 ? -p.detune / 2 : 0, now, 0.015);
+      v.osc2.detune.setTargetAtTime(p.detune, now, 0.015);
+      v.osc2Gain.gain.setTargetAtTime(p.detune > 0 ? 0.6 : 0.0001, now, 0.02);
+      v.subGain.gain.setTargetAtTime(p.sub ? 0.35 : 0.0001, now, 0.02);
+      v.oscBusGain.gain.setTargetAtTime(isNoise ? 0.0001 : 1.0, now, 0.02);
+      v.noiseGain.gain.setTargetAtTime(isNoise ? 0.9 : 0.0001, now, 0.02);
+
+      v.lfoOsc.type = p.lfoWave;
+      v.lfoOsc.frequency.setTargetAtTime(p.lfoRate, now, 0.02);
+      v.lfoPitchGain.gain.setTargetAtTime(p.lfoTarget === 'pitch' ? p.lfoDepth * 1.4 : 0, now, 0.02);
+      v.lfoAmpGain.gain.setTargetAtTime(p.lfoTarget === 'amp' ? (p.lfoDepth / 100) * 0.48 : 0, now, 0.02);
+      v.lfoCutGain.gain.setTargetAtTime(p.lfoTarget === 'cutoff' ? (p.lfoDepth / 100) * Math.max(400, cutoffHz * 0.85) : 0, now, 0.02);
+
+      v.vca.gain.cancelScheduledValues(now);
+      v.vca.gain.setTargetAtTime(Math.max(0.0001, v.gainScale * Math.max(0.02, p.sustain)), now, 0.025);
+    });
+  }
+  drawADSR(p);
+  drawFilterAndHarmonics(p, cutoffHz);
+}
+
+function drawADSR(p) {
+  const w = 220, h = 40, pad = 5;
+  const xA = pad + (p.attack / 1.2) * 52;
+  const xD = xA + (p.decay / 1.2) * 52;
+  const xS = xD + 46;
+  const xR = Math.min(w - pad, xS + (p.release / 1.8) * 56);
+  const yTop = pad, yBot = h - pad;
+  const ySus = yBot - p.sustain * (yBot - yTop);
+  const path = `M ${pad} ${yBot} L ${xA} ${yTop} L ${xD} ${ySus} L ${xS} ${ySus} L ${xR} ${yBot}`;
+  document.getElementById('adsrPath').setAttribute('d', path);
+  document.getElementById('adsrFill').setAttribute('d', `${path} L ${pad} ${yBot} Z`);
+}
+
+function filterMag(type, r, q, slope) {
+  const denom = Math.sqrt(Math.pow(1 - r * r, 2) + Math.pow(r / q, 2));
+  let m1 = 1;
+  if (type === 'lowpass') m1 = 1 / denom;
+  else if (type === 'highpass') m1 = (r * r) / denom;
+  else m1 = (r / q) / denom;
+  if (slope === 24) {
+    const q2 = Math.max(0.7, q * 0.45);
+    const d2 = Math.sqrt(Math.pow(1 - r * r, 2) + Math.pow(r / q2, 2));
+    const m2 = type === 'lowpass' ? (1 / d2) : (type === 'highpass' ? ((r * r) / d2) : ((r / q2) / d2));
+    return m1 * m2;
+  }
+  return m1;
+}
+
+function drawFilterAndHarmonics(p, cutoffHz) {
+  const canvas = document.getElementById('filterCanvas');
+  const ctx = canvas.getContext('2d');
+  const W = canvas.width, H = canvas.height;
+  ctx.clearRect(0, 0, W, H);
+
+  ctx.strokeStyle = 'rgba(148, 163, 184, 0.16)'; ctx.lineWidth = 1;
+  [100, 500, 1000, 5000, 10000].forEach(hz => {
+    const x = (Math.log10(hz / 40) / Math.log10(16000 / 40)) * W;
+    ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, H); ctx.stroke();
+    ctx.fillStyle = '#64748b'; ctx.font = '10px sans-serif';
+    ctx.fillText(hz >= 1000 ? `${hz/1000}k` : `${hz}`, x + 3, H - 3);
+  });
+
+  const f0 = 130.81 * Math.pow(2, p.octave + 1);
+  for (let n = 1; n <= 24; n++) {
+    const hz = f0 * n;
+    if (hz > 15500) break;
+    let amp = 0;
+    if (p.wave === 'sine') amp = n === 1 ? 1 : 0;
+    else if (p.wave === 'triangle') amp = (n % 2 === 1) ? 1 / (n * n) : 0;
+    else if (p.wave === 'sawtooth') amp = 1 / n;
+    else if (p.wave === 'square') amp = (n % 2 === 1) ? 1 / n : 0;
+    else if (p.wave === 'noise') amp = 0.55;
+    if (amp <= 0.01) continue;
+
+    const gain = filterMag(p.filterType, hz / cutoffHz, p.q, p.slope);
+    const shaped = Math.min(1.4, amp * Math.min(2.4, gain));
+    const x = (Math.log10(Math.max(40, hz) / 40) / Math.log10(16000 / 40)) * W;
+    const rawH = amp * (H * 0.62);
+    const filtH = Math.min(H - 16, shaped * (H * 0.62));
+    ctx.fillStyle = 'rgba(148, 163, 184, 0.22)'; ctx.fillRect(x - 3, H - 14 - rawH, 6, rawH);
+    ctx.fillStyle = '#38bdf8'; ctx.fillRect(x - 3, H - 14 - filtH, 6, filtH);
+  }
+
+  ctx.beginPath(); ctx.strokeStyle = '#2dd4bf'; ctx.lineWidth = 2.4;
+  for (let x = 0; x < W; x += 2) {
+    const hz = 40 * Math.pow(16000 / 40, x / W);
+    const mag = filterMag(p.filterType, hz / cutoffHz, p.q, p.slope);
+    const db = Math.max(-42, Math.min(18, 20 * Math.log10(Math.max(0.0001, mag))));
+    const y = H * 0.34 - (db / 42) * (H * 0.48);
+    if (x === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+  }
+  ctx.stroke();
+
+  const cx = (Math.log10(Math.max(40, cutoffHz) / 40) / Math.log10(16000 / 40)) * W;
+  ctx.strokeStyle = 'rgba(245, 158, 11, 0.8)'; ctx.setLineDash([4, 3]);
+  ctx.beginPath(); ctx.moveTo(cx, 0); ctx.lineTo(cx, H - 14); ctx.stroke(); ctx.setLineDash([]);
+}
+
+let scopeAutoGain = 4.0;
+function renderScopeLoop() {
+  const canvas = document.getElementById('scopeCanvas');
+  const ctx = canvas.getContext('2d');
+  const W = canvas.width, H = canvas.height;
+  ctx.clearRect(0, 0, W, H);
+  ctx.strokeStyle = 'rgba(148, 163, 184, 0.25)'; ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.moveTo(0, H / 2); ctx.lineTo(W, H / 2); ctx.stroke();
+
+  ctx.strokeStyle = '#38bdf8'; ctx.lineWidth = 2.4; ctx.beginPath();
+  if (analyser && activeVoices.size > 0) {
+    const buf = new Float32Array(analyser.fftSize);
+    analyser.getFloatTimeDomainData(buf);
+    let maxAbs = 0;
+    for (let i = 0; i < buf.length; i++) maxAbs = Math.max(maxAbs, Math.abs(buf[i]));
+    const targetGain = maxAbs > 0.004 ? Math.min(14, 0.82 / maxAbs) : 4.0;
+    scopeAutoGain += (targetGain - scopeAutoGain) * 0.18;
+    let start = 0;
+    for (let i = 1; i < buf.length / 2; i++) { if (buf[i - 1] <= 0 && buf[i] > 0) { start = i; break; } }
+    const slice = Math.min(320, buf.length - start);
+    for (let i = 0; i < slice; i++) {
+      const x = (i / (slice - 1)) * W;
+      const sample = Math.max(-1, Math.min(1, buf[start + i] * scopeAutoGain));
+      const y = H / 2 - sample * (H * 0.42);
+      if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+    }
+  } else {
+    const p = getLabParams();
+    for (let x = 0; x < W; x++) {
+      const t = (x / W) * 3;
+      const ph = t - Math.floor(t);
+      let s = 0;
+      if (p.wave === 'sine') s = Math.sin(t * Math.PI * 2);
+      else if (p.wave === 'triangle') s = 1 - 4 * Math.abs(Math.round(t - 0.25) - (t - 0.25));
+      else if (p.wave === 'sawtooth') s = 2 * ph - 1;
+      else if (p.wave === 'square') s = ph < 0.5 ? 0.85 : -0.85;
+      else s = (Math.sin(x * 1.9) * Math.cos(x * 0.7)) * 0.7;
+      const y = H / 2 - s * (H * 0.36);
+      if (x === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+    }
+  }
+  ctx.stroke();
+  requestAnimationFrame(renderScopeLoop);
+}
+
+// Keyboard builder
+const NOTES = [
+  { id: 'C4', freq: 261.63, key: 'a', black: false, lbl: 'C' },
+  { id: 'C#4', freq: 277.18, key: 'w', black: true, left: 23 },
+  { id: 'D4', freq: 293.66, key: 's', black: false, lbl: 'D' },
+  { id: 'D#4', freq: 311.13, key: 'e', black: true, left: 57 },
+  { id: 'E4', freq: 329.63, key: 'd', black: false, lbl: 'E' },
+  { id: 'F4', freq: 349.23, key: 'f', black: false, lbl: 'F' },
+  { id: 'F#4', freq: 369.99, key: 't', black: true, left: 125 },
+  { id: 'G4', freq: 392.00, key: 'g', black: false, lbl: 'G' },
+  { id: 'G#4', freq: 415.30, key: 'y', black: true, left: 159 },
+  { id: 'A4', freq: 440.00, key: 'h', black: false, lbl: 'A' },
+  { id: 'A#4', freq: 466.16, key: 'u', black: true, left: 193 },
+  { id: 'B4', freq: 493.88, key: 'j', black: false, lbl: 'B' },
+  { id: 'C5', freq: 523.25, key: 'k', black: false, lbl: 'C' }
+];
+function buildKeyboard() {
+  const wrap = document.getElementById('keyboard');
+  NOTES.forEach(n => {
+    const btn = document.createElement('div');
+    btn.className = n.black ? 'key-black' : 'key-white';
+    btn.dataset.note = n.id;
+    if (n.black) btn.style.left = n.left + 'px';
+    else btn.textContent = n.lbl;
+    btn.addEventListener('mousedown', (e) => { e.preventDefault(); startNote(n.id, n.freq); });
+    btn.addEventListener('mouseup', () => stopNote(n.id));
+    btn.addEventListener('mouseleave', () => { if (activeVoices.has(n.id) && !(holdActive && n.id === 'C4')) stopNote(n.id); });
+    btn.addEventListener('touchstart', (e) => { e.preventDefault(); startNote(n.id, n.freq); }, { passive: false });
+    btn.addEventListener('touchend', () => stopNote(n.id));
+    wrap.appendChild(btn);
+  });
+}
+window.addEventListener('keydown', (e) => {
+  if (e.repeat || ['INPUT', 'TEXTAREA', 'SELECT'].includes(document.activeElement?.tagName)) return;
+  const n = NOTES.find(x => x.key === e.key.toLowerCase());
+  if (n && document.getElementById('synthDrawer').classList.contains('open')) startNote(n.id, n.freq);
+});
+window.addEventListener('keyup', (e) => {
+  const n = NOTES.find(x => x.key === e.key.toLowerCase());
+  if (n && activeVoices.has(n.id) && !(holdActive && n.id === 'C4')) stopNote(n.id);
+});
+
+// ================= 4. WORKBOOK AUTO-SAVE & PROGRESS =================
+const WB_KEY = 'synth_y1_ext_answers_v1';
+const GLOS_KEY = 'synth_y1_ext_glossary_v1';
+const NAME_KEY = 'synth_y1_ext_student_name';
+
+function loadWorkbookAnswers() {
+  try {
+    const nm = localStorage.getItem(NAME_KEY) || '';
+    document.getElementById('studentNameInput').value = nm;
+    const saved = JSON.parse(localStorage.getItem(WB_KEY) || '{}');
+    document.querySelectorAll('.wb-textarea').forEach(ta => {
+      if (saved[ta.id]) ta.value = saved[ta.id];
+      ta.classList.toggle('has-answer', ta.value.trim().length >= 8);
+      ta.addEventListener('input', () => {
+        ta.classList.toggle('has-answer', ta.value.trim().length >= 8);
+        saveWorkbookAnswers();
+      });
+    });
+  } catch (e) {}
+  updateWorkbookProgress();
+}
+
+function saveStudentName(val) {
+  try { localStorage.setItem(NAME_KEY, val); } catch (e) {}
+}
+
+function saveWorkbookAnswers() {
+  const obj = {};
+  document.querySelectorAll('.wb-textarea').forEach(ta => { obj[ta.id] = ta.value; });
+  try { localStorage.setItem(WB_KEY, JSON.stringify(obj)); } catch (e) {}
+  updateWorkbookProgress();
+}
+
+function updateWorkbookProgress() {
+  const allTas = Array.from(document.querySelectorAll('.wb-textarea'));
+  const doneCount = allTas.filter(t => t.value.trim().length >= 8).length;
+  const pill = document.getElementById('wbTasksPill');
+  if (pill) pill.textContent = `Written/Lab Boxes: ${doneCount} / ${allTas.length}`;
+
+  const taskGroups = {};
+  allTas.forEach(t => {
+    const g = t.dataset.task;
+    if (!g) return;
+    taskGroups[g] = taskGroups[g] || { total: 0, done: 0 };
+    taskGroups[g].total++;
+    if (t.value.trim().length >= 8) taskGroups[g].done++;
+  });
+  Object.entries(taskGroups).forEach(([g, info]) => {
+    const el = document.getElementById('st-' + g);
+    if (!el) return;
+    const complete = info.done === info.total;
+    el.textContent = complete ? `✓ All ${info.total} answers logged` : `${info.done} / ${info.total} answered`;
+    el.classList.toggle('done', complete);
+  });
+}
+
+function toggleReveal(id) {
+  const el = document.getElementById(id);
+  if (el) el.classList.toggle('visible');
+}
+
+// ================= 5. MASTER GLOSSARY TABLE (ALL RAG TIERS) =================
+const GLOSSARY_TERMS = [
+  { term: 'Synthesis', def: 'Creating musical sounds artificially using electronic waveforms without an acoustic source.', tier: 'Tier 1 (Comp 2)' },
+  { term: 'Subtractive Synthesis', def: 'Starting with a harmonically rich waveform and removing unwanted frequencies using a filter.', tier: 'Tier 1 & 3' },
+  { term: 'Monophonic / Polyphonic', def: 'Monophonic plays one note at a time (bass/leads); polyphonic plays multiple notes simultaneously (chords/pads).', tier: 'Tier 1 (Spec p.49)' },
+  { term: 'MIDI (1983)', def: 'Serial digital interface sending performance messages (Note Number, Velocity 1–127) — not audio.', tier: 'Tier 2 (AOS 3)' },
+  { term: 'Portamento (Glide)', def: 'A smooth, continuous pitch slide between successive notes.', tier: 'Tier 1 (Spec p.49)' },
+  { term: 'VCO (Oscillator)', def: 'Voltage-Controlled Oscillator — the sound source generating a continuous pitched waveform.', tier: 'Tier 1 & 3' },
+  { term: 'VCF (Filter)', def: 'Voltage-Controlled Filter — the tone sculptor that attenuates selected frequency ranges.', tier: 'Tier 1 & 3' },
+  { term: 'VCA (Amplifier)', def: 'Voltage-Controlled Amplifier — the final volume gate opening on key press and closing on release.', tier: 'Tier 1 & 3' },
+  { term: 'Periodic Waveform & Cycle', def: 'A repeating vibration pattern giving definite pitch; one peak-and-trough repetition is a cycle (cycles/sec = Hz).', tier: 'Tier 0 & 3' },
+  { term: 'Fundamental Frequency (f)', def: 'The lowest frequency (1st harmonic) in a periodic waveform, determining the perceived musical pitch.', tier: 'Tier 0 & 2' },
+  { term: 'Harmonics & Overtones', def: 'Integer multiples of the fundamental (2f, 3f, 4f...). The 2nd harmonic is the 1st overtone.', tier: 'Tier 0 & 2' },
+  { term: 'Timbre & Partials', def: 'Tone colour determined by fundamental + harmonic blend + any non-harmonic partials (e.g. noise).', tier: 'Tier 2 (AOS 2)' },
+  { term: 'Golden Rule of Subtractive', def: 'A filter can only subtract harmonics already present in the oscillator — it cannot invent new ones.', tier: 'Tier 1 & 2' },
+  { term: 'Sine / Triangle / Sawtooth / Square', def: 'Sine = fundamental only; Triangle = weak odd; Sawtooth = all odd & even; Square = strong odd.', tier: 'Tier 0, 2 & 3' },
+  { term: 'White Noise / Pink Noise', def: 'Unpitched random frequencies: White has equal energy across the spectrum; Pink emphasises lows.', tier: 'Tier 0, 1 & 3' },
+  { term: 'Octave Footage (16\', 8\', 4\')', def: 'Organ-pipe pitch range: 16\' = 1 oct down, 8\' = normal, 4\' = 1 oct up (doubling Hz = +1 octave).', tier: 'Tier 1 & 3' },
+  { term: 'Detune (Cents) & Sub-Oscillator', def: 'Detuning a 2nd osc by 6–18 cents thickens tone via phase beating; a Sub-Osc adds -1/-2 oct bass weight.', tier: 'Tier 1 & 3' },
+  { term: 'LPF / HPF / BPF', def: 'Low-Pass cuts highs; High-Pass cuts lows; Band-Pass passes only a narrow middle frequency band.', tier: 'Tier 1 & 3' },
+  { term: 'Cutoff Frequency & Slope (dB/oct)', def: 'Cutoff (-3 dB) is where filtering starts; Slope (LP12 vs LP24) sets steepness of attenuation per octave.', tier: 'Tier 1 (Comp 1/2)' },
+  { term: 'Resonance (Q) & Self-Oscillation', def: 'Narrow gain boost right at cutoff for punch/squelch; extreme Q makes the filter oscillate its own pitch.', tier: 'Tier 1 (Comp 2)' },
+  { term: 'ADSR Envelope (VCA & VCF)', def: 'One-shot contour per note: Attack (time), Decay (time), Sustain (LEVEL %), Release (time).', tier: 'Tier 1 & 3' },
+  { term: 'LFO (Vibrato / Tremolo / Wobble)', def: 'Sub-audio (0.1–20 Hz) repeating modulator: to VCO = Vibrato, VCA = Tremolo, VCF = Filter Wobble.', tier: 'Tier 1 & 3' }
+];
+
+function renderGlossary() {
+  let checked = {};
+  try { checked = JSON.parse(localStorage.getItem(GLOS_KEY) || '{}'); } catch (e) {}
+  document.getElementById('glossaryBody').innerHTML = GLOSSARY_TERMS.map((g, i) => `
+    <tr>
+      <td style="text-align:center;"><input type="checkbox" ${checked[i] ? 'checked' : ''} onchange="toggleGloss(${i}, this.checked)" /></td>
+      <td><strong>${g.term}</strong></td>
+      <td>${g.def}</td>
+      <td><span class="tier-tag">${g.tier}</span></td>
+    </tr>
+  `).join('');
+}
+function toggleGloss(idx, val) {
+  let checked = {};
+  try { checked = JSON.parse(localStorage.getItem(GLOS_KEY) || '{}'); } catch (e) {}
+  checked[idx] = val;
+  try { localStorage.setItem(GLOS_KEY, JSON.stringify(checked)); } catch (e) {}
+}
+
+// ================= 6. MODULE CHECKPOINTS (MODULES 1-9) =================
+const SECTION_ORDER = ['mod1','mod2','mod3','mod4','mod5','mod6','mod7','mod8','mod9','mod10'];
+const SECTION_LABELS = {
+  mod1: 'Module 1: Context',
+  mod2: 'Module 2: Signal Flow',
+  mod3: 'Module 3: Harmonics & Timbre',
+  mod4: 'Module 4: VCO Waveforms',
+  mod5: 'Module 5: Filters (VCF)',
+  mod6: 'Module 6: Amp Envelopes',
+  mod7: 'Module 7: Filter Envelopes',
+  mod8: 'Module 8: LFO Modulation',
+  mod9: 'Module 9: Patch Recipes',
+  mod10: 'Module 10: Quiz & Exam'
+};
+
+const GUARDRAILS = {
+  mod1: { next: 'mod2', questions: [
+    { q: '1. What does "monophonic" mean on a 1970 Minimoog?', opts: ['It can only play one note at a time', 'It has no filter', 'It only outputs white noise'], ans: 0, hint: 'Mono = one voice at a time (ideal for basslines and leads).' },
+    { q: '2. What does a MIDI cable transmit?', opts: ['Analogue speaker audio', 'Digital control messages such as Note Number and Velocity (1–127)', 'High-voltage mains power'], ans: 1, hint: 'MIDI sends digital performance instructions, never audio.' },
+    { q: '3. Why do modern DAW producers still deliberately add slight detuning?', opts: ['To mimic warm analogue tuning drift and thicken the timbre', 'To disable the VCA', 'To make the synth monophonic'], ans: 0, hint: 'Subtle analogue tuning drift creates a lush, thick chorus-like warmth.' }
+  ]},
+  mod2: { next: 'mod3', questions: [
+    { q: '1. What is the correct left-to-right audio signal path in subtractive synthesis?', opts: ['VCA → VCF → VCO', 'VCO → VCF → VCA', 'LFO → VCA → VCO'], ans: 1, hint: 'Generate sound (VCO), sculpt tone (VCF), control volume (VCA).' },
+    { q: '2. Which module acts as an automatic volume gate so notes stop when you release a key?', opts: ['VCO', 'VCF', 'VCA'], ans: 2, hint: 'Voltage-Controlled Amplifier (VCA) controls final loudness.' },
+    { q: '3. Do you hear an ADSR Envelope or LFO directly as audio?', opts: ['No — they are silent control/modulation signals that move parameters', 'Yes — they replace the oscillator', 'Only on a Sine wave'], ans: 0, hint: 'Modulators act like invisible hands turning knobs automatically.' }
+  ]},
+  mod3: { next: 'mod4', questions: [
+    { q: '1. If a note has a fundamental frequency of 100 Hz, what is its 3rd harmonic?', opts: ['103 Hz', '200 Hz', '300 Hz'], ans: 2, hint: 'Harmonics are integer multiples: 3 × 100 Hz = 300 Hz.' },
+    { q: '2. In accepted acoustics terminology, the 2nd harmonic is also known as the...', opts: ['Fundamental', '1st Overtone', 'Sub-oscillator'], ans: 1, hint: 'Because the 1st harmonic IS the fundamental, the 2nd harmonic is the 1st overtone.' },
+    { q: '3. What is the Golden Rule of Subtractive Synthesis?', opts: ['A filter can only subtract harmonics already present in the waveform', 'A filter invents new harmonics on a Sine wave', 'Only low frequencies have harmonics'], ans: 0, hint: 'Filters carve away existing harmonics; they cannot invent new ones.' }
+  ]},
+  mod4: { next: 'mod5', questions: [
+    { q: '1. Which pitched waveform contains ALL odd and even harmonics?', opts: ['Sine', 'Square', 'Sawtooth'], ans: 2, hint: 'Sawtooth is the richest standard wave (f, 2f, 3f, 4f, 5f...).' },
+    { q: '2. Switching VCO octave footage from 8\' to 16\' does what?', opts: ['Drops pitch by 1 octave into bass register', 'Raises pitch by 1 octave', 'Switches to White Noise'], ans: 0, hint: 'Longer organ pipe (16\') = deeper pitch (1 octave down).' },
+    { q: '3. Which unpitched waveform contains all frequencies randomly at equal average level?', opts: ['Triangle', 'White Noise', 'Sine'], ans: 1, hint: 'White Noise sounds like static hiss and is ideal for hi-hats/snares.' }
+  ]},
+  mod5: { next: 'mod6', questions: [
+    { q: '1. What does a Low-Pass Filter (LPF) do?', opts: ['Passes lows below cutoff and attenuates highs above cutoff', 'Passes highs and cuts lows', 'Boosts bass by 24 dB'], ans: 0, hint: 'Low-Pass = lets lows pass.' },
+    { q: '2. An LP24 filter has a cutoff of 200 Hz. How much attenuation occurs at 400 Hz (1 octave above)?', opts: ['-6 dB', '-12 dB', '-24 dB'], ans: 2, hint: 'LP24 attenuates 24 dB per octave above the cutoff.' },
+    { q: '3. What does raising Filter Resonance (Q) do?', opts: ['Boosts a narrow frequency band right at the cutoff frequency', 'Lowers the oscillator octave', 'Slows down the Attack time'], ans: 0, hint: 'Resonance creates a sharp peak right at the cutoff point.' }
+  ]},
+  mod6: { next: 'mod7', questions: [
+    { q: '1. In an ADSR envelope, which parameter is a LEVEL (%) rather than a time?', opts: ['Attack', 'Decay', 'Sustain'], ans: 2, hint: 'Attack, Decay, and Release are times; Sustain is a held volume level.' },
+    { q: '2. To create a slow, swelling ambient string pad, you should use...', opts: ['A slow Attack (e.g. 0.7 s) and long Release', '0% Sustain and 0.01 s Attack', '0.02 s Release'], ans: 0, hint: 'Slow Attack fades the pad in smoothly; long Release lets chords linger.' },
+    { q: '3. What does Release control?', opts: ['How fast the note fades to silence AFTER you let go of the key', 'How loud the initial click is', 'The pitch of the sub-oscillator'], ans: 0, hint: 'Release begins the moment you lift your finger off the key.' }
+  ]},
+  mod7: { next: 'mod8', questions: [
+    { q: '1. What does a positive Filter Envelope modulate?', opts: ['The VCF Cutoff Frequency over the duration of each note', 'The MIDI cable tempo', 'The speaker impedance'], ans: 0, hint: 'A Filter Envelope sweeps filter brightness automatically per key press.' },
+    { q: '2. For a punchy 1970s funk bass transient, how should the Filter Envelope be set?', opts: ['Instant Attack, short Decay, low Sustain', 'Slow 1.5 s Attack, 100% Sustain', '0 Hz Filter Env Amount'], ans: 0, hint: 'Instant Attack + short Decay snaps brightness open then quickly back to warm bass.' },
+    { q: '3. A slower Filter Envelope Attack (~60–150 ms) on a Sawtooth wave emulates which instrument?', opts: ['80s Synth Brass blooming brighter', 'Closed hi-hat', 'Pure sine sub-bass'], ans: 0, hint: 'Brass starts mellow and blooms brighter as air pressure builds.' }
+  ]},
+  mod8: { next: 'mod9', questions: [
+    { q: '1. Routing an LFO to VCO Pitch creates which musical effect?', opts: ['Tremolo', 'Vibrato', 'Reverb'], ans: 1, hint: 'Pitch wobble = Vibrato; Volume pulse = Tremolo.' },
+    { q: '2. Routing an LFO to VCA Volume creates which musical effect?', opts: ['Vibrato', 'Tremolo', 'Portamento'], ans: 1, hint: 'Amplitude (volume) modulation = Tremolo.' },
+    { q: '3. How does an LFO differ from an ADSR Envelope?', opts: ['LFO repeats continuously in a cycle; ADSR fires a one-shot shape per key press', 'LFO is always above 10 kHz', 'They do the exact same thing'], ans: 0, hint: 'LFO = cyclic/repeating; ADSR = one-shot per note.' }
+  ]},
+  mod9: { next: 'mod10', questions: [
+    { q: '1. Which combination synthesises a crisp 1980s closed hi-hat?', opts: ['White Noise + High-Pass Filter + instant Attack, very short Decay, 0% Sustain', 'Sine wave + LPF 200 Hz + long Release', 'Sawtooth 16\' + 24 dB LPF'], ans: 0, hint: 'Unpitched white noise + HPF removes lows + snappy 0% sustain envelope.' },
+    { q: '2. Why is a Sawtooth wave at 16\' through a 24 dB/oct LPF ideal for 1970s funk bass?', opts: ['Sawtooth supplies all harmonics while the steep 24 dB/oct LPF carves warm, focused bass weight', 'Sawtooth has zero harmonics', '16\' is two octaves above concert pitch'], ans: 0, hint: 'Rich source + steep Moog-style ladder filter = classic warm bass.' },
+    { q: '3. Which setting widens and thickens an 80s Juno pad?', opts: ['Detuning a 2nd oscillator (e.g. 15–18 cents) with slow Attack and long Release', 'Setting Sustain to 0%', 'Using a High-Pass Filter at 8 kHz'], ans: 0, hint: 'Detuning creates chorus-like phase beating; slow A + long R gives lush swell.' }
+  ]}
+};
+
+const PROG_KEY = 'synth_y1_ext_unlocked_level';
+let unlockedLevel = 0;
+let teacherUnlockedAll = false;
+try {
+  const saved = parseInt(localStorage.getItem(PROG_KEY) || '0', 10);
+  if (!Number.isNaN(saved) && saved >= 0 && saved < SECTION_ORDER.length) unlockedLevel = saved;
+} catch (e) {}
+
+function renderGuardrails() {
+  Object.entries(GUARDRAILS).forEach(([secId, cfg]) => {
+    const box = document.getElementById('guardrail-' + secId);
+    if (!box) return;
+    const secIdx = SECTION_ORDER.indexOf(secId);
+    const isPassed = unlockedLevel > secIdx;
+    const nextLabel = SECTION_LABELS[cfg.next];
+    box.classList.toggle('passed', isPassed);
+
+    if (isPassed) {
+      box.innerHTML = `<div class="guardrail-head" style="margin:0;"><span style="font-size:13px;font-weight:700;color:#166534;">&#10003; Checkpoint passed — <strong>${nextLabel}</strong> unlocked</span><span class="guardrail-badge">Passed &#10003;</span></div>`;
+      return;
+    }
+    box.innerHTML = `
+      <div class="guardrail-head">
+        <h3 class="guardrail-title">Module Checkpoint: Unlock ${nextLabel}</h3>
+        <span class="guardrail-badge">3 Confirmation Questions</span>
+      </div>
+      ${cfg.questions.map((item, qi) => `
+        <div class="gq-item" id="gq-${secId}-${qi}">
+          <div class="gq-prompt">${item.q}</div>
+          <div class="gq-opts">
+            ${item.opts.map((opt, oi) => `<label class="gq-opt"><input type="radio" name="gq_${secId}_${qi}" value="${oi}" /><span>${opt}</span></label>`).join('')}
+          </div>
+          <div class="gq-hint">Hint: ${item.hint}</div>
+        </div>
+      `).join('')}
+      <div class="guardrail-actions">
+        <button type="button" class="btn btn-primary btn-sm" onclick="checkGuardrail('${secId}')">Check Answers &amp; Unlock Next Module</button>
+        <span class="guardrail-status" id="gq-status-${secId}" style="color:var(--muted);">Get 3/3 to unlock the next module.</span>
+      </div>
+    `;
+  });
+}
+
+function applyLocks() {
+  const maxIdx = teacherUnlockedAll ? SECTION_ORDER.length - 1 : unlockedLevel;
+  SECTION_ORDER.forEach((secId, idx) => {
+    const sec = document.getElementById(secId);
+    if (!sec) return;
+    const locked = idx > maxIdx;
+    sec.classList.toggle('section-locked', locked);
+    let ov = sec.querySelector('.lock-overlay');
+    if (locked && !ov) {
+      ov = document.createElement('div');
+      ov.className = 'lock-overlay';
+      const prev = SECTION_LABELS[SECTION_ORDER[idx - 1]];
+      ov.innerHTML = `<div class="lock-overlay-card"><h4>&#128274; ${SECTION_LABELS[secId]} Locked</h4><p>Complete the 3 checkpoint questions at the bottom of <strong>${prev}</strong> to unlock this module.</p><button type="button" class="btn btn-primary btn-sm" onclick="jumpToActiveCheckpoint()">Go to Active Checkpoint</button></div>`;
+      sec.appendChild(ov);
+    } else if (!locked && ov) {
+      ov.remove();
+    }
+    const link = document.querySelector(`#mainToc a[data-sec="${secId}"]`);
+    if (link) {
+      link.classList.toggle('locked-link', locked);
+      link.classList.toggle('passed-link', !locked && idx < unlockedLevel);
+    }
+  });
+  const cp = document.getElementById('wbCheckpointsPill');
+  if (cp) cp.textContent = unlockedLevel >= 9 ? '✓ All 9 Checkpoints Passed!' : `Checkpoints: ${unlockedLevel} / 9`;
+}
+
+function jumpToActiveCheckpoint() {
+  const secId = SECTION_ORDER[Math.min(unlockedLevel, SECTION_ORDER.length - 2)];
+  const target = document.getElementById('guardrail-' + secId) || document.getElementById(secId);
+  if (target) target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+
+function checkGuardrail(secId) {
+  const cfg = GUARDRAILS[secId];
+  let okCount = 0;
+  cfg.questions.forEach((item, qi) => {
+    const card = document.getElementById(`gq-${secId}-${qi}`);
+    const sel = document.querySelector(`input[name="gq_${secId}_${qi}"]:checked`);
+    const ok = sel && parseInt(sel.value, 10) === item.ans;
+    card.classList.remove('gq-right', 'gq-wrong');
+    card.classList.add(ok ? 'gq-right' : 'gq-wrong');
+    if (ok) okCount++;
+  });
+  const st = document.getElementById(`gq-status-${secId}`);
+  const idx = SECTION_ORDER.indexOf(secId);
+  if (okCount === cfg.questions.length) {
+    if (unlockedLevel <= idx) {
+      unlockedLevel = idx + 1;
+      try { localStorage.setItem(PROG_KEY, String(unlockedLevel)); } catch (e) {}
+    }
+    renderGuardrails();
+    applyLocks();
+    setTimeout(() => document.getElementById(cfg.next)?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 260);
+  } else {
+    st.style.color = '#991b1b';
+    st.textContent = `${okCount}/3 correct — check the red hint(s) and try again.`;
+  }
+}
+
+// ================= 7. 10-QUESTION SELF-MARKING QUIZ =================
+const QUIZ_QUESTIONS = [
+  { q: '1. A note has a fundamental frequency of 150 Hz. If played with a Square wave (odd harmonics only), which frequencies are present?', opts: ['150 Hz, 300 Hz, 450 Hz, 600 Hz', '150 Hz, 450 Hz, 750 Hz, 1050 Hz', '150 Hz only', 'Random unpitched frequencies'], ans: 1, explain: 'Square waves contain only odd integer multiples of the fundamental: 1×150 = 150 Hz, 3×150 = 450 Hz, 5×150 = 750 Hz, 7×150 = 1050 Hz.' },
+  { q: '2. Why does sweeping a Low-Pass Filter from 10 kHz down to 400 Hz have no audible effect on a 100 Hz Sine wave?', opts: ['A Sine wave contains only the fundamental frequency (100 Hz) with zero upper harmonics to subtract', 'Low-Pass Filters bypass Sine waves automatically', 'A Sine wave is too loud for the filter', '100 Hz is above 400 Hz'], ans: 0, explain: 'Golden Rule of Subtractive Synthesis: a filter can only remove harmonics already present. A 100 Hz sine wave has no frequencies above 100 Hz.' },
+  { q: '3. An LP24 (24 dB/octave) low-pass filter is set to a cutoff of 300 Hz. How much attenuation occurs at 600 Hz?', opts: ['-6 dB', '-12 dB', '-24 dB', '-48 dB'], ans: 2, explain: 'Doubling frequency (300 Hz → 600 Hz) is exactly one octave. A 24 dB/oct slope attenuates by 24 dB per octave above cutoff.' },
+  { q: '4. What happens on an analogue synthesiser when Filter Resonance (Q) is pushed to extreme maximum?', opts: ['The filter begins to self-oscillate, generating its own pure sine-like pitch at the cutoff frequency', 'The VCO switches to White Noise', 'All frequencies below cutoff are muted', 'The Release time becomes infinite'], ans: 0, explain: 'High resonance feeds the filter output back into itself; at extreme settings, it self-oscillates as a pitched whistle/sine tone.' },
+  { q: '5. Which parameter in an ADSR envelope is measured as a LEVEL (%) rather than a TIME (s/ms)?', opts: ['Attack', 'Decay', 'Sustain', 'Release'], ans: 2, explain: 'Attack, Decay, and Release are times; Sustain is the held volume level while the key remains pressed.' },
+  { q: '6. How is a crisp 1980s closed hi-hat synthesised on a subtractive synth?', opts: ['Sawtooth at 16\' + LPF + long Release', 'White Noise + High-Pass Filter + instant Attack, very short Decay (~50 ms), and 0% Sustain', 'Sine wave + Band-Pass Filter + slow Attack', 'Triangle wave + 5 Hz LFO on Pitch'], ans: 1, explain: 'White noise supplies unpitched metallic frequencies, HPF removes low rumble, and a snappy 0%-sustain envelope creates the percussive tick.' },
+  { q: '7. Routing a 5 Hz Sine LFO to the VCO Pitch input produces which effect?', opts: ['Tremolo', 'Vibrato', 'Filter Wobble', 'Portamento'], ans: 1, explain: 'Cyclic pitch modulation (LFO → VCO Pitch) is Vibrato; cyclic volume modulation (LFO → VCA) is Tremolo.' },
+  { q: '8. Why do producers detune a second oscillator by 6–18 cents on synth pads and basses?', opts: ['To remove all even harmonics', 'To create subtle phase beating that thickens and warms the timbre', 'To transpose the note down an octave', 'To lock the LFO to tempo'], ans: 1, explain: 'Slight detuning (cents = 1/100th of a semitone) creates slow phase movement inspired by warm analogue tuning drift.' },
+  { q: '9. To make an 80s synth brass note start slightly muffled and bloom brighter, which setting is most effective?', opts: ['Positive Filter Envelope Amount with a medium-fast Attack (~60–100 ms) modulating VCF cutoff', 'Setting LPF cutoff to 100 Hz with 0 Hz Filter Env Amount', 'Setting VCA Sustain to 0%', 'Switching from Sawtooth to Sine'], ans: 0, explain: 'A positive Filter Envelope with a ~60–100 ms Attack sweeps the LPF open smoothly on each note, emulating acoustic brass bloom.' },
+  { q: '10. Which statement accurately describes MIDI (introduced in 1983)?', opts: ['MIDI carries stereo analogue audio over 5-pin cables', 'MIDI sends serial digital performance messages such as Note Number and Velocity (1–127)', 'MIDI only works on monophonic 1970 Minimoogs', 'MIDI is a type of 24 dB/oct ladder filter'], ans: 1, explain: 'MIDI (Musical Instrument Digital Interface) transmits digital control messages (note number, velocity 1–127, pitch bend, etc.), never audio.' }
+];
+
+function renderQuiz() {
+  document.getElementById('quizContainer').innerHTML = QUIZ_QUESTIONS.map((item, qi) => `
+    <div class="quiz-q">
+      <div class="quiz-q-title">${item.q}</div>
+      <div class="quiz-opts">
+        ${item.opts.map((opt, oi) => `<label class="quiz-opt" id="qopt-${qi}-${oi}"><input type="radio" name="q${qi}" value="${oi}" /><span>${opt}</span></label>`).join('')}
+      </div>
+      <div class="quiz-explain" id="qexp-${qi}"><strong>Explanation:</strong> ${item.explain}</div>
+    </div>
+  `).join('');
+}
+
+function markQuiz() {
+  let correct = 0;
+  QUIZ_QUESTIONS.forEach((item, qi) => {
+    const chosen = document.querySelector(`input[name="q${qi}"]:checked`);
+    item.opts.forEach((_, oi) => {
+      const lbl = document.getElementById(`qopt-${qi}-${oi}`);
+      lbl.classList.remove('is-correct', 'is-wrong');
+      if (oi === item.ans) lbl.classList.add('is-correct');
+    });
+    if (chosen) {
+      const val = parseInt(chosen.value, 10);
+      if (val === item.ans) correct++;
+      else document.getElementById(`qopt-${qi}-${val}`).classList.add('is-wrong');
+    }
+    document.getElementById(`qexp-${qi}`).classList.add('show');
+  });
+  const pct = Math.round((correct / QUIZ_QUESTIONS.length) * 100);
+  const box = document.getElementById('quizScore');
+  box.style.display = 'block';
+  box.className = 'quiz-score' + (pct >= 80 ? ' great' : '');
+  box.textContent = `Quiz Score: ${correct} / ${QUIZ_QUESTIONS.length} (${pct}%). Read the explanations below to lock in every concept!`;
+}
+
+function resetQuiz() {
+  document.getElementById('quizScore').style.display = 'none';
+  renderQuiz();
+}
+
+// ================= 8. TEACHER PIN AUTH (SHARED WITH GUIDES 1-3) =================
+const _TPIN_H = 2351199037;
+function _hashPin(s) {
+  let h = 2166136261;
+  for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619) >>> 0; }
+  return h;
+}
+function isTeacherAuthed() { return localStorage.getItem('rjc_teacher_mode') === '1'; }
+function openTeacherPinModal() {
+  const on = isTeacherAuthed();
+  document.getElementById('tpinTitle').innerHTML = on ? '&#128275; Teacher Mode Active' : '&#128274; Teacher PIN Required';
+  document.getElementById('tpinSubtitle').style.display = on ? 'none' : 'block';
+  document.getElementById('tpinFormWrap').style.display = on ? 'none' : 'block';
+  document.getElementById('tpinActiveWrap').style.display = on ? 'block' : 'none';
+  document.getElementById('tpinErr').textContent = '';
+  document.getElementById('tpinBackdrop').classList.add('open');
+  if (!on) setTimeout(() => document.getElementById('tpinInput')?.focus(), 40);
+}
+function closeTeacherPinModal() { document.getElementById('tpinBackdrop').classList.remove('open'); }
+function submitTeacherPin() {
+  const val = (document.getElementById('tpinInput').value || '').trim();
+  if (_hashPin(val) === _TPIN_H) {
+    localStorage.setItem('rjc_teacher_mode', '1');
+    teacherUnlockedAll = true;
+    applyLocks();
+    closeTeacherPinModal();
+  } else {
+    document.getElementById('tpinErr').textContent = 'Incorrect PIN — please try again.';
+  }
+}
+function exitTeacherMode() {
+  localStorage.removeItem('rjc_teacher_mode');
+  teacherUnlockedAll = false;
+  applyLocks();
+  closeTeacherPinModal();
+}
+
+// ================= INIT =================
+if (isTeacherAuthed()) teacherUnlockedAll = true;
+buildKeyboard();
+renderGlossary();
+renderQuiz();
+renderGuardrails();
+applyLocks();
+loadWorkbookAnswers();
+updateSynthParams();
+renderScopeLoop();
+</script>
+</body>
+</html>
