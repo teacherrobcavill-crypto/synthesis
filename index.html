@@ -316,7 +316,7 @@
 
   <script>
     const g1 = parseInt(localStorage.getItem('synth_v3_unlocked_level') || '0', 10);
-    const g1y1 = parseInt(localStorage.getItem('synth_y1_ext_unlocked_level') || '0', 10);
+    const g1y1 = parseInt(localStorage.getItem('synth_y1_v2_unlocked_level') || localStorage.getItem('synth_y1_ext_unlocked_level') || '0', 10);
     const g2 = parseInt(localStorage.getItem('modular_g2_unlocked_level') || '0', 10);
     const g3 = parseInt(localStorage.getItem('minimoog_g3_unlocked_level') || '0', 10);
     if (g1 >= 5) { const e = document.getElementById('st1'); e.textContent = '✓ Completed'; e.classList.add('done'); }
