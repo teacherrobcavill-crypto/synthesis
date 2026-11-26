@@ -161,6 +161,25 @@
     background: #fff;
     color: var(--ink);
   }
+  .student-inputs input.name-needed {
+    border-color: #f59e0b;
+    background: #fffbeb;
+    box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.22);
+  }
+  .name-hint {
+    font-size: 12.5px;
+    font-weight: 700;
+    color: #b45309;
+    background: #fef3c7;
+    border: 1px solid #fde68a;
+    padding: 4px 10px;
+    border-radius: 999px;
+  }
+  .name-hint.ready {
+    color: #166534;
+    background: #dcfce7;
+    border-color: #bbf7d0;
+  }
 
   .btn {
     border: 1px solid var(--border);
@@ -449,8 +468,9 @@
 
   <div class="score-bar no-print">
     <div class="student-inputs">
-      <input type="text" id="studentName" placeholder="Student Name" aria-label="Student Name" />
+      <input type="text" id="studentName" class="name-needed" placeholder="Enter your full name first *" aria-label="Student Name" required />
       <input type="date" id="assessDate" aria-label="Assessment Date" />
+      <span class="name-hint" id="nameHint">Enter your name before starting</span>
     </div>
     <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
       <span class="score-pill" id="scoreBadge">Section A Score: 0 / 10</span>
@@ -720,6 +740,19 @@
   <footer>RJC Audio &bull; Basic Synthesis Assessment &bull; Grounded in A-Level Music Technology Interactive Guides 1–3</footer>
 </div>
 
+<!-- NAME REQUIRED POPUP MODAL -->
+<div class="modal-backdrop" id="nameModal" role="dialog" aria-modal="true" aria-labelledby="nameModalTitle">
+  <div class="modal-card">
+    <h3 id="nameModalTitle">Enter Your Name First</h3>
+    <p>Please enter your full name before attempting any questions.</p>
+    <input type="text" id="modalNameInput" class="field-input" placeholder="Your full name..." aria-label="Your full name" style="margin-bottom:10px; font-size:15px; padding:10px 12px;" />
+    <div class="pin-error" id="nameModalError"></div>
+    <div class="modal-actions">
+      <button class="btn btn-primary" onclick="confirmStudentName()">Start Assessment</button>
+    </div>
+  </div>
+</div>
+
 <!-- INCOMPLETE ASSESSMENT POPUP MODAL -->
 <div class="modal-backdrop" id="incompleteModal" role="dialog" aria-modal="true" aria-labelledby="incompleteTitle">
   <div class="modal-card">
@@ -809,7 +842,49 @@
     });
   }
 
+  function hasStudentName() {
+    return Boolean(document.getElementById("studentName").value.trim());
+  }
+
+  function updateNameStatus() {
+    const input = document.getElementById("studentName");
+    const hint = document.getElementById("nameHint");
+    const ok = hasStudentName();
+    input.classList.toggle("name-needed", !ok);
+    hint.classList.toggle("ready", ok);
+    hint.textContent = ok ? "✓ Name entered" : "Enter your name before starting";
+  }
+
+  function requireStudentName(e) {
+    if (isTeacherMode || hasStudentName()) return true;
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+    if (document.activeElement && typeof document.activeElement.blur === "function") {
+      document.activeElement.blur();
+    }
+    const modalInput = document.getElementById("modalNameInput");
+    modalInput.value = "";
+    document.getElementById("nameModalError").textContent = "";
+    openModal("nameModal");
+    setTimeout(() => modalInput.focus(), 50);
+    return false;
+  }
+
+  function confirmStudentName() {
+    const val = document.getElementById("modalNameInput").value.trim();
+    if (!val) {
+      document.getElementById("nameModalError").textContent = "Please type your full name to continue.";
+      return;
+    }
+    document.getElementById("studentName").value = val;
+    updateNameStatus();
+    closeModal("nameModal");
+  }
+
   function pickChip(qid, text) {
+    if (!requireStudentName()) return;
     const emptyIdx = chainState[qid].indexOf(null);
     if (emptyIdx === -1) return;
     chainState[qid][emptyIdx] = text;
@@ -895,6 +970,7 @@
 
   function getIncompleteQuestions() {
     const missing = [];
+    if (!hasStudentName()) missing.push("Student Name");
     if (!document.querySelector('input[name="q1"]:checked')) missing.push("Q1");
     if (chainState.q2.includes(null)) missing.push("Q2 (all 3 chain slots)");
     if (!document.querySelector('input[name="q3"]:checked')) missing.push("Q3");
@@ -1065,9 +1141,24 @@
     if (wasEditing) setEditMode(true);
   }
 
-  // Allow Enter key in PIN modal
+  // Allow Enter key in PIN and Name modals
   document.getElementById("pinInput").addEventListener("keydown", (e) => {
     if (e.key === "Enter") submitTeacherPin();
+  });
+  document.getElementById("modalNameInput").addEventListener("keydown", (e) => {
+    if (e.key === "Enter") confirmStudentName();
+  });
+  document.getElementById("studentName").addEventListener("input", updateNameStatus);
+
+  // Direct students to enter their name before attempting any question
+  document.querySelectorAll('.q-block input[type="radio"]').forEach((r) => {
+    r.addEventListener("click", (e) => {
+      if (!requireStudentName(e)) r.checked = false;
+    });
+  });
+  document.querySelectorAll(".q-block .req-answer").forEach((el) => {
+    el.addEventListener("focus", (e) => requireStudentName(e));
+    el.addEventListener("mousedown", (e) => requireStudentName(e));
   });
 
   // Close modals on backdrop click
@@ -1078,6 +1169,7 @@
   });
 
   document.getElementById("assessDate").valueAsDate = new Date();
+  updateNameStatus();
   loadTeacherEdits();
   renderChain("q2");
   renderChain("q4");
