@@ -1471,16 +1471,35 @@
         body.innerHTML = "<p>No student submissions recorded yet.</p>";
         return;
       }
-      let tbl = `<table><thead><tr><th>Student</th><th>Date</th><th>Scores (A / B / C / Total)</th><th>Recorded Misconceptions</th></tr></thead><tbody>`;
+      let tbl = `<table><thead><tr><th>Student</th><th>Date</th><th>Scores (A / B / C / Total)</th><th>Recorded Misconceptions &amp; Full Answers</th></tr></thead><tbody>`;
       subs.forEach((s) => {
         const miscText = (s.misconceptions || [])
           .map((m) => `<div><strong>${escapeHtml(m.topic)}:</strong> ${escapeHtml(m.misconceptionNote)}</div>`)
           .join("");
+        const a = s.answers || {};
+        const secA = a.sectionA || {};
+        const secB = a.sectionB || {};
+        const q6 = secB.q6 || {};
+        const q8a = secB.q8a || {};
+        const secC = a.sectionC || {};
+        const qf = s.aiResult?.questionFeedback || {};
         tbl += `<tr>
           <td><strong>${escapeHtml(s.studentName)}</strong></td>
           <td>${escapeHtml(s.assessDate || s.createdAt?.slice(0, 10) || "")}</td>
           <td>A: ${s.sectionAScore}/10 &bull; B: ${s.sectionBScore}/12 &bull; C: ${s.sectionCScore}/8<br><strong>Total: ${s.totalScore}/30</strong></td>
-          <td>${miscText || "None recorded"}</td>
+          <td>
+            ${miscText || "None recorded"}
+            <details style="margin-top:8px;">
+              <summary style="cursor:pointer; font-weight:700; color:var(--vco);">View Full Submitted Answers &amp; Feedback</summary>
+              <div style="margin-top:8px; padding:10px; background:#fff; border:1px solid var(--border); border-radius:8px; font-size:13px;">
+                <p style="margin:0 0 6px;"><strong>Section A:</strong> Q1=${escapeHtml(secA.q1 || "-")} | Q2=${escapeHtml((secA.q2 || []).join(" → "))} | Q3=${escapeHtml(secA.q3 || "-")} | Q4=${escapeHtml((secA.q4 || []).join(" → "))} | Q5=${escapeHtml(secA.q5 || "-")}</p>
+                <p style="margin:0 0 6px;"><strong>Q6 Synth Bass:</strong> VCO: ${escapeHtml(q6.vcoSetting)} (${escapeHtml(q6.vcoReason)}) | Slope: ${escapeHtml(q6.slopeSetting)} (${escapeHtml(q6.slopeReason)}) | Cutoff: ${escapeHtml(q6.cutoffSetting)} (${escapeHtml(q6.cutoffReason)}) | Res: ${escapeHtml(q6.resSetting)} (${escapeHtml(q6.resReason)})<br><em>Feedback:</em> ${escapeHtml(qf.q6 || "")}</p>
+                <p style="margin:0 0 6px;"><strong>Q7(a):</strong> ${escapeHtml(secB.q7a || "")}<br><strong>Q7(b):</strong> ${escapeHtml(secB.q7b || "")}<br><em>Feedback:</em> ${escapeHtml(qf.q7 || "")}</p>
+                <p style="margin:0 0 6px;"><strong>Q8(a):</strong> Pitch=${escapeHtml(q8a.pitch)}, Amp=${escapeHtml(q8a.amp)}, Cutoff=${escapeHtml(q8a.cutoff)}<br><strong>Q8(b):</strong> ${escapeHtml(secB.q8b || "")}<br><em>Feedback:</em> ${escapeHtml(qf.q8 || "")}</p>
+                <p style="margin:0;"><strong>Q9 Essay:</strong> ${escapeHtml(secC.q9 || "")}<br><em>Feedback:</em> ${escapeHtml(qf.q9 || "")}</p>
+              </div>
+            </details>
+          </td>
         </tr>`;
       });
       tbl += `</tbody></table>`;
