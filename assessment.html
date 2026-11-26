@@ -408,6 +408,81 @@
   }
   .pin-error { color: var(--danger); font-size: 13px; font-weight: 600; min-height: 18px; margin-bottom: 10px; }
 
+  /* AI Feedback & Follow-Up Panel */
+  .ai-results-panel {
+    display: none;
+    background: var(--surface);
+    border: 2px solid var(--vco);
+    border-radius: var(--radius);
+    padding: 24px 26px;
+    margin-bottom: 20px;
+    box-shadow: var(--shadow);
+  }
+  .ai-results-panel.show { display: block; }
+  .ai-score-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+    margin: 14px 0 18px;
+  }
+  @media (max-width: 680px) { .ai-score-grid { grid-template-columns: repeat(2, 1fr); } }
+  .ai-score-box {
+    background: #eff6ff;
+    border: 1px solid #bfdbfe;
+    border-radius: 10px;
+    padding: 10px 12px;
+    text-align: center;
+  }
+  .ai-score-box strong { display: block; font-size: 11px; text-transform: uppercase; color: var(--vco); letter-spacing: 0.05em; }
+  .ai-score-box span { font-size: 20px; font-weight: 800; color: var(--ink); }
+  .ai-subcard {
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 16px;
+    margin-bottom: 12px;
+    background: #fcfdff;
+  }
+  .misc-pill {
+    display: inline-block;
+    font-size: 11.5px;
+    font-weight: 700;
+    padding: 3px 9px;
+    border-radius: 999px;
+    background: #fef2f2;
+    color: #991b1b;
+    border: 1px solid #fecaca;
+    margin-right: 6px;
+  }
+  .guide-link {
+    display: inline-block;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--vco);
+    text-decoration: none;
+    margin-left: 6px;
+  }
+  .guide-link:hover { text-decoration: underline; }
+  .followup-reveal {
+    display: none;
+    margin-top: 8px;
+    padding: 10px 12px;
+    border-radius: 8px;
+    background: #f0fdf4;
+    border: 1px solid #bbf7d0;
+    color: #166534;
+    font-size: 13.5px;
+  }
+  .followup-reveal.show { display: block; }
+  .teacher-submissions-panel {
+    display: none;
+    background: #fffbeb;
+    border: 1.5px solid #f59e0b;
+    border-radius: 14px;
+    padding: 18px 20px;
+    margin-bottom: 18px;
+  }
+  .teacher-submissions-panel.show { display: block; }
+
   footer { text-align: center; color: var(--muted); font-size: 12.5px; margin-top: 28px; }
 
   @media print {
@@ -437,12 +512,22 @@
       &#x2705; Teacher Mode Active — Mark Scheme unlocked. Click any highlighted question or mark scheme to edit directly on the page.
     </div>
     <div class="teacher-bar-actions">
+      <button class="btn btn-primary" onclick="loadTeacherSubmissions()">View Student Submissions</button>
       <button class="btn btn-amber" id="toggleEditBtn" onclick="toggleEditMode()">Edit Mode: ON</button>
       <button class="btn btn-green" onclick="saveTeacherEdits()">Save Edits</button>
       <button class="btn btn-primary" onclick="downloadUpdatedHtml()">Download Updated HTML</button>
       <button class="btn" onclick="resetTeacherEdits()">Reset Defaults</button>
       <button class="btn btn-danger" onclick="lockTeacherMode()">Lock Teacher Mode</button>
     </div>
+  </div>
+
+  <!-- TEACHER SUBMISSIONS DRAWER -->
+  <div class="teacher-submissions-panel no-print" id="teacherSubmissionsPanel">
+    <div style="display:flex; justify-content:space-between; align-items:center; gap:10px; margin-bottom:10px;">
+      <h3 style="margin:0;">Recent Student Submissions &amp; Recorded Misconceptions</h3>
+      <button class="btn" onclick="document.getElementById('teacherSubmissionsPanel').classList.remove('show')">Close</button>
+    </div>
+    <div id="teacherSubmissionsBody">Loading...</div>
   </div>
 
   <header class="hero">
@@ -729,13 +814,21 @@
 
   <!-- BOTTOM ACTION BAR -->
   <div class="bottom-actions no-print">
-    <p><strong>Finished all questions?</strong> Check Section A, then reveal the Teacher Mark Scheme to self-assess Sections B &amp; C.</p>
+    <p><strong>Finished all questions?</strong> Submit for AI marking, recorded misconceptions, and bespoke follow-up questions.</p>
     <div style="display:flex; gap:8px; flex-wrap:wrap;">
-      <button class="btn btn-primary" onclick="markSectionA()">Mark Section A</button>
+      <button class="btn btn-primary" id="submitAiBtn" onclick="submitAssessmentForAI()">Submit for AI Marking &amp; Follow-Up</button>
       <button class="btn btn-amber js-ms-toggle" onclick="toggleMarkScheme()">Show Teacher Mark Scheme</button>
       <button class="btn" onclick="window.print()">Print / Save PDF</button>
     </div>
   </div>
+
+  <!-- AI GRADED FEEDBACK & BESPOKE FOLLOW-UP PANEL -->
+  <section class="ai-results-panel" id="aiResultsPanel" aria-live="polite">
+    <span class="section-tag">TeachAssist AI Marker &bull; Personalised Follow-Up</span>
+    <h2 id="aiResultsHeading">Your Assessment Feedback &amp; Bespoke Follow-Up</h2>
+    <div class="ai-score-grid" id="aiScoreGrid"></div>
+    <div id="aiFeedbackBody"></div>
+  </section>
 
   <footer>RJC Audio &bull; Basic Synthesis Assessment &bull; Grounded in A-Level Music Technology Interactive Guides 1–3</footer>
 </div>
@@ -782,6 +875,7 @@
 <script>
   const TEACHER_PIN = "01823";
   const STORAGE_KEY_EDITS = "synth_assessment_teacher_edits_v1";
+  const STORAGE_KEY_DRAFT = "synth_assessment_draft_v1";
 
   const CHAINS = {
     q2: {
@@ -1141,6 +1235,244 @@
     if (wasEditing) setEditMode(true);
   }
 
+  function collectAllAnswers() {
+    const q6Inputs = document.querySelectorAll('#q6 input.field-input');
+    const q8aInputs = document.querySelectorAll('#q8 input.field-input');
+    const q7Areas = document.querySelectorAll('#q7 textarea');
+    const q8bArea = document.querySelector('#q8 textarea');
+    const q9Area = document.querySelector('#q9 textarea');
+
+    const secAScoreText = document.getElementById("scoreBadge").textContent || "";
+    const secAMatch = secAScoreText.match(/(\d+)\s*\/\s*10/);
+    const scoreA = secAMatch ? parseInt(secAMatch[1], 10) : 0;
+
+    return {
+      studentName: document.getElementById("studentName").value.trim(),
+      assessDate: document.getElementById("assessDate").value,
+      sectionA: {
+        score: scoreA,
+        q1: document.querySelector('input[name="q1"]:checked')?.value || null,
+        q2: [...chainState.q2],
+        q3: document.querySelector('input[name="q3"]:checked')?.value || null,
+        q4: [...chainState.q4],
+        q5: document.querySelector('input[name="q5"]:checked')?.value || null
+      },
+      sectionB: {
+        q6: {
+          vcoSetting: q6Inputs[0]?.value.trim() || "",
+          vcoReason: q6Inputs[1]?.value.trim() || "",
+          slopeSetting: q6Inputs[2]?.value.trim() || "",
+          slopeReason: q6Inputs[3]?.value.trim() || "",
+          cutoffSetting: q6Inputs[4]?.value.trim() || "",
+          cutoffReason: q6Inputs[5]?.value.trim() || "",
+          resSetting: q6Inputs[6]?.value.trim() || "",
+          resReason: q6Inputs[7]?.value.trim() || ""
+        },
+        q7a: q7Areas[0]?.value.trim() || "",
+        q7b: q7Areas[1]?.value.trim() || "",
+        q8a: {
+          pitch: q8aInputs[0]?.value.trim() || "",
+          amp: q8aInputs[1]?.value.trim() || "",
+          cutoff: q8aInputs[2]?.value.trim() || ""
+        },
+        q8b: q8bArea?.value.trim() || ""
+      },
+      sectionC: {
+        q9: q9Area?.value.trim() || ""
+      }
+    };
+  }
+
+  function saveDraft() {
+    try {
+      const payload = collectAllAnswers();
+      localStorage.setItem(STORAGE_KEY_DRAFT, JSON.stringify(payload));
+    } catch (_) {}
+  }
+
+  function loadDraft() {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY_DRAFT);
+      if (!raw) return;
+      const d = JSON.parse(raw);
+      if (d.studentName) document.getElementById("studentName").value = d.studentName;
+      if (d.assessDate) document.getElementById("assessDate").value = d.assessDate;
+      ["q1", "q3", "q5"].forEach((q) => {
+        const val = d.sectionA?.[q];
+        if (val) {
+          const r = document.querySelector(`input[name="${q}"][value="${val}"]`);
+          if (r) r.checked = true;
+        }
+      });
+      if (Array.isArray(d.sectionA?.q2) && d.sectionA.q2.length === 3) chainState.q2 = d.sectionA.q2;
+      if (Array.isArray(d.sectionA?.q4) && d.sectionA.q4.length === 3) chainState.q4 = d.sectionA.q4;
+
+      const q6Inputs = document.querySelectorAll('#q6 input.field-input');
+      const q6 = d.sectionB?.q6 || {};
+      const q6Keys = ["vcoSetting","vcoReason","slopeSetting","slopeReason","cutoffSetting","cutoffReason","resSetting","resReason"];
+      q6Keys.forEach((k, i) => { if (q6Inputs[i] && q6[k]) q6Inputs[i].value = q6[k]; });
+
+      const q7Areas = document.querySelectorAll('#q7 textarea');
+      if (q7Areas[0] && d.sectionB?.q7a) q7Areas[0].value = d.sectionB.q7a;
+      if (q7Areas[1] && d.sectionB?.q7b) q7Areas[1].value = d.sectionB.q7b;
+
+      const q8aInputs = document.querySelectorAll('#q8 input.field-input');
+      if (q8aInputs[0] && d.sectionB?.q8a?.pitch) q8aInputs[0].value = d.sectionB.q8a.pitch;
+      if (q8aInputs[1] && d.sectionB?.q8a?.amp) q8aInputs[1].value = d.sectionB.q8a.amp;
+      if (q8aInputs[2] && d.sectionB?.q8a?.cutoff) q8aInputs[2].value = d.sectionB.q8a.cutoff;
+
+      const q8bArea = document.querySelector('#q8 textarea');
+      if (q8bArea && d.sectionB?.q8b) q8bArea.value = d.sectionB.q8b;
+
+      const q9Area = document.querySelector('#q9 textarea');
+      if (q9Area && d.sectionC?.q9) q9Area.value = d.sectionC.q9;
+    } catch (_) {}
+  }
+
+  function escapeHtml(str) {
+    return String(str ?? "")
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;");
+  }
+
+  async function submitAssessmentForAI() {
+    if (!isTeacherMode) {
+      const missing = getIncompleteQuestions();
+      if (missing.length > 0) {
+        document.getElementById("missingList").innerHTML =
+          `<strong>Still to complete:</strong> ${missing.join(", ")}`;
+        openModal("incompleteModal");
+        return;
+      }
+    } else if (!hasStudentName()) {
+      requireStudentName();
+      return;
+    }
+
+    markSectionA();
+    saveDraft();
+    const payload = collectAllAnswers();
+    const btn = document.getElementById("submitAiBtn");
+    const origText = btn.textContent;
+    btn.disabled = true;
+    btn.textContent = "Marking with AI & Generating Follow-Up...";
+
+    try {
+      const res = await fetch("/api/v1/assessment-submit", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Submission failed");
+      renderAiResults(data);
+    } catch (err) {
+      alert("Could not reach the AI marker: " + err.message);
+    } finally {
+      btn.disabled = false;
+      btn.textContent = origText;
+    }
+  }
+
+  function renderAiResults(data) {
+    const panel = document.getElementById("aiResultsPanel");
+    document.getElementById("aiResultsHeading").textContent =
+      `Personalised Feedback & Follow-Up for ${data.studentName}`;
+
+    document.getElementById("aiScoreGrid").innerHTML = `
+      <div class="ai-score-box"><strong>Total Score</strong><span>${data.totalScore} / ${data.maxScore}</span></div>
+      <div class="ai-score-box"><strong>Section A</strong><span>${data.sectionAScore} / 10</span></div>
+      <div class="ai-score-box"><strong>Section B</strong><span>${data.sectionBScore} / 12</span></div>
+      <div class="ai-score-box"><strong>Section C</strong><span>${data.sectionCScore} / 8</span></div>
+    `;
+
+    const qf = data.questionFeedback || {};
+    const qs = data.qScores || {};
+    let html = `
+      <div class="ai-subcard">
+        <h3>Written Answer Feedback (Sections B &amp; C)</h3>
+        <p><strong>Q6 Synth Bass (${qs.q6 ?? 0}/4):</strong> ${escapeHtml(qf.q6 || "")}</p>
+        <p><strong>Q7 Audio vs CV &amp; 1V/Oct (${qs.q7 ?? 0}/4):</strong> ${escapeHtml(qf.q7 || "")}</p>
+        <p><strong>Q8 LFO &amp; Dual Envelopes (${qs.q8 ?? 0}/4):</strong> ${escapeHtml(qf.q8 || "")}</p>
+        <p style="margin-bottom:0;"><strong>Q9 Extended Evaluation (${qs.q9 ?? 0}/8):</strong> ${escapeHtml(qf.q9 || "")}</p>
+      </div>
+    `;
+
+    if (Array.isArray(data.misconceptions) && data.misconceptions.length > 0) {
+      html += `<div class="ai-subcard"><h3>Recorded Misconceptions &amp; Focus Areas</h3><ul style="margin:6px 0 0 18px; padding:0;">`;
+      data.misconceptions.forEach((m) => {
+        html += `<li style="margin-bottom:6px;"><span class="misc-pill">${escapeHtml(m.topic)}</span> ${escapeHtml(m.misconceptionNote)} <a class="guide-link" href="${escapeHtml(m.guideUrl || "/guide1")}">Review Guide &rarr;</a></li>`;
+      });
+      html += `</ul></div>`;
+    }
+
+    if (Array.isArray(data.followUpQuestions) && data.followUpQuestions.length > 0) {
+      html += `<div class="ai-subcard"><h3>Bespoke Follow-Up Practice Questions</h3>`;
+      data.followUpQuestions.forEach((fq, idx) => {
+        html += `
+          <div style="padding:10px 0; ${idx > 0 ? "border-top:1px solid var(--border);" : ""}">
+            <p style="margin:0 0 6px;"><strong>Follow-Up ${idx + 1} (${escapeHtml(fq.topic)}):</strong> ${escapeHtml(fq.question)} <a class="guide-link" href="${escapeHtml(fq.guideUrl || "/guide1")}">Open Guide &rarr;</a></p>
+            <textarea placeholder="Write your follow-up answer here..." style="min-height:62px; margin-bottom:6px;"></textarea>
+            <div style="display:flex; gap:8px; flex-wrap:wrap;">
+              <button type="button" class="btn" onclick="this.parentElement.nextElementSibling.classList.toggle('show')">Hint</button>
+              <button type="button" class="btn btn-amber" onclick="this.parentElement.nextElementSibling.nextElementSibling.classList.toggle('show')">Reveal Model Answer</button>
+            </div>
+            <div class="followup-reveal" style="background:#fffbeb; border-color:#fde68a; color:#78350f;"><strong>Hint:</strong> ${escapeHtml(fq.hint)}</div>
+            <div class="followup-reveal"><strong>Model Answer:</strong> ${escapeHtml(fq.modelAnswer)}</div>
+          </div>
+        `;
+      });
+      html += `</div>`;
+    }
+
+    if (Array.isArray(data.revisionNotes) && data.revisionNotes.length > 0) {
+      html += `<div class="ai-subcard" style="margin-bottom:0;"><h3>Tailored Revision Notes</h3><ul style="margin:6px 0 0 18px; padding:0;">`;
+      data.revisionNotes.forEach((rn) => {
+        html += `<li style="margin-bottom:6px;"><strong>${escapeHtml(rn.title)}:</strong> ${escapeHtml(rn.note)} <a class="guide-link" href="${escapeHtml(rn.guideUrl || "/guide1")}">Open Guide &rarr;</a></li>`;
+      });
+      html += `</ul></div>`;
+    }
+
+    document.getElementById("aiFeedbackBody").innerHTML = html;
+    panel.classList.add("show");
+    panel.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+
+  async function loadTeacherSubmissions() {
+    const panel = document.getElementById("teacherSubmissionsPanel");
+    const body = document.getElementById("teacherSubmissionsBody");
+    panel.classList.add("show");
+    body.textContent = "Loading submissions from D1...";
+    try {
+      const res = await fetch(`/api/v1/assessment-submit?pin=${encodeURIComponent(TEACHER_PIN)}`);
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Failed to load");
+      const subs = data.submissions || [];
+      if (subs.length === 0) {
+        body.innerHTML = "<p>No student submissions recorded yet.</p>";
+        return;
+      }
+      let tbl = `<table><thead><tr><th>Student</th><th>Date</th><th>Scores (A / B / C / Total)</th><th>Recorded Misconceptions</th></tr></thead><tbody>`;
+      subs.forEach((s) => {
+        const miscText = (s.misconceptions || [])
+          .map((m) => `<div><strong>${escapeHtml(m.topic)}:</strong> ${escapeHtml(m.misconceptionNote)}</div>`)
+          .join("");
+        tbl += `<tr>
+          <td><strong>${escapeHtml(s.studentName)}</strong></td>
+          <td>${escapeHtml(s.assessDate || s.createdAt?.slice(0, 10) || "")}</td>
+          <td>A: ${s.sectionAScore}/10 &bull; B: ${s.sectionBScore}/12 &bull; C: ${s.sectionCScore}/8<br><strong>Total: ${s.totalScore}/30</strong></td>
+          <td>${miscText || "None recorded"}</td>
+        </tr>`;
+      });
+      tbl += `</tbody></table>`;
+      body.innerHTML = tbl;
+    } catch (err) {
+      body.textContent = "Error loading submissions: " + err.message;
+    }
+  }
+
   // Allow Enter key in PIN and Name modals
   document.getElementById("pinInput").addEventListener("keydown", (e) => {
     if (e.key === "Enter") submitTeacherPin();
@@ -1169,10 +1501,15 @@
   });
 
   document.getElementById("assessDate").valueAsDate = new Date();
+  loadDraft();
   updateNameStatus();
   loadTeacherEdits();
   renderChain("q2");
   renderChain("q4");
+
+  // Auto-save student progress locally
+  document.addEventListener("input", saveDraft);
+  document.addEventListener("change", saveDraft);
 </script>
 </body>
 </html>
