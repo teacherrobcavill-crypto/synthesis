@@ -58,6 +58,37 @@
   }
   .series-links a:hover { color: var(--vco); border-color: var(--vco); background: #eff6ff; }
 
+  /* Teacher Mode Banner */
+  .teacher-bar {
+    display: none;
+    background: #fef3c7;
+    border: 1.5px solid #f59e0b;
+    color: #78350f;
+    border-radius: 12px;
+    padding: 12px 16px;
+    margin-bottom: 16px;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 10px;
+    box-shadow: var(--shadow);
+  }
+  body.teacher-mode .teacher-bar { display: flex; }
+  .teacher-bar-info { font-size: 13.5px; font-weight: 600; }
+  .teacher-bar-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+
+  body.teacher-editing .editable {
+    outline: 2px dashed #f59e0b;
+    outline-offset: 3px;
+    border-radius: 6px;
+    background: rgba(254, 243, 199, 0.35);
+    cursor: text;
+  }
+  body.teacher-editing .editable:focus {
+    outline: 2px solid #d97706;
+    background: #fffbeb;
+  }
+
   header.hero {
     background: linear-gradient(135deg, #0f172a 0%, #1e293b 55%, #1d4ed8 100%);
     color: #fff;
@@ -152,6 +183,10 @@
   .btn-ghost:hover { background: rgba(255,255,255,0.24); }
   .btn-amber { background: #d97706; border-color: #d97706; color: #fff; }
   .btn-amber:hover { background: #b45309; }
+  .btn-green { background: #16a34a; border-color: #16a34a; color: #fff; }
+  .btn-green:hover { background: #15803d; }
+  .btn-danger { background: #dc2626; border-color: #dc2626; color: #fff; }
+  .btn-danger:hover { background: #b91c1c; }
 
   section.card {
     background: var(--surface);
@@ -293,12 +328,73 @@
   body.show-ms .mark-scheme { display: block; }
   .mark-scheme strong { color: #92400e; }
 
+  .bottom-actions {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 20px 24px;
+    margin-bottom: 20px;
+    box-shadow: var(--shadow);
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+  }
+  .bottom-actions p { margin: 0; font-size: 14px; color: var(--ink-soft); }
+
+  /* Modals */
+  .modal-backdrop {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.58);
+    backdrop-filter: blur(3px);
+    z-index: 100;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
+  .modal-backdrop.open { display: flex; }
+  .modal-card {
+    background: #fff;
+    border-radius: 16px;
+    max-width: 440px;
+    width: 100%;
+    padding: 24px 26px;
+    box-shadow: 0 20px 50px rgba(15, 23, 42, 0.35);
+    border: 1px solid var(--border);
+  }
+  .modal-card h3 { margin: 0 0 8px; font-size: 18px; }
+  .modal-card p { margin: 0 0 14px; color: var(--ink-soft); font-size: 14.5px; }
+  .modal-missing {
+    background: #fef2f2;
+    border: 1px solid #fecaca;
+    color: #991b1b;
+    border-radius: 9px;
+    padding: 10px 12px;
+    font-size: 13px;
+    margin-bottom: 16px;
+  }
+  .modal-actions { display: flex; justify-content: flex-end; gap: 8px; flex-wrap: wrap; }
+  .pin-input {
+    width: 100%;
+    border: 1.5px solid #cbd5e1;
+    border-radius: 10px;
+    padding: 10px 12px;
+    font-size: 18px;
+    letter-spacing: 0.25em;
+    text-align: center;
+    margin-bottom: 10px;
+  }
+  .pin-error { color: var(--danger); font-size: 13px; font-weight: 600; min-height: 18px; margin-bottom: 10px; }
+
   footer { text-align: center; color: var(--muted); font-size: 12.5px; margin-top: 28px; }
 
   @media print {
     body { background: #fff; font-size: 12.5px; }
     .container { max-width: 100%; padding: 0; }
-    .series-bar, .score-bar, .hero-actions, .no-print { display: none !important; }
+    .series-bar, .teacher-bar, .score-bar, .hero-actions, .bottom-actions, .modal-backdrop, .no-print { display: none !important; }
     header.hero { background: #0f172a !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
     section.card, .q-block { box-shadow: none; break-inside: avoid; }
   }
@@ -316,16 +412,31 @@
     </div>
   </nav>
 
+  <!-- TEACHER MODE BAR -->
+  <div class="teacher-bar no-print" id="teacherBar">
+    <div class="teacher-bar-info">
+      &#x2705; Teacher Mode Active — Mark Scheme unlocked. Click any highlighted question or mark scheme to edit directly on the page.
+    </div>
+    <div class="teacher-bar-actions">
+      <button class="btn btn-amber" id="toggleEditBtn" onclick="toggleEditMode()">Edit Mode: ON</button>
+      <button class="btn btn-green" onclick="saveTeacherEdits()">Save Edits</button>
+      <button class="btn btn-primary" onclick="downloadUpdatedHtml()">Download Updated HTML</button>
+      <button class="btn" onclick="resetTeacherEdits()">Reset Defaults</button>
+      <button class="btn btn-danger" onclick="lockTeacherMode()">Lock Teacher Mode</button>
+    </div>
+  </div>
+
   <header class="hero">
     <div class="hero-top">
       <div>
         <div class="hero-badge">A-Level Music Technology (Edexcel 9MT0) &bull; Guides 1–3 Assessment</div>
-        <h1>Basic Synthesis Assessment</h1>
-        <p class="subtitle">Grounded in Interactive Synthesis Guides 1, 2 &amp; 3: Subtractive Waveforms &amp; Filters, 1960s Moog Modular Audio vs. CV/LFO/Dual Envelopes, and the 1970 Minimoog Model D to Modern DAW Plugins.</p>
+        <h1 class="editable" data-edit-id="hero-title">Basic Synthesis Assessment</h1>
+        <p class="subtitle editable" data-edit-id="hero-sub">Grounded in Interactive Synthesis Guides 1, 2 &amp; 3: Subtractive Waveforms &amp; Filters, 1960s Moog Modular Audio vs. CV/LFO/Dual Envelopes, and the 1970 Minimoog Model D to Modern DAW Plugins.</p>
       </div>
       <div class="hero-actions no-print">
         <button class="btn btn-ghost" onclick="window.print()">Print / Save PDF</button>
-        <button class="btn btn-amber" id="toggleMsBtn" onclick="toggleMarkScheme()">Show Teacher Mark Scheme</button>
+        <button class="btn btn-amber js-ms-toggle" onclick="toggleMarkScheme()">Show Teacher Mark Scheme</button>
+        <button class="btn btn-ghost" id="teacherPinBtn" onclick="openPinModal()">&#x1F512; Teacher PIN</button>
       </div>
     </div>
     <div class="meta-grid">
@@ -351,44 +462,47 @@
   <!-- SECTION A -->
   <section class="card">
     <span class="section-tag">Section A &bull; Diagnostic Concept Checks</span>
-    <h2>1. Auto-Marked Concept &amp; Misconception Checks (10 marks)</h2>
-    <p class="prompt">Complete all 5 diagnostic checks below, then click <strong>Mark Section A</strong> for instant Socratic feedback.</p>
+    <h2 class="editable" data-edit-id="secA-title">1. Auto-Marked Concept &amp; Misconception Checks (10 marks)</h2>
+    <p class="prompt editable" data-edit-id="secA-intro">Complete all 5 diagnostic checks below, then click <strong>Mark Section A</strong> for instant Socratic feedback.</p>
 
     <!-- Q1 -->
     <div class="q-block" id="q1">
       <div class="q-head">
-        <h3>Q1. Waveforms, Harmonics &amp; The Golden Rule (Guide 1)</h3>
+        <h3 class="editable" data-edit-id="q1-title">Q1. Waveforms, Harmonics &amp; The Golden Rule (Guide 1)</h3>
         <span class="marks">2 marks</span>
       </div>
-      <p class="prompt">Following Guide 1's <strong>Golden Rule of Subtractive Synthesis</strong>, why do producers start with a <strong>Sawtooth</strong> wave rather than a <strong>Sine</strong> wave when programming bright 1980s synth brass?</p>
+      <p class="prompt editable" data-edit-id="q1-prompt">Following Guide 1's <strong>Golden Rule of Subtractive Synthesis</strong>, why do producers start with a <strong>Sawtooth</strong> wave rather than a <strong>Sine</strong> wave when programming bright 1980s synth brass?</p>
       <div class="options-list">
         <label class="option-card" data-correct="true" data-nudge="Correct! Sawtooth waves contain all odd and even harmonics, giving the filter rich upper overtones to carve away.">
           <input type="radio" name="q1" value="A" />
-          <span><strong>A.</strong> A sawtooth wave contains all odd and even harmonics, giving the filter rich upper frequencies to sculpt, whereas a sine wave has only the fundamental.</span>
+          <span class="editable" data-edit-id="q1-optA"><strong>A.</strong> A sawtooth wave contains all odd and even harmonics, giving the filter rich upper frequencies to sculpt, whereas a sine wave has only the fundamental.</span>
         </label>
         <label class="option-card" data-correct="false" data-nudge="Think about harmonic partials above the fundamental rather than VCA output voltage. What is missing from a sine wave's spectrum?">
           <input type="radio" name="q1" value="B" />
-          <span><strong>B.</strong> A sine wave outputs lower voltage than a sawtooth wave and cannot open the VCA.</span>
+          <span class="editable" data-edit-id="q1-optB"><strong>B.</strong> A sine wave outputs lower voltage than a sawtooth wave and cannot open the VCA.</span>
         </label>
         <label class="option-card" data-correct="false" data-nudge="Recall the Golden Rule: a subtractive filter can only attenuate harmonics already present — it cannot invent new ones.">
           <input type="radio" name="q1" value="C" />
-          <span><strong>C.</strong> A low-pass filter invents extra harmonics on a sawtooth wave that it refuses to add to a sine wave.</span>
+          <span class="editable" data-edit-id="q1-optC"><strong>C.</strong> A low-pass filter invents extra harmonics on a sawtooth wave that it refuses to add to a sine wave.</span>
         </label>
         <label class="option-card" data-correct="false" data-nudge="Check which waveform actually has odd harmonics only and a hollow clarinet-like tone — that's a Square wave, not a Sawtooth.">
           <input type="radio" name="q1" value="D" />
-          <span><strong>D.</strong> A sawtooth wave contains only odd harmonics, which makes it sound hollow like a clarinet.</span>
+          <span class="editable" data-edit-id="q1-optD"><strong>D.</strong> A sawtooth wave contains only odd harmonics, which makes it sound hollow like a clarinet.</span>
         </label>
       </div>
       <div class="feedback" id="fb-q1"></div>
+      <div class="mark-scheme editable" data-edit-id="ms-q1">
+        <strong>Mark Scheme (2 marks):</strong> Correct answer is <strong>A</strong>. Sawtooth waves contain all odd and even harmonics, whereas a sine wave contains only the fundamental frequency (no upper harmonics for the filter to subtract).
+      </div>
     </div>
 
     <!-- Q2 -->
     <div class="q-block" id="q2">
       <div class="q-head">
-        <h3>Q2. Filter Resonance / Emphasis Chain (Guides 1 &amp; 3)</h3>
+        <h3 class="editable" data-edit-id="q2-title">Q2. Filter Resonance / Emphasis Chain (Guides 1 &amp; 3)</h3>
         <span class="marks">2 marks</span>
       </div>
-      <p class="prompt">Click chips in order to build the <strong>Cause &rarr; Mechanism &rarr; Sonic Impact</strong> chain for raising <strong>Resonance (Emphasis)</strong> on a low-pass filter. (Leave the 2 distractors unused.)</p>
+      <p class="prompt editable" data-edit-id="q2-prompt">Click chips in order to build the <strong>Cause &rarr; Mechanism &rarr; Sonic Impact</strong> chain for raising <strong>Resonance (Emphasis)</strong> on a low-pass filter. (Leave the 2 distractors unused.)</p>
       <div class="chain-area" id="q2-slots">
         <div class="chain-slot" data-slot="0" onclick="clearSlot('q2',0)"><div class="slot-label">1. Cause</div><div class="slot-val">Click a chip below…</div></div>
         <div class="chain-slot" data-slot="1" onclick="clearSlot('q2',1)"><div class="slot-label">2. Mechanism</div><div class="slot-val">Click a chip below…</div></div>
@@ -396,43 +510,49 @@
       </div>
       <div class="chip-pool" id="q2-pool"></div>
       <div class="feedback" id="fb-q2"></div>
+      <div class="mark-scheme editable" data-edit-id="ms-q2">
+        <strong>Mark Scheme (2 marks):</strong> <em>Increase VCF Resonance (Q)</em> &rarr; <em>Boosts a narrow frequency band right at the cutoff point</em> &rarr; <em>Adds nasal punch or squelchy acid emphasis</em>.
+      </div>
     </div>
 
     <!-- Q3 -->
     <div class="q-block" id="q3">
       <div class="q-head">
-        <h3>Q3. 1960s Modular Patching: Audio vs. CV (Guide 2)</h3>
+        <h3 class="editable" data-edit-id="q3-title">Q3. 1960s Modular Patching: Audio vs. CV (Guide 2)</h3>
         <span class="marks">2 marks</span>
       </div>
-      <p class="prompt">On a 1960s Moog Modular, why must you patch <strong>ADSR &rarr; VCA</strong> in addition to the audio chain <strong>VCO &rarr; VCF &rarr; VCA</strong>?</p>
+      <p class="prompt editable" data-edit-id="q3-prompt">On a 1960s Moog Modular, why must you patch <strong>ADSR &rarr; VCA</strong> in addition to the audio chain <strong>VCO &rarr; VCF &rarr; VCA</strong>?</p>
       <div class="options-list">
         <label class="option-card" data-correct="false" data-nudge="Check which module generates audio versus control signals: the VCO generates the sawtooth wave, while the ADSR outputs a voltage contour.">
           <input type="radio" name="q3" value="A" />
-          <span><strong>A.</strong> The ADSR generates the audible sawtooth waveform and mixes it directly into the VCA output.</span>
+          <span class="editable" data-edit-id="q3-optA"><strong>A.</strong> The ADSR generates the audible sawtooth waveform and mixes it directly into the VCA output.</span>
         </label>
         <label class="option-card" data-correct="true" data-nudge="Correct! Oscillators run continuously, so a Gate-triggered ADSR control voltage is needed to open and close the VCA cleanly for every note.">
           <input type="radio" name="q3" value="B" />
-          <span><strong>B.</strong> The VCO oscillates continuously, so a Gate-triggered ADSR control voltage is needed to open and close the VCA cleanly for each note.</span>
+          <span class="editable" data-edit-id="q3-optB"><strong>B.</strong> The VCO oscillates continuously, so a Gate-triggered ADSR control voltage is needed to open and close the VCA cleanly for each note.</span>
         </label>
         <label class="option-card" data-correct="false" data-nudge="1V/Octave pitch CV goes to the VCO to control pitch; the VCA controls overall loudness over time.">
           <input type="radio" name="q3" value="C" />
-          <span><strong>C.</strong> The ADSR sends 1V/Octave pitch tuning to the VCA so the keyboard plays in tune.</span>
+          <span class="editable" data-edit-id="q3-optC"><strong>C.</strong> The ADSR sends 1V/Octave pitch tuning to the VCA so the keyboard plays in tune.</span>
         </label>
         <label class="option-card" data-correct="false" data-nudge="The VCF attenuates selected frequencies rather than gating final amplitude cleanly between notes.">
           <input type="radio" name="q3" value="D" />
-          <span><strong>D.</strong> It is optional because the VCF already stops the oscillator from humming between notes.</span>
+          <span class="editable" data-edit-id="q3-optD"><strong>D.</strong> It is optional because the VCF already stops the oscillator from humming between notes.</span>
         </label>
       </div>
       <div class="feedback" id="fb-q3"></div>
+      <div class="mark-scheme editable" data-edit-id="ms-q3">
+        <strong>Mark Scheme (2 marks):</strong> Correct answer is <strong>B</strong>. Because the VCO oscillates continuously, a Gate-triggered ADSR CV is required to open and close the VCA cleanly per note.
+      </div>
     </div>
 
     <!-- Q4 -->
     <div class="q-block" id="q4">
       <div class="q-head">
-        <h3>Q4. LFO Routing Chain: Pitch Vibrato (Guide 2)</h3>
+        <h3 class="editable" data-edit-id="q4-title">Q4. LFO Routing Chain: Pitch Vibrato (Guide 2)</h3>
         <span class="marks">2 marks</span>
       </div>
-      <p class="prompt">Click chips in order to build the <strong>Cause &rarr; Mechanism &rarr; Sonic Impact</strong> chain for patching a <strong>5 Hz sine LFO</strong> to the <strong>VCO pitch CV input</strong>. (Leave the 2 distractors unused.)</p>
+      <p class="prompt editable" data-edit-id="q4-prompt">Click chips in order to build the <strong>Cause &rarr; Mechanism &rarr; Sonic Impact</strong> chain for patching a <strong>5 Hz sine LFO</strong> to the <strong>VCO pitch CV input</strong>. (Leave the 2 distractors unused.)</p>
       <div class="chain-area" id="q4-slots">
         <div class="chain-slot" data-slot="0" onclick="clearSlot('q4',0)"><div class="slot-label">1. Cause</div><div class="slot-val">Click a chip below…</div></div>
         <div class="chain-slot" data-slot="1" onclick="clearSlot('q4',1)"><div class="slot-label">2. Mechanism</div><div class="slot-val">Click a chip below…</div></div>
@@ -440,98 +560,104 @@
       </div>
       <div class="chip-pool" id="q4-pool"></div>
       <div class="feedback" id="fb-q4"></div>
+      <div class="mark-scheme editable" data-edit-id="ms-q4">
+        <strong>Mark Scheme (2 marks):</strong> <em>Patch 5 Hz LFO &rarr; VCO pitch CV</em> &rarr; <em>Cyclically modulates oscillator frequency below 20 Hz</em> &rarr; <em>Produces expressive pitch vibrato on sustained notes</em>.
+      </div>
     </div>
 
     <!-- Q5 -->
     <div class="q-block" id="q5">
       <div class="q-head">
-        <h3>Q5. 1970 Minimoog Model D vs. Modern DAW Plugins (Guide 3)</h3>
+        <h3 class="editable" data-edit-id="q5-title">Q5. 1970 Minimoog Model D vs. Modern DAW Plugins (Guide 3)</h3>
         <span class="marks">2 marks</span>
       </div>
-      <p class="prompt">Why did the 1970 Minimoog Model D transform live performance compared with a 1960s Moog Modular, and what key limitation did it still share until modern DAW plugins arrived?</p>
+      <p class="prompt editable" data-edit-id="q5-prompt">Why did the 1970 Minimoog Model D transform live performance compared with a 1960s Moog Modular, and what key limitation did it still share until modern DAW plugins arrived?</p>
       <div class="options-list">
         <label class="option-card" data-correct="false" data-nudge="The 1970 Minimoog was monophonic and had no digital preset memory — musicians drew knob settings on paper patch sheets.">
           <input type="radio" name="q5" value="A" />
-          <span><strong>A.</strong> It introduced 6-voice polyphony and digital preset memory so keyboardists could save chord pads on stage.</span>
+          <span class="editable" data-edit-id="q5-optA"><strong>A.</strong> It introduced 6-voice polyphony and digital preset memory so keyboardists could save chord pads on stage.</span>
         </label>
         <label class="option-card" data-correct="false" data-nudge="Moog's iconic 24 dB/octave transistor ladder low-pass filter was central to the Minimoog's fat bass and lead tone.">
           <input type="radio" name="q5" value="B" />
-          <span><strong>B.</strong> It removed the 24 dB/octave ladder filter completely to save weight inside the walnut case.</span>
+          <span class="editable" data-edit-id="q5-optB"><strong>B.</strong> It removed the 24 dB/octave ladder filter completely to save weight inside the walnut case.</span>
         </label>
         <label class="option-card" data-correct="true" data-nudge="Correct! Normalling the core signal path eliminated patch cables on stage, while monophony, zero preset memory, and analogue drift remained hardware constraints.">
           <input type="radio" name="q5" value="C" />
-          <span><strong>C.</strong> It hard-wired ("normalled") the core signal path for fast cable-free stage use, yet remained monophonic with no preset memory and analogue tuning drift.</span>
+          <span class="editable" data-edit-id="q5-optC"><strong>C.</strong> It hard-wired ("normalled") the core signal path for fast cable-free stage use, yet remained monophonic with no preset memory and analogue tuning drift.</span>
         </label>
         <label class="option-card" data-correct="false" data-nudge="Reverse-check reliability: analogue hardware oscillators drift with temperature (needing warm-up and the built-in A-440 ref), whereas DAW plugins stay locked in tune.">
           <input type="radio" name="q5" value="D" />
-          <span><strong>D.</strong> It eliminated all tuning drift permanently, whereas modern DAW plugins require a 20-minute warm-up and A-440 re-tuning.</span>
+          <span class="editable" data-edit-id="q5-optD"><strong>D.</strong> It eliminated all tuning drift permanently, whereas modern DAW plugins require a 20-minute warm-up and A-440 re-tuning.</span>
         </label>
       </div>
       <div class="feedback" id="fb-q5"></div>
+      <div class="mark-scheme editable" data-edit-id="ms-q5">
+        <strong>Mark Scheme (2 marks):</strong> Correct answer is <strong>C</strong>. Normalling removed patch cables on stage, but the 1970 hardware stayed monophonic with zero preset memory and analogue tuning drift.
+      </div>
     </div>
   </section>
 
   <!-- SECTION B -->
   <section class="card">
     <span class="section-tag tag-vcf">Section B &bull; Applied Sound Design &amp; Signal Flow</span>
-    <h2>2. Short-Answer Technical Application (12 marks)</h2>
+    <h2 class="editable" data-edit-id="secB-title">2. Short-Answer Technical Application (12 marks)</h2>
 
-    <div class="q-block">
+    <div class="q-block" id="q6">
       <div class="q-head">
-        <h3>Q6. Sculpting a Punchy 1970s Analogue Synth Bass</h3>
+        <h3 class="editable" data-edit-id="q6-title">Q6. Sculpting a Punchy 1970s Analogue Synth Bass</h3>
         <span class="marks">4 marks</span>
       </div>
-      <p class="prompt">Specify suitable settings for a classic 1970s analogue synth bass and justify each choice technically.</p>
+      <p class="prompt editable" data-edit-id="q6-prompt">Specify suitable settings for a classic 1970s analogue synth bass and justify each choice technically.</p>
       <table>
         <thead>
           <tr><th style="width:24%">Parameter</th><th style="width:26%">Recommended Setting</th><th>Technical / Sonic Reason</th></tr>
         </thead>
         <tbody>
-          <tr><td>VCO Waveform &amp; Range</td><td><input class="field-input" placeholder="e.g. Sawtooth, 16'" /></td><td><input class="field-input" placeholder="Why this wave &amp; octave?" /></td></tr>
-          <tr><td>VCF Slope (dB/oct)</td><td><input class="field-input" placeholder="e.g. 24 dB/oct" /></td><td><input class="field-input" placeholder="Effect on harmonics above cutoff?" /></td></tr>
-          <tr><td>VCF Cutoff Frequency</td><td><input class="field-input" placeholder="e.g. 250–650 Hz" /></td><td><input class="field-input" placeholder="Sonic impact on treble/bass?" /></td></tr>
-          <tr><td>VCF Resonance (Q)</td><td><input class="field-input" placeholder="e.g. Moderate (Q 4–8)" /></td><td><input class="field-input" placeholder="Effect at cutoff point?" /></td></tr>
+          <tr><td>VCO Waveform &amp; Range</td><td><input class="field-input req-answer" data-qlabel="Q6" placeholder="e.g. Sawtooth, 16'" /></td><td><input class="field-input req-answer" data-qlabel="Q6" placeholder="Why this wave &amp; octave?" /></td></tr>
+          <tr><td>VCF Slope (dB/oct)</td><td><input class="field-input req-answer" data-qlabel="Q6" placeholder="e.g. 24 dB/oct" /></td><td><input class="field-input req-answer" data-qlabel="Q6" placeholder="Effect on harmonics above cutoff?" /></td></tr>
+          <tr><td>VCF Cutoff Frequency</td><td><input class="field-input req-answer" data-qlabel="Q6" placeholder="e.g. 250–650 Hz" /></td><td><input class="field-input req-answer" data-qlabel="Q6" placeholder="Sonic impact on treble/bass?" /></td></tr>
+          <tr><td>VCF Resonance (Q)</td><td><input class="field-input req-answer" data-qlabel="Q6" placeholder="e.g. Moderate (Q 4–8)" /></td><td><input class="field-input req-answer" data-qlabel="Q6" placeholder="Effect at cutoff point?" /></td></tr>
         </tbody>
       </table>
-      <div class="mark-scheme">
+      <div class="mark-scheme editable" data-edit-id="ms-q6">
         <strong>Mark Scheme (4 marks — 1 per row):</strong>
         Sawtooth (all harmonics) or Square (odd harmonics) at <strong>16'</strong> bass range (1); <strong>24 dB/oct</strong> Moog ladder slope for steep treble roll-off and warm bass weight (1); low static cutoff (<strong>250–650 Hz</strong>) to remove harsh highs (1); moderate <strong>Resonance (Q 4–8)</strong> to boost a narrow band right at cutoff for nasal punch (1).
       </div>
     </div>
 
-    <div class="q-block">
+    <div class="q-block" id="q7">
       <div class="q-head">
-        <h3>Q7. Audio Signals vs. Control Voltages &amp; 1V/Octave</h3>
+        <h3 class="editable" data-edit-id="q7-title">Q7. Audio Signals vs. Control Voltages &amp; 1V/Octave</h3>
         <span class="marks">4 marks</span>
       </div>
-      <p class="prompt"><strong>(a)</strong> Explain the difference between <strong>Audio Signals</strong> and <strong>Control Voltages (CV) / Gates</strong> on a 1960s Moog Modular. <em>(2 marks)</em></p>
-      <textarea placeholder="Write your answer for 7(a)..."></textarea>
-      <p class="prompt" style="margin-top:10px;"><strong>(b)</strong> State what <strong>1V/Octave</strong> means in Moog's pitch standard, and name the module triggered by a Gate pulse to shape note volume. <em>(2 marks)</em></p>
-      <textarea placeholder="Write your answer for 7(b)..."></textarea>
-      <div class="mark-scheme">
+      <p class="prompt editable" data-edit-id="q7a-prompt"><strong>(a)</strong> Explain the difference between <strong>Audio Signals</strong> and <strong>Control Voltages (CV) / Gates</strong> on a 1960s Moog Modular. <em>(2 marks)</em></p>
+      <textarea class="req-answer" data-qlabel="Q7(a)" placeholder="Write your answer for 7(a)..."></textarea>
+      <p class="prompt editable" data-edit-id="q7b-prompt" style="margin-top:10px;"><strong>(b)</strong> State what <strong>1V/Octave</strong> means in Moog's pitch standard, and name the module triggered by a Gate pulse to shape note volume. <em>(2 marks)</em></p>
+      <textarea class="req-answer" data-qlabel="Q7(b)" placeholder="Write your answer for 7(b)..."></textarea>
+      <div class="mark-scheme editable" data-edit-id="ms-q7">
         <strong>Mark Scheme (4 marks):</strong>
         (a) Audio signals carry the audible sound path (<code>VCO &rarr; VCF &rarr; VCA &rarr; Out</code>) (1); Control Voltages / Gates are non-audible automation voltages controlling pitch, filter cutoff, or VCA loudness (1).
         (b) Every <strong>+1.00 V</strong> increase doubles oscillator frequency / raises pitch by <strong>1 octave</strong> (1); the <strong>ADSR Envelope Generator</strong> receives the Gate pulse to open/close the VCA (1).
       </div>
     </div>
 
-    <div class="q-block">
+    <div class="q-block" id="q8">
       <div class="q-head">
-        <h3>Q8. LFO Destinations &amp; Independent Dual Envelopes (VCA vs. VCF)</h3>
+        <h3 class="editable" data-edit-id="q8-title">Q8. LFO Destinations &amp; Independent Dual Envelopes (VCA vs. VCF)</h3>
         <span class="marks">4 marks</span>
       </div>
-      <p class="prompt"><strong>(a)</strong> Name the musical effect created by each LFO routing: <em>(2 marks)</em></p>
+      <p class="prompt editable" data-edit-id="q8a-prompt"><strong>(a)</strong> Name the musical effect created by each LFO routing: <em>(2 marks)</em></p>
       <table>
         <thead><tr><th>LFO Destination</th><th>Resulting Musical Effect</th></tr></thead>
         <tbody>
-          <tr><td>LFO &rarr; VCO Pitch</td><td><input class="field-input" placeholder="Musical effect..." /></td></tr>
-          <tr><td>LFO &rarr; VCA Amplitude</td><td><input class="field-input" placeholder="Musical effect..." /></td></tr>
-          <tr><td>LFO &rarr; VCF Cutoff</td><td><input class="field-input" placeholder="Musical effect..." /></td></tr>
+          <tr><td>LFO &rarr; VCO Pitch</td><td><input class="field-input req-answer" data-qlabel="Q8(a)" placeholder="Musical effect..." /></td></tr>
+          <tr><td>LFO &rarr; VCA Amplitude</td><td><input class="field-input req-answer" data-qlabel="Q8(a)" placeholder="Musical effect..." /></td></tr>
+          <tr><td>LFO &rarr; VCF Cutoff</td><td><input class="field-input req-answer" data-qlabel="Q8(a)" placeholder="Musical effect..." /></td></tr>
         </tbody>
       </table>
-      <p class="prompt"><strong>(b)</strong> Explain why a producer separates the <strong>VCA Envelope</strong> from the <strong>VCF Envelope</strong> when programming a plucky synth bass or slow-blooming synth brass. <em>(2 marks)</em></p>
-      <textarea placeholder="Write your answer for 8(b)..."></textarea>
-      <div class="mark-scheme">
+      <p class="prompt editable" data-edit-id="q8b-prompt"><strong>(b)</strong> Explain why a producer separates the <strong>VCA Envelope</strong> from the <strong>VCF Envelope</strong> when programming a plucky synth bass or slow-blooming synth brass. <em>(2 marks)</em></p>
+      <textarea class="req-answer" data-qlabel="Q8(b)" placeholder="Write your answer for 8(b)..."></textarea>
+      <div class="mark-scheme editable" data-edit-id="ms-q8">
         <strong>Mark Scheme (4 marks):</strong>
         (a) <code>LFO &rarr; VCO Pitch</code> = <strong>Vibrato</strong>; <code>LFO &rarr; VCA Amplitude</code> = <strong>Tremolo</strong>; <code>LFO &rarr; VCF Cutoff</code> = <strong>Filter Wobble / Auto-wah</strong> (2 marks for all 3, 1 mark for 2).
         (b) Separating VCA and VCF envelopes allows loudness and timbral brightness to evolve independently (1) — e.g. fast Filter Decay + high VCA Sustain creates a bright percussive pluck over a sustained warm bass fundamental, or slow Filter Attack creates a gradual brass bloom (1).
@@ -542,15 +668,15 @@
   <!-- SECTION C -->
   <section class="card">
     <span class="section-tag tag-lfo">Section C &bull; Extended Response (AO3 / AO4)</span>
-    <h2>3. Hardware Minimoog vs. Modern DAW Plugins (8 marks)</h2>
-    <div class="q-block">
+    <h2 class="editable" data-edit-id="secC-title">3. Hardware Minimoog vs. Modern DAW Plugins (8 marks)</h2>
+    <div class="q-block" id="q9">
       <div class="q-head">
-        <h3>Q9. Extended Evaluation</h3>
+        <h3 class="editable" data-edit-id="q9-title">Q9. Extended Evaluation</h3>
         <span class="marks">8 marks</span>
       </div>
-      <p class="prompt">Explain how the <strong>1970 Minimoog Model D</strong> built upon 1960s modular synthesis to become a landmark instrument, and evaluate the <strong>musical and technical advantages and disadvantages</strong> of using a modern DAW software plugin recreation — including expanded features such as <strong>polyphony, portamento, arpeggiation, pitch bend range, and unison mode</strong> — compared with the original hardware.</p>
-      <textarea class="extended" placeholder="Plan and write your 8-mark extended response here..."></textarea>
-      <div class="mark-scheme">
+      <p class="prompt editable" data-edit-id="q9-prompt">Explain how the <strong>1970 Minimoog Model D</strong> built upon 1960s modular synthesis to become a landmark instrument, and evaluate the <strong>musical and technical advantages and disadvantages</strong> of using a modern DAW software plugin recreation — including expanded features such as <strong>polyphony, portamento, arpeggiation, pitch bend range, and unison mode</strong> — compared with the original hardware.</p>
+      <textarea class="extended req-answer" data-qlabel="Q9" placeholder="Plan and write your 8-mark extended response here..."></textarea>
+      <div class="mark-scheme editable" data-edit-id="ms-q9">
         <strong>Band 4 (7–8 marks) Indicative Content:</strong>
         <ul style="margin:6px 0 0 18px; padding:0;">
           <li><strong>Minimoog Architecture &amp; Impact (AO3):</strong> Hard-wired ("normalled") <code>3 VCOs &rarr; Mixer &rarr; 24 dB/oct Ladder VCF &rarr; VCA</code> in a portable case with Pitch/Mod wheels (Osc 3 in LO mode doubling as LFO); eliminated live patch cables across Prog Rock (ELP, Yes), Funk bass (Parliament, Stevie Wonder), Synthpop (Kraftwerk), and 1990s G-Funk leads.</li>
@@ -569,22 +695,61 @@
     <table>
       <thead><tr><th style="width:26%">Term</th><th>Definition</th></tr></thead>
       <tbody>
-        <tr><td><strong>Harmonic Richness</strong></td><td>The density and strength of upper overtones above the fundamental frequency, determining what a subtractive filter can attenuate.</td></tr>
-        <tr><td><strong>24 dB/oct Ladder Filter</strong></td><td>Robert Moog's 4-pole transistor ladder low-pass filter that rolls off frequencies above cutoff steeply for warm bass weight.</td></tr>
-        <tr><td><strong>Resonance (Emphasis)</strong></td><td>A narrow gain boost centred at the filter cutoff point, adding nasal punch or squelchy acid character.</td></tr>
-        <tr><td><strong>Control Voltage (CV)</strong></td><td>A steady or slowly changing electrical voltage automating synth parameters (pitch, filter cutoff, or loudness).</td></tr>
-        <tr><td><strong>Gate Signal</strong></td><td>An on/off voltage (+5V held, 0V released) telling an ADSR envelope when to start Attack and begin Release.</td></tr>
-        <tr><td><strong>1V/Octave Standard</strong></td><td>Moog's pitch standard where every +1.00 V increase doubles oscillator frequency (raising pitch by 1 octave).</td></tr>
-        <tr><td><strong>Normalled Signal Path</strong></td><td>An internally hard-wired routing (e.g. <code>VCO &rarr; VCF &rarr; VCA</code>) requiring no external patch cables.</td></tr>
-        <tr><td><strong>Portamento / Unison</strong></td><td>Portamento slides pitch smoothly between notes; Unison stacks detuned stereo-spread voices for wide supersaw leads.</td></tr>
+        <tr><td><strong>Harmonic Richness</strong></td><td class="editable" data-edit-id="gl-1">The density and strength of upper overtones above the fundamental frequency, determining what a subtractive filter can attenuate.</td></tr>
+        <tr><td><strong>24 dB/oct Ladder Filter</strong></td><td class="editable" data-edit-id="gl-2">Robert Moog's 4-pole transistor ladder low-pass filter that rolls off frequencies above cutoff steeply for warm bass weight.</td></tr>
+        <tr><td><strong>Resonance (Emphasis)</strong></td><td class="editable" data-edit-id="gl-3">A narrow gain boost centred at the filter cutoff point, adding nasal punch or squelchy acid character.</td></tr>
+        <tr><td><strong>Control Voltage (CV)</strong></td><td class="editable" data-edit-id="gl-4">A steady or slowly changing electrical voltage automating synth parameters (pitch, filter cutoff, or loudness).</td></tr>
+        <tr><td><strong>Gate Signal</strong></td><td class="editable" data-edit-id="gl-5">An on/off voltage (+5V held, 0V released) telling an ADSR envelope when to start Attack and begin Release.</td></tr>
+        <tr><td><strong>1V/Octave Standard</strong></td><td class="editable" data-edit-id="gl-6">Moog's pitch standard where every +1.00 V increase doubles oscillator frequency (raising pitch by 1 octave).</td></tr>
+        <tr><td><strong>Normalled Signal Path</strong></td><td class="editable" data-edit-id="gl-7">An internally hard-wired routing (e.g. <code>VCO &rarr; VCF &rarr; VCA</code>) requiring no external patch cables.</td></tr>
+        <tr><td><strong>Portamento / Unison</strong></td><td class="editable" data-edit-id="gl-8">Portamento slides pitch smoothly between notes; Unison stacks detuned stereo-spread voices for wide supersaw leads.</td></tr>
       </tbody>
     </table>
   </section>
 
+  <!-- BOTTOM ACTION BAR -->
+  <div class="bottom-actions no-print">
+    <p><strong>Finished all questions?</strong> Check Section A, then reveal the Teacher Mark Scheme to self-assess Sections B &amp; C.</p>
+    <div style="display:flex; gap:8px; flex-wrap:wrap;">
+      <button class="btn btn-primary" onclick="markSectionA()">Mark Section A</button>
+      <button class="btn btn-amber js-ms-toggle" onclick="toggleMarkScheme()">Show Teacher Mark Scheme</button>
+      <button class="btn" onclick="window.print()">Print / Save PDF</button>
+    </div>
+  </div>
+
   <footer>RJC Audio &bull; Basic Synthesis Assessment &bull; Grounded in A-Level Music Technology Interactive Guides 1–3</footer>
 </div>
 
+<!-- INCOMPLETE ASSESSMENT POPUP MODAL -->
+<div class="modal-backdrop" id="incompleteModal" role="dialog" aria-modal="true" aria-labelledby="incompleteTitle">
+  <div class="modal-card">
+    <h3 id="incompleteTitle">Complete All Questions First</h3>
+    <p>You must complete all questions before seeing the answers.</p>
+    <div class="modal-missing" id="missingList"></div>
+    <div class="modal-actions">
+      <button class="btn btn-primary" onclick="closeModal('incompleteModal')">Back to Assessment</button>
+    </div>
+  </div>
+</div>
+
+<!-- TEACHER PIN MODAL -->
+<div class="modal-backdrop" id="pinModal" role="dialog" aria-modal="true" aria-labelledby="pinTitle">
+  <div class="modal-card">
+    <h3 id="pinTitle">&#x1F512; Teacher PIN</h3>
+    <p>Enter the Teacher PIN to unlock the Mark Scheme immediately and edit questions or mark schemes directly on the page.</p>
+    <input type="password" inputmode="numeric" maxlength="10" id="pinInput" class="pin-input" placeholder="&bull;&bull;&bull;&bull;&bull;" aria-label="Teacher PIN" />
+    <div class="pin-error" id="pinError"></div>
+    <div class="modal-actions">
+      <button class="btn" onclick="closeModal('pinModal')">Cancel</button>
+      <button class="btn btn-amber" onclick="submitTeacherPin()">Unlock Teacher Mode</button>
+    </div>
+  </div>
+</div>
+
 <script>
+  const TEACHER_PIN = "01823";
+  const STORAGE_KEY_EDITS = "synth_assessment_teacher_edits_v1";
+
   const CHAINS = {
     q2: {
       correct: [
@@ -619,6 +784,8 @@
   };
 
   const chainState = { q2: [null, null, null], q4: [null, null, null] };
+  let isTeacherMode = false;
+  let isEditMode = false;
 
   function renderChain(qid) {
     const slots = document.querySelectorAll(`#${qid}-slots .chain-slot`);
@@ -726,12 +893,192 @@
     document.getElementById("scoreBadge").textContent = "Section A Score: 0 / 10";
   }
 
-  function toggleMarkScheme() {
-    const active = document.body.classList.toggle("show-ms");
-    document.getElementById("toggleMsBtn").textContent = active ? "Hide Teacher Mark Scheme" : "Show Teacher Mark Scheme";
+  function getIncompleteQuestions() {
+    const missing = [];
+    if (!document.querySelector('input[name="q1"]:checked')) missing.push("Q1");
+    if (chainState.q2.includes(null)) missing.push("Q2 (all 3 chain slots)");
+    if (!document.querySelector('input[name="q3"]:checked')) missing.push("Q3");
+    if (chainState.q4.includes(null)) missing.push("Q4 (all 3 chain slots)");
+    if (!document.querySelector('input[name="q5"]:checked')) missing.push("Q5");
+
+    const seen = new Set();
+    document.querySelectorAll(".req-answer").forEach((el) => {
+      if (!el.value || !el.value.trim()) {
+        const lbl = el.dataset.qlabel || "Short Answer";
+        if (!seen.has(lbl)) {
+          seen.add(lbl);
+          missing.push(lbl);
+        }
+      }
+    });
+    return missing;
   }
 
+  function updateMsButtons(showing) {
+    document.querySelectorAll(".js-ms-toggle").forEach((btn) => {
+      btn.textContent = showing ? "Hide Teacher Mark Scheme" : "Show Teacher Mark Scheme";
+    });
+  }
+
+  function toggleMarkScheme() {
+    const currentlyShowing = document.body.classList.contains("show-ms");
+    if (currentlyShowing) {
+      document.body.classList.remove("show-ms");
+      updateMsButtons(false);
+      return;
+    }
+
+    if (!isTeacherMode) {
+      const missing = getIncompleteQuestions();
+      if (missing.length > 0) {
+        document.getElementById("missingList").innerHTML =
+          `<strong>Still to complete:</strong> ${missing.join(", ")}`;
+        openModal("incompleteModal");
+        return;
+      }
+    }
+
+    document.body.classList.add("show-ms");
+    updateMsButtons(true);
+  }
+
+  function openModal(id) {
+    document.getElementById(id).classList.add("open");
+  }
+
+  function closeModal(id) {
+    document.getElementById(id).classList.remove("open");
+  }
+
+  function openPinModal() {
+    if (isTeacherMode) {
+      lockTeacherMode();
+      return;
+    }
+    const input = document.getElementById("pinInput");
+    input.value = "";
+    document.getElementById("pinError").textContent = "";
+    openModal("pinModal");
+    setTimeout(() => input.focus(), 50);
+  }
+
+  function submitTeacherPin() {
+    const val = document.getElementById("pinInput").value.trim();
+    if (val !== TEACHER_PIN) {
+      document.getElementById("pinError").textContent = "Incorrect PIN. Please try again.";
+      return;
+    }
+    closeModal("pinModal");
+    enableTeacherMode();
+  }
+
+  function enableTeacherMode() {
+    isTeacherMode = true;
+    document.body.classList.add("teacher-mode", "show-ms");
+    updateMsButtons(true);
+    document.getElementById("teacherPinBtn").innerHTML = "&#x1F513; Teacher Mode ON";
+    setEditMode(true);
+  }
+
+  function lockTeacherMode() {
+    isTeacherMode = false;
+    setEditMode(false);
+    document.body.classList.remove("teacher-mode", "show-ms");
+    updateMsButtons(false);
+    document.getElementById("teacherPinBtn").innerHTML = "&#x1F512; Teacher PIN";
+  }
+
+  function setEditMode(on) {
+    isEditMode = on;
+    document.body.classList.toggle("teacher-editing", on);
+    document.querySelectorAll(".editable").forEach((el) => {
+      el.contentEditable = on ? "true" : "false";
+    });
+    document.getElementById("toggleEditBtn").textContent = on ? "Edit Mode: ON" : "Edit Mode: OFF";
+  }
+
+  function toggleEditMode() {
+    if (!isTeacherMode) return;
+    setEditMode(!isEditMode);
+  }
+
+  function saveTeacherEdits() {
+    const data = {};
+    document.querySelectorAll(".editable[data-edit-id]").forEach((el) => {
+      data[el.dataset.editId] = el.innerHTML;
+    });
+    try {
+      localStorage.setItem(STORAGE_KEY_EDITS, JSON.stringify(data));
+      alert("Saved your edits to this browser. Use 'Download Updated HTML' if you want a permanent HTML file.");
+    } catch (_) {
+      alert("Could not save to browser storage.");
+    }
+  }
+
+  function loadTeacherEdits() {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY_EDITS);
+      if (!raw) return;
+      const data = JSON.parse(raw);
+      document.querySelectorAll(".editable[data-edit-id]").forEach((el) => {
+        if (typeof data[el.dataset.editId] === "string") {
+          el.innerHTML = data[el.dataset.editId];
+        }
+      });
+    } catch (_) {}
+  }
+
+  function resetTeacherEdits() {
+    if (!confirm("Reset all edited questions and mark schemes back to the default text?")) return;
+    try { localStorage.removeItem(STORAGE_KEY_EDITS); } catch (_) {}
+    location.reload();
+  }
+
+  function downloadUpdatedHtml() {
+    const wasEditing = isEditMode;
+    const wasTeacher = isTeacherMode;
+    const wasMs = document.body.classList.contains("show-ms");
+
+    // Temporarily strip teacher/edit state so exported HTML opens cleanly for students
+    setEditMode(false);
+    document.body.classList.remove("teacher-mode", "show-ms");
+    updateMsButtons(false);
+    document.getElementById("teacherPinBtn").innerHTML = "&#x1F512; Teacher PIN";
+
+    const html = "<!DOCTYPE html>\n" + document.documentElement.outerHTML;
+    const blob = new Blob([html], { type: "text/html;charset=utf-8" });
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = "assessment.html";
+    a.click();
+    URL.revokeObjectURL(a.href);
+
+    if (wasTeacher) {
+      isTeacherMode = true;
+      document.body.classList.add("teacher-mode");
+      document.getElementById("teacherPinBtn").innerHTML = "&#x1F513; Teacher Mode ON";
+    }
+    if (wasMs) {
+      document.body.classList.add("show-ms");
+      updateMsButtons(true);
+    }
+    if (wasEditing) setEditMode(true);
+  }
+
+  // Allow Enter key in PIN modal
+  document.getElementById("pinInput").addEventListener("keydown", (e) => {
+    if (e.key === "Enter") submitTeacherPin();
+  });
+
+  // Close modals on backdrop click
+  document.querySelectorAll(".modal-backdrop").forEach((bg) => {
+    bg.addEventListener("click", (e) => {
+      if (e.target === bg) bg.classList.remove("open");
+    });
+  });
+
   document.getElementById("assessDate").valueAsDate = new Date();
+  loadTeacherEdits();
   renderChain("q2");
   renderChain("q4");
 </script>
