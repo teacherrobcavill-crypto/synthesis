@@ -814,9 +814,9 @@
 
   <!-- BOTTOM ACTION BAR -->
   <div class="bottom-actions no-print">
-    <p><strong>Finished all questions?</strong> Click <strong>Submit for Rob's Inspection</strong> first to record your answers and unlock the Teacher Mark Scheme.</p>
+    <p><strong>Finished all questions?</strong> Click <strong>Submit for Feedback to Your Answers</strong> first to record your answers and unlock the Teacher Mark Scheme.</p>
     <div style="display:flex; gap:8px; flex-wrap:wrap;">
-      <button class="btn btn-primary" id="submitAiBtn" onclick="submitAssessmentForAI()">Submit for Rob's Inspection</button>
+      <button class="btn btn-primary" id="submitAiBtn" onclick="submitAssessmentForAI()">Submit for Feedback to Your Answers</button>
       <button class="btn btn-amber js-ms-toggle" onclick="toggleMarkScheme()">Show Teacher Mark Scheme</button>
       <button class="btn" onclick="window.print()">Print / Save PDF</button>
     </div>
@@ -824,7 +824,7 @@
 
   <!-- FEEDBACK & BESPOKE FOLLOW-UP PANEL -->
   <section class="ai-results-panel" id="aiResultsPanel" aria-live="polite">
-    <span class="section-tag">Rob's Inspection &bull; Personalised Follow-Up</span>
+    <span class="section-tag">Feedback &amp; Personalised Follow-Up</span>
     <h2 id="aiResultsHeading">Your Assessment Feedback &amp; Bespoke Follow-Up</h2>
     <div class="ai-score-grid" id="aiScoreGrid"></div>
     <div id="aiFeedbackBody"></div>
@@ -1111,11 +1111,11 @@
         return;
       }
       if (!hasSubmittedForInspection) {
-        document.getElementById("incompleteTitle").textContent = "Submit for Rob's Inspection First";
+        document.getElementById("incompleteTitle").textContent = "Submit for Feedback First";
         document.getElementById("incompleteModal").querySelector("p").textContent =
-          "Please click \"Submit for Rob's Inspection\" at the bottom of the page before viewing the Teacher Mark Scheme.";
+          "Please click \"Submit for Feedback to Your Answers\" at the bottom of the page before viewing the Teacher Mark Scheme.";
         document.getElementById("missingList").innerHTML =
-          "<strong>Next step:</strong> Scroll to the bottom and click <strong>Submit for Rob's Inspection</strong>.";
+          "<strong>Next step:</strong> Scroll to the bottom and click <strong>Submit for Feedback to Your Answers</strong>.";
         openModal("incompleteModal");
         return;
       }
@@ -1356,7 +1356,7 @@
       if (missing.length > 0) {
         document.getElementById("incompleteTitle").textContent = "Complete All Questions First";
         document.getElementById("incompleteModal").querySelector("p").textContent =
-          "You must complete all questions before submitting for Rob's inspection.";
+          "You must complete all questions before submitting for feedback.";
         document.getElementById("missingList").innerHTML =
           `<strong>Still to complete:</strong> ${missing.join(", ")}`;
         openModal("incompleteModal");
@@ -1373,7 +1373,7 @@
     const btn = document.getElementById("submitAiBtn");
     const origText = btn.textContent;
     btn.disabled = true;
-    btn.textContent = "Submitting for Rob's Inspection...";
+    btn.textContent = "Submitting for Feedback...";
 
     try {
       const res = await fetch("/api/v1/assessment-submit", {
@@ -1386,7 +1386,7 @@
       hasSubmittedForInspection = true;
       renderAiResults(data);
     } catch (err) {
-      alert("Could not submit for Rob's inspection: " + err.message);
+      alert("Could not submit for feedback: " + err.message);
     } finally {
       btn.disabled = false;
       btn.textContent = origText;
