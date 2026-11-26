@@ -502,9 +502,9 @@
         <h3 class="editable" data-edit-id="q2-title">Q2. Filter Resonance / Emphasis Chain (Guides 1 &amp; 3)</h3>
         <span class="marks">2 marks</span>
       </div>
-      <p class="prompt editable" data-edit-id="q2-prompt">Click chips in order to build the <strong>Cause &rarr; Mechanism &rarr; Sonic Impact</strong> chain for raising <strong>Resonance (Emphasis)</strong> on a low-pass filter. (Leave the 2 distractors unused.)</p>
+      <p class="prompt editable" data-edit-id="q2-prompt">Click chips in order to build the <strong>Action &rarr; Mechanism &rarr; Sonic Impact</strong> chain for raising <strong>Resonance (Emphasis)</strong> on a low-pass filter. (Leave the 2 distractors unused.)</p>
       <div class="chain-area" id="q2-slots">
-        <div class="chain-slot" data-slot="0" onclick="clearSlot('q2',0)"><div class="slot-label">1. Cause</div><div class="slot-val">Click a chip below…</div></div>
+        <div class="chain-slot" data-slot="0" onclick="clearSlot('q2',0)"><div class="slot-label">1. Action</div><div class="slot-val">Click a chip below…</div></div>
         <div class="chain-slot" data-slot="1" onclick="clearSlot('q2',1)"><div class="slot-label">2. Mechanism</div><div class="slot-val">Click a chip below…</div></div>
         <div class="chain-slot" data-slot="2" onclick="clearSlot('q2',2)"><div class="slot-label">3. Sonic Impact</div><div class="slot-val">Click a chip below…</div></div>
       </div>
@@ -552,9 +552,9 @@
         <h3 class="editable" data-edit-id="q4-title">Q4. LFO Routing Chain: Pitch Vibrato (Guide 2)</h3>
         <span class="marks">2 marks</span>
       </div>
-      <p class="prompt editable" data-edit-id="q4-prompt">Click chips in order to build the <strong>Cause &rarr; Mechanism &rarr; Sonic Impact</strong> chain for patching a <strong>5 Hz sine LFO</strong> to the <strong>VCO pitch CV input</strong>. (Leave the 2 distractors unused.)</p>
+      <p class="prompt editable" data-edit-id="q4-prompt">Click chips in order to build the <strong>Action &rarr; Mechanism &rarr; Sonic Impact</strong> chain for patching a <strong>5 Hz sine LFO</strong> to the <strong>VCO pitch CV input</strong>. (Leave the 2 distractors unused.)</p>
       <div class="chain-area" id="q4-slots">
-        <div class="chain-slot" data-slot="0" onclick="clearSlot('q4',0)"><div class="slot-label">1. Cause</div><div class="slot-val">Click a chip below…</div></div>
+        <div class="chain-slot" data-slot="0" onclick="clearSlot('q4',0)"><div class="slot-label">1. Action</div><div class="slot-val">Click a chip below…</div></div>
         <div class="chain-slot" data-slot="1" onclick="clearSlot('q4',1)"><div class="slot-label">2. Mechanism</div><div class="slot-val">Click a chip below…</div></div>
         <div class="chain-slot" data-slot="2" onclick="clearSlot('q4',2)"><div class="slot-label">3. Sonic Impact</div><div class="slot-val">Click a chip below…</div></div>
       </div>
@@ -792,7 +792,7 @@
     slots.forEach((slotEl, idx) => {
       const val = chainState[qid][idx];
       slotEl.classList.remove("filled", "correct", "wrong");
-      const label = ["1. Cause", "2. Mechanism", "3. Sonic Impact"][idx];
+      const label = ["1. Action", "2. Mechanism", "3. Sonic Impact"][idx];
       slotEl.innerHTML = `<div class="slot-label">${label}</div><div class="slot-val">${val ? val : "Click a chip below…"}</div>`;
       if (val) slotEl.classList.add("filled");
     });
@@ -853,7 +853,7 @@
       const ans = chainState[qid];
       if (ans.includes(null)) {
         fb.className = "feedback show err";
-        fb.textContent = "Fill all 3 chain slots (Cause → Mechanism → Sonic Impact) before marking.";
+        fb.textContent = "Fill all 3 chain slots (Action → Mechanism → Sonic Impact) before marking.";
         return;
       }
       let allMatch = true;
@@ -869,7 +869,7 @@
       if (allMatch) {
         score += 2;
         fb.className = "feedback show ok";
-        fb.textContent = "Correct Cause → Mechanism → Sonic Impact chain! (+2 marks)";
+        fb.textContent = "Correct Action → Mechanism → Sonic Impact chain! (+2 marks)";
       } else {
         fb.className = "feedback show err";
         fb.textContent = CHAINS[qid].nudge + " (Click any filled slot to remove and try again.)";
