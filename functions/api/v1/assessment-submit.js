@@ -54,7 +54,7 @@ Here are their submitted answers:
 - Q2 (Filter Resonance Chain): ${JSON.stringify(sectionA.q2 || [])} (Correct: ["Increase VCF Resonance (Q)", "Boosts a narrow frequency band right at the cutoff point", "Adds nasal punch or squelchy acid emphasis"])
 - Q3 (Modular ADSR -> VCA): Selected "${sectionA.q3 || 'None'}" (Correct: B - VCO runs continuously; Gate-triggered ADSR opens/closes VCA)
 - Q4 (LFO -> VCO Pitch Chain): ${JSON.stringify(sectionA.q4 || [])} (Correct: ["Patch 5 Hz LFO -> VCO pitch CV", "Cyclically modulates oscillator frequency below 20 Hz", "Produces expressive pitch vibrato on sustained notes"])
-- Q5 (1970 Minimoog vs DAW): Selected "${sectionA.q5 || 'None'}" (Correct: C - Normalled cable-free path, monophonic, no preset memory, analogue tuning drift)
+- Q5 (1970 Minimoog vs DAW): Selected "${sectionA.q5 || 'None'}" (Correct: C - Normalled cable-free path, monophonic, no preset memory)
 
 === SECTION B (12 marks total: Q6=4, Q7=4, Q8=4) ===
 - Q6 (1970s Analogue Synth Bass Table):
@@ -83,7 +83,7 @@ Here are their submitted answers:
 
 === SECTION C (8 marks: Q9 Extended Evaluation AO3/AO4) ===
 Student wrote: "${sectionC.q9 || ''}"
-(Band 4 7-8 marks covers: Minimoog normalled 3 VCO->Mixer->24dB Ladder->VCA + Osc 3 LO/Pitch-Mod wheels + genre impact; Hardware pros/cons incl. drift/A-440/paper patch sheets/monophony; DAW plugin pros/cons incl. recall/instances/automation/CPU; Expanded features: polyphony, portamento, arpeggiation, pitch bend range, unison.)
+(Band 4 7-8 marks covers: Minimoog normalled 3 VCO->Mixer->24dB Ladder->VCA + Osc 3 LO/Pitch-Mod wheels + genre impact; Hardware pros/cons incl. tactile control/analogue saturation/paper patch sheets/monophony/cost; DAW plugin pros/cons incl. recall/instances/automation/CPU; Expanded features: polyphony, portamento, arpeggiation, pitch bend range, unison. Do NOT penalise students for not mentioning thermal/tuning drift.)
 
 Return ONLY valid JSON matching this exact structure:
 {
@@ -198,7 +198,7 @@ function buildFallbackResult(payload) {
   if (misconceptions.length === 0) {
     misconceptions.push({
       topic: 'Extended Evaluation Depth',
-      misconceptionNote: 'Strong Section A accuracy — deepen AO4 evaluation of hardware drift and DAW plugin workflow trade-offs.',
+      misconceptionNote: 'Strong Section A accuracy — deepen AO4 evaluation of hardware limitations and DAW plugin workflow trade-offs.',
       guideUrl: '/guide3'
     });
   }
@@ -234,7 +234,7 @@ function buildFallbackResult(payload) {
       {
         topic: 'Minimoog vs. DAW (Guide 3)',
         question: 'Name two workflow problems of a 1970 Minimoog Model D that modern DAW plugin recreations solve.',
-        hint: 'Consider patch recall, polyphony, tuning drift, and automation.',
+        hint: 'Consider patch recall, polyphony, and tempo-synced automation.',
         modelAnswer: 'DAW plugins provide instant preset recall (replacing paper patch sheets) and sample-accurate tempo-synced automation plus polyphony and rock-solid tuning.',
         guideUrl: '/guide3'
       }
