@@ -985,12 +985,14 @@
     if (emptyIdx === -1) return;
     chainState[qid][emptyIdx] = text;
     renderChain(qid);
+    saveDraft();
   }
 
   function clearSlot(qid, idx) {
     if (!chainState[qid][idx]) return;
     chainState[qid][idx] = null;
     renderChain(qid);
+    saveDraft();
   }
 
   function markSectionA() {
@@ -1297,11 +1299,59 @@
     };
   }
 
+  let draftSyncTimer = null;
+  let lastSyncedHash = "";
+
+  function computeSectionAScoreQuiet() {
+    let s = 0;
+    if (document.querySelector('input[name="q1"]:checked')?.value === "A") s += 2;
+    if (JSON.stringify(chainState.q2) === JSON.stringify(CHAINS.q2.correct)) s += 2;
+    if (document.querySelector('input[name="q3"]:checked')?.value === "B") s += 2;
+    if (JSON.stringify(chainState.q4) === JSON.stringify(CHAINS.q4.correct)) s += 2;
+    if (document.querySelector('input[name="q5"]:checked')?.value === "C") s += 2;
+    return s;
+  }
+
+  function scheduleServerDraftSync() {
+    if (!hasStudentName() || isTeacherMode) return;
+    if (draftSyncTimer) clearTimeout(draftSyncTimer);
+    draftSyncTimer = setTimeout(() => syncDraftToServer(), 2000);
+  }
+
+  async function syncDraftToServer(useBeacon = false) {
+    if (!hasStudentName() || isTeacherMode) return;
+    const payload = collectAllAnswers();
+    payload.sectionA.score = computeSectionAScoreQuiet();
+    const hash = JSON.stringify(payload);
+    if (hash === lastSyncedHash) return;
+
+    if (useBeacon && navigator.sendBeacon) {
+      const blob = new Blob([hash], { type: "application/json" });
+      navigator.sendBeacon("/api/v1/assessment-draft", blob);
+      lastSyncedHash = hash;
+      return;
+    }
+
+    const hint = document.getElementById("nameHint");
+    try {
+      const res = await fetch("/api/v1/assessment-draft", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: hash
+      });
+      if (res.ok) {
+        lastSyncedHash = hash;
+        if (hint && hasStudentName()) hint.textContent = "✓ Name entered • Auto-saved";
+      }
+    } catch (_) {}
+  }
+
   function saveDraft() {
     try {
       const payload = collectAllAnswers();
       localStorage.setItem(STORAGE_KEY_DRAFT, JSON.stringify(payload));
     } catch (_) {}
+    scheduleServerDraftSync();
   }
 
   function loadDraft() {
@@ -1462,50 +1512,92 @@
     const panel = document.getElementById("teacherSubmissionsPanel");
     const body = document.getElementById("teacherSubmissionsBody");
     panel.classList.add("show");
-    body.textContent = "Loading submissions from D1...";
+    body.textContent = "Loading submissions and auto-synced drafts from D1...";
     try {
-      const res = await fetch(`/api/v1/assessment-submit?pin=${encodeURIComponent(TEACHER_PIN)}`);
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Failed to load");
+      const [subRes, draftRes] = await Promise.all([
+        fetch(`/api/v1/assessment-submit?pin=${encodeURIComponent(TEACHER_PIN)}`),
+        fetch(`/api/v1/assessment-draft?pin=${encodeURIComponent(TEACHER_PIN)}`)
+      ]);
+      const data = await subRes.json();
+      const draftData = draftRes.ok ? await draftRes.json() : { drafts: [] };
+      if (!subRes.ok) throw new Error(data.error || "Failed to load");
+
       const subs = data.submissions || [];
+      const drafts = draftData.drafts || [];
+      const submittedKeys = new Set(subs.map((s) => (s.studentName || "").trim().toLowerCase().replace(/\s+/g, " ")));
+      const inProgressDrafts = drafts.filter((d) => !submittedKeys.has(d.studentKey));
+
+      let html = "";
       if (subs.length === 0) {
-        body.innerHTML = "<p>No student submissions recorded yet.</p>";
-        return;
+        html += "<p>No completed student submissions recorded yet.</p>";
+      } else {
+        html += `<table><thead><tr><th>Student</th><th>Date</th><th>Scores (A / B / C / Total)</th><th>Recorded Misconceptions &amp; Full Answers</th></tr></thead><tbody>`;
+        subs.forEach((s) => {
+          const miscText = (s.misconceptions || [])
+            .map((m) => `<div><strong>${escapeHtml(m.topic)}:</strong> ${escapeHtml(m.misconceptionNote)}</div>`)
+            .join("");
+          const a = s.answers || {};
+          const secA = a.sectionA || {};
+          const secB = a.sectionB || {};
+          const q6 = secB.q6 || {};
+          const q8a = secB.q8a || {};
+          const secC = a.sectionC || {};
+          const qf = s.aiResult?.questionFeedback || {};
+          const fbUrl = `${window.location.origin}/feedback?id=${encodeURIComponent(s.id)}`;
+          html += `<tr>
+            <td><strong>${escapeHtml(s.studentName)}</strong><div style="margin-top:6px;"><button type="button" class="btn" style="padding:4px 9px; font-size:11.5px;" onclick="navigator.clipboard?.writeText('${fbUrl}'); this.textContent='Copied Link!'">Copy Feedback Link</button></div></td>
+            <td>${escapeHtml(s.assessDate || s.createdAt?.slice(0, 10) || "")}</td>
+            <td>A: ${s.sectionAScore}/10 &bull; B: ${s.sectionBScore}/12 &bull; C: ${s.sectionCScore}/8<br><strong>Total: ${s.totalScore}/30</strong></td>
+            <td>
+              ${miscText || "None recorded"}
+              <details style="margin-top:8px;">
+                <summary style="cursor:pointer; font-weight:700; color:var(--vco);">View Full Submitted Answers &amp; Feedback</summary>
+                <div style="margin-top:8px; padding:10px; background:#fff; border:1px solid var(--border); border-radius:8px; font-size:13px;">
+                  <p style="margin:0 0 6px;"><strong>Section A:</strong> Q1=${escapeHtml(secA.q1 || "-")} | Q2=${escapeHtml((secA.q2 || []).join(" → "))} | Q3=${escapeHtml(secA.q3 || "-")} | Q4=${escapeHtml((secA.q4 || []).join(" → "))} | Q5=${escapeHtml(secA.q5 || "-")}</p>
+                  <p style="margin:0 0 6px;"><strong>Q6 Synth Bass:</strong> VCO: ${escapeHtml(q6.vcoSetting)} (${escapeHtml(q6.vcoReason)}) | Slope: ${escapeHtml(q6.slopeSetting)} (${escapeHtml(q6.slopeReason)}) | Cutoff: ${escapeHtml(q6.cutoffSetting)} (${escapeHtml(q6.cutoffReason)}) | Res: ${escapeHtml(q6.resSetting)} (${escapeHtml(q6.resReason)})<br><em>Feedback:</em> ${escapeHtml(qf.q6 || "")}</p>
+                  <p style="margin:0 0 6px;"><strong>Q7(a):</strong> ${escapeHtml(secB.q7a || "")}<br><strong>Q7(b):</strong> ${escapeHtml(secB.q7b || "")}<br><em>Feedback:</em> ${escapeHtml(qf.q7 || "")}</p>
+                  <p style="margin:0 0 6px;"><strong>Q8(a):</strong> Pitch=${escapeHtml(q8a.pitch)}, Amp=${escapeHtml(q8a.amp)}, Cutoff=${escapeHtml(q8a.cutoff)}<br><strong>Q8(b):</strong> ${escapeHtml(secB.q8b || "")}<br><em>Feedback:</em> ${escapeHtml(qf.q8 || "")}</p>
+                  <p style="margin:0;"><strong>Q9 Essay:</strong> ${escapeHtml(secC.q9 || "")}<br><em>Feedback:</em> ${escapeHtml(qf.q9 || "")}</p>
+                </div>
+              </details>
+            </td>
+          </tr>`;
+        });
+        html += `</tbody></table>`;
       }
-      let tbl = `<table><thead><tr><th>Student</th><th>Date</th><th>Scores (A / B / C / Total)</th><th>Recorded Misconceptions &amp; Full Answers</th></tr></thead><tbody>`;
-      subs.forEach((s) => {
-        const miscText = (s.misconceptions || [])
-          .map((m) => `<div><strong>${escapeHtml(m.topic)}:</strong> ${escapeHtml(m.misconceptionNote)}</div>`)
-          .join("");
-        const a = s.answers || {};
-        const secA = a.sectionA || {};
-        const secB = a.sectionB || {};
-        const q6 = secB.q6 || {};
-        const q8a = secB.q8a || {};
-        const secC = a.sectionC || {};
-        const qf = s.aiResult?.questionFeedback || {};
-        const fbUrl = `${window.location.origin}/feedback?id=${encodeURIComponent(s.id)}`;
-        tbl += `<tr>
-          <td><strong>${escapeHtml(s.studentName)}</strong><div style="margin-top:6px;"><button type="button" class="btn" style="padding:4px 9px; font-size:11.5px;" onclick="navigator.clipboard?.writeText('${fbUrl}'); this.textContent='Copied Link!'">Copy Feedback Link</button></div></td>
-          <td>${escapeHtml(s.assessDate || s.createdAt?.slice(0, 10) || "")}</td>
-          <td>A: ${s.sectionAScore}/10 &bull; B: ${s.sectionBScore}/12 &bull; C: ${s.sectionCScore}/8<br><strong>Total: ${s.totalScore}/30</strong></td>
-          <td>
-            ${miscText || "None recorded"}
-            <details style="margin-top:8px;">
-              <summary style="cursor:pointer; font-weight:700; color:var(--vco);">View Full Submitted Answers &amp; Feedback</summary>
-              <div style="margin-top:8px; padding:10px; background:#fff; border:1px solid var(--border); border-radius:8px; font-size:13px;">
-                <p style="margin:0 0 6px;"><strong>Section A:</strong> Q1=${escapeHtml(secA.q1 || "-")} | Q2=${escapeHtml((secA.q2 || []).join(" → "))} | Q3=${escapeHtml(secA.q3 || "-")} | Q4=${escapeHtml((secA.q4 || []).join(" → "))} | Q5=${escapeHtml(secA.q5 || "-")}</p>
-                <p style="margin:0 0 6px;"><strong>Q6 Synth Bass:</strong> VCO: ${escapeHtml(q6.vcoSetting)} (${escapeHtml(q6.vcoReason)}) | Slope: ${escapeHtml(q6.slopeSetting)} (${escapeHtml(q6.slopeReason)}) | Cutoff: ${escapeHtml(q6.cutoffSetting)} (${escapeHtml(q6.cutoffReason)}) | Res: ${escapeHtml(q6.resSetting)} (${escapeHtml(q6.resReason)})<br><em>Feedback:</em> ${escapeHtml(qf.q6 || "")}</p>
-                <p style="margin:0 0 6px;"><strong>Q7(a):</strong> ${escapeHtml(secB.q7a || "")}<br><strong>Q7(b):</strong> ${escapeHtml(secB.q7b || "")}<br><em>Feedback:</em> ${escapeHtml(qf.q7 || "")}</p>
-                <p style="margin:0 0 6px;"><strong>Q8(a):</strong> Pitch=${escapeHtml(q8a.pitch)}, Amp=${escapeHtml(q8a.amp)}, Cutoff=${escapeHtml(q8a.cutoff)}<br><strong>Q8(b):</strong> ${escapeHtml(secB.q8b || "")}<br><em>Feedback:</em> ${escapeHtml(qf.q8 || "")}</p>
-                <p style="margin:0;"><strong>Q9 Essay:</strong> ${escapeHtml(secC.q9 || "")}<br><em>Feedback:</em> ${escapeHtml(qf.q9 || "")}</p>
-              </div>
-            </details>
-          </td>
-        </tr>`;
-      });
-      tbl += `</tbody></table>`;
-      body.innerHTML = tbl;
+
+      if (inProgressDrafts.length > 0) {
+        html += `<h4 style="margin:16px 0 8px;">In-Progress Drafts (Auto-Synced, Not Yet Submitted)</h4>`;
+        html += `<table><thead><tr><th>Student</th><th>Last Saved</th><th>Progress</th><th>Partial Answers</th></tr></thead><tbody>`;
+        inProgressDrafts.forEach((d) => {
+          const a = d.answers || {};
+          const secA = a.sectionA || {};
+          const secB = a.sectionB || {};
+          const q6 = secB.q6 || {};
+          const q8a = secB.q8a || {};
+          const secC = a.sectionC || {};
+          html += `<tr>
+            <td><strong>${escapeHtml(d.studentName)}</strong></td>
+            <td>${escapeHtml((d.updatedAt || "").replace("T", " ").slice(0, 16))}</td>
+            <td>${d.answeredCount}/9 questions<br>Sec A: ${d.sectionAScore}/10</td>
+            <td>
+              <details>
+                <summary style="cursor:pointer; font-weight:700; color:var(--env);">View Partial Answers</summary>
+                <div style="margin-top:8px; padding:10px; background:#fff; border:1px solid var(--border); border-radius:8px; font-size:13px;">
+                  <p style="margin:0 0 6px;"><strong>Section A:</strong> Q1=${escapeHtml(secA.q1 || "-")} | Q2=${escapeHtml((secA.q2 || []).join(" → "))} | Q3=${escapeHtml(secA.q3 || "-")} | Q4=${escapeHtml((secA.q4 || []).join(" → "))} | Q5=${escapeHtml(secA.q5 || "-")}</p>
+                  <p style="margin:0 0 6px;"><strong>Q6 Synth Bass:</strong> VCO: ${escapeHtml(q6.vcoSetting)} (${escapeHtml(q6.vcoReason)}) | Slope: ${escapeHtml(q6.slopeSetting)} (${escapeHtml(q6.slopeReason)}) | Cutoff: ${escapeHtml(q6.cutoffSetting)} (${escapeHtml(q6.cutoffReason)}) | Res: ${escapeHtml(q6.resSetting)} (${escapeHtml(q6.resReason)})</p>
+                  <p style="margin:0 0 6px;"><strong>Q7(a):</strong> ${escapeHtml(secB.q7a || "")}<br><strong>Q7(b):</strong> ${escapeHtml(secB.q7b || "")}</p>
+                  <p style="margin:0 0 6px;"><strong>Q8(a):</strong> Pitch=${escapeHtml(q8a.pitch)}, Amp=${escapeHtml(q8a.amp)}, Cutoff=${escapeHtml(q8a.cutoff)}<br><strong>Q8(b):</strong> ${escapeHtml(secB.q8b || "")}</p>
+                  <p style="margin:0;"><strong>Q9 Essay:</strong> ${escapeHtml(secC.q9 || "")}</p>
+                </div>
+              </details>
+            </td>
+          </tr>`;
+        });
+        html += `</tbody></table>`;
+      }
+
+      body.innerHTML = html;
     } catch (err) {
       body.textContent = "Error loading submissions: " + err.message;
     }
@@ -1545,9 +1637,10 @@
   renderChain("q2");
   renderChain("q4");
 
-  // Auto-save student progress locally
+  // Auto-save student progress locally & sync partial drafts to D1
   document.addEventListener("input", saveDraft);
   document.addEventListener("change", saveDraft);
+  window.addEventListener("pagehide", () => syncDraftToServer(true));
 </script>
 </body>
 </html>
