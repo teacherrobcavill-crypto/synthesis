@@ -503,6 +503,7 @@
       <a href="/guide1">Guide 1: Basics</a>
       <a href="/guide2">Guide 2: Modular</a>
       <a href="/guide3">Guide 3: Minimoog &amp; DAW</a>
+      <a href="/feedback">My Feedback</a>
     </div>
   </nav>
 
@@ -1483,8 +1484,9 @@
         const q8a = secB.q8a || {};
         const secC = a.sectionC || {};
         const qf = s.aiResult?.questionFeedback || {};
+        const fbUrl = `${window.location.origin}/feedback?id=${encodeURIComponent(s.id)}`;
         tbl += `<tr>
-          <td><strong>${escapeHtml(s.studentName)}</strong></td>
+          <td><strong>${escapeHtml(s.studentName)}</strong><div style="margin-top:6px;"><button type="button" class="btn" style="padding:4px 9px; font-size:11.5px;" onclick="navigator.clipboard?.writeText('${fbUrl}'); this.textContent='Copied Link!'">Copy Feedback Link</button></div></td>
           <td>${escapeHtml(s.assessDate || s.createdAt?.slice(0, 10) || "")}</td>
           <td>A: ${s.sectionAScore}/10 &bull; B: ${s.sectionBScore}/12 &bull; C: ${s.sectionCScore}/8<br><strong>Total: ${s.totalScore}/30</strong></td>
           <td>

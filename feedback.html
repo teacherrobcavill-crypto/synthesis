@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Personalised Synthesis Feedback — A-Level Music Technology</title>
+<style>
+  :root {
+    --bg: #f8fafc;
+    --surface: #ffffff;
+    --surface-alt: #f1f5f9;
+    --ink: #0f172a;
+    --ink-soft: #334155;
+    --muted: #64748b;
+    --border: #e2e8f0;
+    --vco: #2563eb;
+    --vcf: #0d9488;
+    --vca: #16a34a;
+    --env: #d97706;
+    --lfo: #7c3aed;
+    --danger: #dc2626;
+    --radius: 14px;
+    --shadow: 0 1px 3px rgba(15, 23, 42, 0.06), 0 8px 24px rgba(15, 23, 42, 0.04);
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Inter, sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    line-height: 1.65;
+    font-size: 15px;
+    -webkit-font-smoothing: antialiased;
+  }
+  .container { max-width: 960px; margin: 0 auto; padding: 18px 20px 72px; }
+
+  .series-bar {
+    display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 10px;
+    margin-bottom: 16px; font-size: 13px; color: var(--muted);
+  }
+  .series-links { display: flex; flex-wrap: wrap; gap: 8px; }
+  .series-links a {
+    text-decoration: none; color: var(--ink-soft); background: var(--surface);
+    border: 1px solid var(--border); padding: 5px 11px; border-radius: 999px;
+    font-weight: 600; font-size: 12.5px; transition: all 0.15s;
+  }
+  .series-links a:hover { color: var(--vco); border-color: var(--vco); background: #eff6ff; }
+
+  header.hero {
+    background: linear-gradient(135deg, #0f172a 0%, #1e293b 55%, #1d4ed8 100%);
+    color: #fff; border-radius: 18px; padding: 26px 30px; margin-bottom: 20px; box-shadow: var(--shadow);
+  }
+  .hero-badge {
+    display: inline-block; background: rgba(255,255,255,0.14); border: 1px solid rgba(255,255,255,0.24);
+    padding: 4px 12px; border-radius: 999px; font-size: 11.5px; font-weight: 700;
+    letter-spacing: 0.04em; text-transform: uppercase; margin-bottom: 10px;
+  }
+  header.hero h1 { margin: 0 0 8px; font-size: 27px; line-height: 1.2; }
+  header.hero p.subtitle { margin: 0; color: #cbd5e1; max-width: 66ch; font-size: 15px; }
+
+  .lookup-card, section.card {
+    background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+    padding: 22px 24px; margin-bottom: 18px; box-shadow: var(--shadow);
+  }
+  .lookup-row { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+  .lookup-row input {
+    flex: 1; min-width: 220px; border: 1.5px solid #cbd5e1; border-radius: 10px;
+    padding: 10px 13px; font-size: 15px; color: var(--ink);
+  }
+  .lookup-row input:focus { outline: none; border-color: var(--vco); }
+  .btn {
+    border: 1px solid var(--border); background: var(--surface); color: var(--ink);
+    padding: 9px 15px; border-radius: 9px; font-size: 13.5px; font-weight: 600;
+    cursor: pointer; transition: all 0.15s; text-decoration: none; display: inline-flex; align-items: center; gap: 6px;
+  }
+  .btn:hover { background: var(--surface-alt); }
+  .btn-primary { background: var(--vco); border-color: var(--vco); color: #fff; }
+  .btn-primary:hover { background: #1d4ed8; }
+  .btn-amber { background: #d97706; border-color: #d97706; color: #fff; }
+  .btn-amber:hover { background: #b45309; }
+  .btn-green { background: #16a34a; border-color: #16a34a; color: #fff; }
+  .btn-green:hover { background: #15803d; }
+
+  .err-msg { color: var(--danger); font-size: 13.5px; font-weight: 600; margin-top: 10px; display: none; }
+  .err-msg.show { display: block; }
+
+  #resultsRoot { display: none; }
+  #resultsRoot.show { display: block; }
+
+  .score-grid {
+    display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin: 14px 0 10px;
+  }
+  @media (max-width: 680px) { .score-grid { grid-template-columns: repeat(2, 1fr); } }
+  .score-box {
+    background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 11px; padding: 12px; text-align: center;
+  }
+  .score-box strong { display: block; font-size: 11px; text-transform: uppercase; color: var(--vco); letter-spacing: 0.05em; }
+  .score-box span { font-size: 22px; font-weight: 800; color: var(--ink); }
+
+  .progress-wrap {
+    margin-top: 12px; background: var(--surface-alt); border-radius: 999px; height: 12px; overflow: hidden;
+    border: 1px solid var(--border);
+  }
+  .progress-fill { height: 100%; background: linear-gradient(90deg, var(--vco), var(--vca)); transition: width 0.4s ease; }
+
+  .tag {
+    display: inline-block; font-size: 11px; font-weight: 800; text-transform: uppercase;
+    letter-spacing: 0.06em; padding: 3px 9px; border-radius: 6px; margin-bottom: 6px;
+  }
+  .tag-blue { background: #eff6ff; color: var(--vco); }
+  .tag-red { background: #fef2f2; color: #991b1b; }
+  .tag-teal { background: #f0fdfa; color: var(--vcf); }
+  .tag-amber { background: #fffbeb; color: var(--env); }
+
+  .q-review {
+    border: 1px solid var(--border); border-radius: 11px; padding: 14px 16px; margin-bottom: 12px; background: #fcfdff;
+  }
+  .q-review:last-child { margin-bottom: 0; }
+  .q-review-head { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-bottom: 6px; }
+  .q-score-pill {
+    font-size: 12px; font-weight: 800; padding: 3px 10px; border-radius: 999px;
+    background: #eff6ff; color: var(--vco); border: 1px solid #bfdbfe;
+  }
+  .your-ans {
+    background: var(--surface-alt); border-radius: 8px; padding: 8px 11px; font-size: 13.5px; color: var(--ink-soft); margin: 6px 0;
+  }
+  .examiner-fb { font-size: 14px; color: var(--ink); margin: 6px 0 0; }
+
+  .misc-card {
+    border: 1px solid #fecaca; background: #fef2f2; border-radius: 11px; padding: 13px 15px; margin-bottom: 10px;
+    display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12px;
+  }
+  .misc-card:last-child { margin-bottom: 0; }
+  .misc-card strong { color: #991b1b; display: block; font-size: 14px; }
+  .misc-card p { margin: 3px 0 0; font-size: 13.5px; color: #7f1d1d; }
+
+  .followup-card {
+    border: 1px solid var(--border); border-radius: 12px; padding: 16px 18px; margin-bottom: 14px; background: #fcfdff;
+  }
+  .followup-card.done { border-color: var(--vca); background: #f0fdf4; }
+  .followup-card textarea {
+    width: 100%; border: 1px solid #cbd5e1; border-radius: 8px; padding: 9px 11px;
+    font-family: inherit; font-size: 14px; min-height: 68px; margin: 8px 0; resize: vertical;
+  }
+  .reveal-box {
+    display: none; margin-top: 9px; padding: 10px 12px; border-radius: 8px; font-size: 13.5px;
+  }
+  .reveal-box.show { display: block; }
+  .reveal-hint { background: #fffbeb; border: 1px solid #fde68a; color: #78350f; }
+  .reveal-model { background: #f0fdf4; border: 1px solid #bbf7d0; color: #166534; }
+
+  footer { text-align: center; color: var(--muted); font-size: 12.5px; margin-top: 28px; }
+</style>
+</head>
+<body>
+<div class="container">
+  <nav class="series-bar" aria-label="Navigation">
+    <span>A-Level Music Technology &bull; Personalised Feedback Portal</span>
+    <div class="series-links">
+      <a href="/">&larr; All Guides</a>
+      <a href="/guide1">Guide 1</a>
+      <a href="/guide2">Guide 2</a>
+      <a href="/guide3">Guide 3</a>
+      <a href="/assessment">Assessment</a>
+    </div>
+  </nav>
+
+  <header class="hero">
+    <div class="hero-badge">Basic Synthesis Assessment &bull; Individual Feedback &amp; Next Steps</div>
+    <h1>Your Personalised Synthesis Feedback</h1>
+    <p class="subtitle">Enter your full name (exactly as you typed it on the assessment) to view your marks, examiner feedback on your written answers, and bespoke follow-up practice.</p>
+  </header>
+
+  <div class="lookup-card">
+    <form class="lookup-row" onsubmit="event.preventDefault(); lookupFeedback();">
+      <input type="text" id="nameQuery" placeholder="Enter your full name (e.g. Chloe Eales)..." aria-label="Your full name" />
+      <button type="submit" class="btn btn-primary" id="lookupBtn">Load My Feedback</button>
+    </form>
+    <div class="err-msg" id="lookupErr"></div>
+  </div>
+
+  <div id="resultsRoot">
+    <!-- Score Overview -->
+    <section class="card">
+      <span class="tag tag-blue">Score Breakdown</span>
+      <h2 id="studentHeading" style="margin:0 0 4px;"></h2>
+      <p id="studentMeta" style="margin:0; font-size:13.5px; color:var(--muted);"></p>
+      <div class="score-grid" id="scoreGrid"></div>
+      <div class="progress-wrap"><div class="progress-fill" id="scoreBar" style="width:0%"></div></div>
+    </section>
+
+    <!-- Misconceptions & Direct Lab Links -->
+    <section class="card" id="miscSection">
+      <span class="tag tag-red">Priority Focus Areas</span>
+      <h2 style="margin:0 0 10px;">Misconceptions to Fix First</h2>
+      <div id="miscList"></div>
+    </section>
+
+    <!-- Written Answers & Examiner Feedback -->
+    <section class="card">
+      <span class="tag tag-teal">Question-by-Question Review</span>
+      <h2 style="margin:0 0 12px;">Your Written Answers &amp; Examiner Feedback</h2>
+      <div id="reviewList"></div>
+    </section>
+
+    <!-- Bespoke Follow-Up Questions -->
+    <section class="card">
+      <span class="tag tag-amber">Bespoke Next Steps</span>
+      <h2 style="margin:0 0 6px;">Your 3 Tailored Follow-Up Questions</h2>
+      <p style="margin:0 0 14px; font-size:14px; color:var(--ink-soft);">Complete each targeted question below, check the hint if stuck, and tick it off once you've compared with the model answer.</p>
+      <div id="followUpList"></div>
+    </section>
+
+    <!-- Tailored Revision Notes -->
+    <section class="card" id="revSection">
+      <span class="tag tag-blue">Revision Summary</span>
+      <h2 style="margin:0 0 10px;">Tailored Revision Notes</h2>
+      <div id="revList"></div>
+    </section>
+  </div>
+
+  <footer>RJC Audio &bull; A-Level Music Technology Interactive Synthesis Suite</footer>
+</div>
+
+<script>
+  function escapeHtml(str) {
+    return String(str ?? "")
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;");
+  }
+
+  function guideLabel(url) {
+    if (url === "/guide1") return "Open Guide 1: Waveforms & Filters";
+    if (url === "/guide2") return "Open Guide 2: Modular CV & LFO";
+    if (url === "/guide3") return "Open Guide 3: Minimoog & DAW";
+    return "Open Guide";
+  }
+
+  async function lookupFeedback(opts = {}) {
+    const errEl = document.getElementById("lookupErr");
+    errEl.classList.remove("show");
+    const nameInput = document.getElementById("nameQuery");
+    const btn = document.getElementById("lookupBtn");
+
+    const params = new URLSearchParams();
+    if (opts.id) {
+      params.set("id", opts.id);
+    } else {
+      const q = nameInput.value.trim();
+      if (!q) {
+        errEl.textContent = "Please enter your full name first.";
+        errEl.classList.add("show");
+        return;
+      }
+      params.set("name", q);
+    }
+
+    btn.disabled = true;
+    btn.textContent = "Loading...";
+    try {
+      const res = await fetch(`/api/v1/student-feedback?${params.toString()}`);
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Could not find submission");
+      if (data.studentName && !nameInput.value.trim()) {
+        nameInput.value = data.studentName;
+      }
+      renderStudentFeedback(data);
+    } catch (err) {
+      document.getElementById("resultsRoot").classList.remove("show");
+      errEl.textContent = err.message;
+      errEl.classList.add("show");
+    } finally {
+      btn.disabled = false;
+      btn.textContent = "Load My Feedback";
+    }
+  }
+
+  function renderStudentFeedback(d) {
+    document.getElementById("studentHeading").textContent = `${d.studentName} — Synthesis Assessment Feedback`;
+    document.getElementById("studentMeta").textContent = `Submitted: ${d.assessDate || ""} • Total Score: ${d.totalScore} / ${d.maxScore}`;
+
+    document.getElementById("scoreGrid").innerHTML = `
+      <div class="score-box"><strong>Total Score</strong><span>${d.totalScore} / 30</span></div>
+      <div class="score-box"><strong>Section A</strong><span>${d.sectionAScore} / 10</span></div>
+      <div class="score-box"><strong>Section B</strong><span>${d.sectionBScore} / 12</span></div>
+      <div class="score-box"><strong>Section C</strong><span>${d.sectionCScore} / 8</span></div>
+    `;
+    const pct = Math.round((d.totalScore / 30) * 100);
+    document.getElementById("scoreBar").style.width = `${pct}%`;
+
+    // Misconceptions
+    const miscEl = document.getElementById("miscList");
+    if (Array.isArray(d.misconceptions) && d.misconceptions.length > 0) {
+      miscEl.innerHTML = d.misconceptions.map((m) => `
+        <div class="misc-card">
+          <div style="flex:1; min-width:220px;">
+            <strong>${escapeHtml(m.topic)}</strong>
+            <p>${escapeHtml(m.misconceptionNote)}</p>
+          </div>
+          <a class="btn btn-primary" href="${escapeHtml(m.guideUrl || "/guide1")}">${guideLabel(m.guideUrl)} &rarr;</a>
+        </div>
+      `).join("");
+    } else {
+      miscEl.innerHTML = `<p style="margin:0;">No major misconceptions flagged — great work!</p>`;
+    }
+
+    // Written review
+    const secB = d.answers?.sectionB || {};
+    const secC = d.answers?.sectionC || {};
+    const q6 = secB.q6 || {};
+    const q8a = secB.q8a || {};
+    const qf = d.questionFeedback || {};
+    const qs = d.qScores || {};
+
+    document.getElementById("reviewList").innerHTML = `
+      <div class="q-review">
+        <div class="q-review-head"><strong>Q6. 1970s Analogue Synth Bass Table</strong><span class="q-score-pill">${qs.q6 ?? 0} / 4</span></div>
+        <div class="your-ans"><strong>You wrote:</strong> VCO: ${escapeHtml(q6.vcoSetting)} (${escapeHtml(q6.vcoReason)}) &bull; Slope: ${escapeHtml(q6.slopeSetting)} (${escapeHtml(q6.slopeReason)}) &bull; Cutoff: ${escapeHtml(q6.cutoffSetting)} (${escapeHtml(q6.cutoffReason)}) &bull; Resonance: ${escapeHtml(q6.resSetting)} (${escapeHtml(q6.resReason)})</div>
+        <p class="examiner-fb"><strong>Feedback:</strong> ${escapeHtml(qf.q6 || "")}</p>
+      </div>
+      <div class="q-review">
+        <div class="q-review-head"><strong>Q7. Audio Signals vs. CV &amp; 1V/Octave</strong><span class="q-score-pill">${qs.q7 ?? 0} / 4</span></div>
+        <div class="your-ans"><strong>You wrote (a):</strong> ${escapeHtml(secB.q7a || "")}<br><strong>You wrote (b):</strong> ${escapeHtml(secB.q7b || "")}</div>
+        <p class="examiner-fb"><strong>Feedback:</strong> ${escapeHtml(qf.q7 || "")}</p>
+      </div>
+      <div class="q-review">
+        <div class="q-review-head"><strong>Q8. LFO Destinations &amp; Dual Envelopes</strong><span class="q-score-pill">${qs.q8 ?? 0} / 4</span></div>
+        <div class="your-ans"><strong>You wrote (a):</strong> Pitch=${escapeHtml(q8a.pitch)}, Amp=${escapeHtml(q8a.amp)}, Cutoff=${escapeHtml(q8a.cutoff)}<br><strong>You wrote (b):</strong> ${escapeHtml(secB.q8b || "")}</div>
+        <p class="examiner-fb"><strong>Feedback:</strong> ${escapeHtml(qf.q8 || "")}</p>
+      </div>
+      <div class="q-review">
+        <div class="q-review-head"><strong>Q9. 1970 Minimoog vs. Modern DAW Plugins (8 Marks)</strong><span class="q-score-pill">${qs.q9 ?? 0} / 8</span></div>
+        <div class="your-ans"><strong>You wrote:</strong> ${escapeHtml(secC.q9 || "")}</div>
+        <p class="examiner-fb"><strong>Feedback:</strong> ${escapeHtml(qf.q9 || "")}</p>
+      </div>
+    `;
+
+    // Follow-up questions
+    const fuEl = document.getElementById("followUpList");
+    const doneKey = `synth_fu_done_${d.id}`;
+    let doneMap = {};
+    try { doneMap = JSON.parse(localStorage.getItem(doneKey) || "{}"); } catch (_) {}
+
+    fuEl.innerHTML = (d.followUpQuestions || []).map((fq, idx) => {
+      const isDone = Boolean(doneMap[idx]);
+      return `
+        <div class="followup-card ${isDone ? "done" : ""}" id="fu-card-${idx}">
+          <div style="display:flex; justify-content:space-between; align-items:center; gap:8px; flex-wrap:wrap;">
+            <strong>Follow-Up ${idx + 1}: ${escapeHtml(fq.topic)}</strong>
+            <a class="btn" href="${escapeHtml(fq.guideUrl || "/guide1")}" style="padding:4px 10px; font-size:12px;">${guideLabel(fq.guideUrl)} &rarr;</a>
+          </div>
+          <p style="margin:6px 0 4px;">${escapeHtml(fq.question)}</p>
+          <textarea placeholder="Write your follow-up answer here..."></textarea>
+          <div style="display:flex; gap:8px; flex-wrap:wrap;">
+            <button type="button" class="btn" onclick="this.parentElement.nextElementSibling.classList.toggle('show')">Hint</button>
+            <button type="button" class="btn btn-amber" onclick="this.parentElement.nextElementSibling.nextElementSibling.classList.toggle('show')">Reveal Model Answer</button>
+            <button type="button" class="btn ${isDone ? "btn-green" : ""}" onclick="toggleFuDone('${escapeHtml(d.id)}', ${idx}, this)">${isDone ? "✓ Completed" : "Mark as Done"}</button>
+          </div>
+          <div class="reveal-box reveal-hint"><strong>Hint:</strong> ${escapeHtml(fq.hint)}</div>
+          <div class="reveal-box reveal-model"><strong>Model Answer:</strong> ${escapeHtml(fq.modelAnswer)}</div>
+        </div>
+      `;
+    }).join("");
+
+    // Revision Notes
+    const revEl = document.getElementById("revList");
+    revEl.innerHTML = (d.revisionNotes || []).map((rn) => `
+      <div class="q-review">
+        <div class="q-review-head">
+          <strong>${escapeHtml(rn.title)}</strong>
+          <a class="btn" href="${escapeHtml(rn.guideUrl || "/guide1")}" style="padding:4px 10px; font-size:12px;">Review Guide &rarr;</a>
+        </div>
+        <p style="margin:4px 0 0; font-size:14px; color:var(--ink-soft);">${escapeHtml(rn.note)}</p>
+      </div>
+    `).join("");
+
+    document.getElementById("resultsRoot").classList.add("show");
+  }
+
+  function toggleFuDone(subId, idx, btn) {
+    const key = `synth_fu_done_${subId}`;
+    let map = {};
+    try { map = JSON.parse(localStorage.getItem(key) || "{}"); } catch (_) {}
+    map[idx] = !map[idx];
+    try { localStorage.setItem(key, JSON.stringify(map)); } catch (_) {}
+    const card = document.getElementById(`fu-card-${idx}`);
+    card.classList.toggle("done", map[idx]);
+    btn.classList.toggle("btn-green", map[idx]);
+    btn.textContent = map[idx] ? "✓ Completed" : "Mark as Done";
+  }
+
+  // Auto-load if ?id= or ?name= is in URL
+  const urlParams = new URLSearchParams(window.location.search);
+  if (urlParams.get("id")) {
+    lookupFeedback({ id: urlParams.get("id") });
+  } else if (urlParams.get("name")) {
+    document.getElementById("nameQuery").value = urlParams.get("name");
+    lookupFeedback();
+  }
+</script>
+</body>
+</html>
