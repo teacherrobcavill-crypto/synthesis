@@ -256,12 +256,31 @@ function csvEscape(val) {
 
 function submissionsToCsv(submissions) {
   const headers = [
-    'Student Name', 'Date', 'Section A (/10)', 'Section B (/12)', 'Section C (/8)', 'Total (/30)',
-    'Q1', 'Q2 Chain', 'Q3', 'Q4 Chain', 'Q5',
-    'Q6 VCO', 'Q6 Slope', 'Q6 Cutoff', 'Q6 Resonance', 'Q6 Feedback',
-    'Q7(a) Audio vs CV', 'Q7(b) 1V/Oct & Gate', 'Q7 Feedback',
-    'Q8(a) LFO Destinations', 'Q8(b) Dual Envelopes', 'Q8 Feedback',
-    'Q9 Extended Essay', 'Q9 Feedback', 'Recorded Misconceptions'
+    'Student Name',
+    'Date',
+    'Section A (/10)',
+    'Section B (/12)',
+    'Section C (/8)',
+    'Total (/30)',
+    'Q1: Why start with Sawtooth vs Sine for bright synth brass?',
+    'Q2: Action -> Mechanism -> Sonic Impact for raising LPF Resonance',
+    'Q3: Why patch ADSR -> VCA in addition to VCO -> VCF -> VCA?',
+    'Q4: Action -> Mechanism -> Sonic Impact for 5 Hz LFO -> VCO Pitch',
+    'Q5: 1970 Minimoog Model D vs DAW plugins (breakthrough & limitation)',
+    'Q6(a) Synth Bass — VCO Waveform & Range (Setting & Reason)',
+    'Q6(b) Synth Bass — VCF Slope dB/oct (Setting & Reason)',
+    'Q6(c) Synth Bass — VCF Cutoff Hz (Setting & Reason)',
+    'Q6(d) Synth Bass — VCF Resonance Q (Setting & Reason)',
+    'Q6 AI Feedback',
+    'Q7(a): Difference between Audio Signals and Control Voltages / Gates',
+    'Q7(b): What does 1V/Octave mean & which module receives the Gate pulse?',
+    'Q7 AI Feedback',
+    'Q8(a): Musical effect of LFO -> VCO Pitch, VCA Amp, VCF Cutoff',
+    'Q8(b): Why separate VCA and VCF ADSR envelopes?',
+    'Q8 AI Feedback',
+    'Q9 (8 Marks): 1970 Minimoog vs Modern DAW Plugins (Poly, Glide, Arp, Bend, Unison)',
+    'Q9 AI Feedback',
+    'Recorded Misconceptions'
   ];
   const lines = [headers.map(csvEscape).join(',')];
   for (const s of submissions) {
