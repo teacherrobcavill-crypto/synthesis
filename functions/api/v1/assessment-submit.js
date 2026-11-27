@@ -123,6 +123,7 @@ Return ONLY valid JSON matching this exact structure:
 }
 
 Rules:
+- Address the student directly in warm, constructive teacher voice using "you" and "your" (second-person), NEVER third-person (e.g. say "You accurately identified..." rather than "${studentName} identified..." or "The student wrote...").
 - q6Score, q7Score, q8Score must be integers 0..4; q9Score must be integer 0..8.
 - Provide 2-4 misconceptions (or if they scored near full marks, 1 stretch misconception/refinement note).
 - Provide exactly 3 bespoke followUpQuestions and 2-3 tailored revisionNotes.
