@@ -248,10 +248,68 @@ function buildFallbackResult(payload) {
   };
 }
 
+function csvEscape(val) {
+  const s = String(val ?? '').replace(/\r?\n/g, ' ');
+  if (/[",]/.test(s)) return `"${s.replace(/"/g, '""')}"`;
+  return s;
+}
+
+function submissionsToCsv(submissions) {
+  const headers = [
+    'Student Name', 'Date', 'Section A (/10)', 'Section B (/12)', 'Section C (/8)', 'Total (/30)',
+    'Q1', 'Q2 Chain', 'Q3', 'Q4 Chain', 'Q5',
+    'Q6 VCO', 'Q6 Slope', 'Q6 Cutoff', 'Q6 Resonance', 'Q6 Feedback',
+    'Q7(a) Audio vs CV', 'Q7(b) 1V/Oct & Gate', 'Q7 Feedback',
+    'Q8(a) LFO Destinations', 'Q8(b) Dual Envelopes', 'Q8 Feedback',
+    'Q9 Extended Essay', 'Q9 Feedback', 'Recorded Misconceptions'
+  ];
+  const lines = [headers.map(csvEscape).join(',')];
+  for (const s of submissions) {
+    const a = s.answers || {};
+    const secA = a.sectionA || {};
+    const secB = a.sectionB || {};
+    const secC = a.sectionC || {};
+    const q6 = secB.q6 || {};
+    const q8a = secB.q8a || {};
+    const qf = (s.aiResult && s.aiResult.questionFeedback) || {};
+    const misc = (s.misconceptions || []).map((m) => `${m.topic || ''}: ${m.misconceptionNote || ''}`).join('; ');
+    const row = [
+      s.studentName || '',
+      s.assessDate || (s.createdAt || '').slice(0, 10),
+      s.sectionAScore ?? 0,
+      s.sectionBScore ?? 0,
+      s.sectionCScore ?? 0,
+      s.totalScore ?? 0,
+      secA.q1 || '',
+      (secA.q2 || []).join(' -> '),
+      secA.q3 || '',
+      (secA.q4 || []).join(' -> '),
+      secA.q5 || '',
+      `${q6.vcoSetting || ''} (${q6.vcoReason || ''})`,
+      `${q6.slopeSetting || ''} (${q6.slopeReason || ''})`,
+      `${q6.cutoffSetting || ''} (${q6.cutoffReason || ''})`,
+      `${q6.resSetting || ''} (${q6.resReason || ''})`,
+      qf.q6 || '',
+      secB.q7a || '',
+      secB.q7b || '',
+      qf.q7 || '',
+      `Pitch: ${q8a.pitch || ''} | Amp: ${q8a.amp || ''} | Cutoff: ${q8a.cutoff || ''}`,
+      secB.q8b || '',
+      qf.q8 || '',
+      secC.q9 || '',
+      qf.q9 || '',
+      misc
+    ];
+    lines.push(row.map(csvEscape).join(','));
+  }
+  return lines.join('\n');
+}
+
 export async function onRequestGet(context) {
   const { request, env } = context;
   const url = new URL(request.url);
   const pin = (url.searchParams.get('pin') || '').trim();
+  const format = (url.searchParams.get('format') || '').trim().toLowerCase();
 
   if (pin !== TEACHER_PIN) {
     return jsonResponse({ error: 'Valid Teacher PIN required' }, 403);
@@ -262,7 +320,7 @@ export async function onRequestGet(context) {
       `SELECT id, student_name, assess_date, section_a_score, section_b_score, section_c_score, total_score, answers_json, ai_result_json, misconceptions_json, created_at
        FROM assessment_submissions
        ORDER BY created_at DESC
-       LIMIT 50`
+       LIMIT 200`
     ).all();
 
     const submissions = (results || []).map((row) => {
@@ -286,6 +344,16 @@ export async function onRequestGet(context) {
         createdAt: row.created_at
       };
     });
+
+    if (format === 'csv') {
+      return new Response(submissionsToCsv(submissions), {
+        status: 200,
+        headers: {
+          'Content-Type': 'text/csv; charset=utf-8',
+          'Cache-Control': 'no-store'
+        }
+      });
+    }
 
     return jsonResponse({ submissions }, 200);
   } catch (err) {
@@ -371,6 +439,48 @@ export async function onRequestPost(context) {
       .run();
   } catch (err) {
     // Do not block student feedback if DB write fails
+  }
+
+  if (env.SHEET_WEBHOOK_URL) {
+    const q6 = sectionB.q6 || {};
+    const q8a = sectionB.q8a || {};
+    const qf = result.questionFeedback || {};
+    const misc = misconceptions.map((m) => `${m.topic || ''}: ${m.misconceptionNote || ''}`).join('; ');
+    try {
+      await fetch(env.SHEET_WEBHOOK_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          row: [
+            studentName,
+            assessDate || createdAt.slice(0, 10),
+            sectionAScore,
+            sectionBScore,
+            sectionCScore,
+            totalScore,
+            sectionA.q1 || '',
+            (sectionA.q2 || []).join(' -> '),
+            sectionA.q3 || '',
+            (sectionA.q4 || []).join(' -> '),
+            sectionA.q5 || '',
+            `${q6.vcoSetting || ''} (${q6.vcoReason || ''})`,
+            `${q6.slopeSetting || ''} (${q6.slopeReason || ''})`,
+            `${q6.cutoffSetting || ''} (${q6.cutoffReason || ''})`,
+            `${q6.resSetting || ''} (${q6.resReason || ''})`,
+            qf.q6 || '',
+            sectionB.q7a || '',
+            sectionB.q7b || '',
+            qf.q7 || '',
+            `Pitch: ${q8a.pitch || ''} | Amp: ${q8a.amp || ''} | Cutoff: ${q8a.cutoff || ''}`,
+            sectionB.q8b || '',
+            qf.q8 || '',
+            sectionC.q9 || '',
+            qf.q9 || '',
+            misc
+          ]
+        })
+      });
+    } catch (_) {}
   }
 
   return jsonResponse({
